@@ -1,4 +1,7 @@
 import { Module } from '@nestjs/common';
+import { NotificationInterfaceResolver } from './notification.resolver';
 
-@Module({})
+@Module({
+  providers: [NotificationInterfaceResolver],
+})
 export class NotificationModule {}

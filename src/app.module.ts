@@ -13,6 +13,7 @@ import { KnownUserService } from './known-user/known-user.service';
 import { KnownUserModule } from './known-user/known-user.module';
 import { FriendService } from './friend/friend.service';
 import { UserService } from './user/user.service';
+import { MeModule } from './me/me.module';
 
 @Module({
   imports: [
@@ -36,9 +37,11 @@ import { UserService } from './user/user.service';
     UserModule,
     KnownUserModule,
     AuthorizationModule,
-    // RequestModule,
-    // NotificationModule,
+    RequestModule,
+    NotificationModule,
     FriendModule,
+    MeModule,
+    RequestModule,
   ],
   // providers: [UserService, KnownUserService, FriendService],
 })
