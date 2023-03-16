@@ -1,0 +1,7 @@
+interface Notification {
+  createdAt: Date!
+  createdBy: User!
+  createdById: HashId!
+  id: HashId!
+  isCreator: Boolean!
+}

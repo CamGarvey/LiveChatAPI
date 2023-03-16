@@ -1,0 +1,188 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                 Int       @id @default(autoincrement())
+  email              String    @unique
+  name               String?
+  username           String    @unique
+  friends            User[]    @relation("Friends")
+  friendsOf          User[]    @relation("Friends")
+  likedMessages      Message[] @relation("MessageLikedBy")
+  creatorOfChats     Chat[]    @relation("ChatCreatedBy")
+  updatedAt          DateTime  @updatedAt
+  createdAt          DateTime  @default(now())
+  alerts             Alert[]   @relation("AlertsReceived")
+  alertsSent         Alert[]   @relation("AlertsSent")
+  requests           Request[] @relation("RequestsReceived")
+  requestsSent       Request[] @relation("RequestsSent")
+  eventsCreated      Event[]   @relation("EventsCreated")
+  memberOfChats      Member[]  @relation()
+  membersAddedToChat Member[]  @relation("AddedBy")
+  membersRemoved     Member[]  @relation("RemovedMembers")
+
+  @@index([username])
+  @@index([email])
+}
+
+// Request is a type of notification that requires action
+// They have a single recipient 
+model Request {
+  id          Int          @id @default(autoincrement())
+  type        RequestType
+  state       RequestState @default(SENT)
+  recipient   User         @relation("RequestsReceived", fields: [recipientId], references: [id])
+  recipientId Int
+  createdBy   User         @relation("RequestsSent", fields: [createdById], references: [id])
+  createdById Int
+  createdAt   DateTime     @unique @default(now())
+  alert       Alert?
+
+  @@unique([recipientId, createdById, type])
+}
+
+enum RequestState {
+  SENT
+  CANCELLED
+  ACCEPTED
+  DECLINED
+}
+
+enum RequestType {
+  FRIEND_REQUEST
+}
+
+// Alert is a type of notifcation that does not require action
+// They can have multiple recipients
+model Alert {
+  id          Int       @id @default(autoincrement())
+  type        AlertType
+  recipients  User[]    @relation("AlertsReceived")
+  createdBy   User      @relation("AlertsSent", fields: [createdById], references: [id])
+  createdById Int
+  createdAt   DateTime  @unique @default(now())
+  chat        Chat?     @relation(fields: [chatId], references: [id])
+  chatId      Int?
+  request     Request?  @relation(references: [id], fields: [requestId], onDelete: Cascade)
+  requestId   Int?      @unique
+
+  @@index([createdById])
+  @@index([chatId])
+  @@index([requestId])
+  @@index([type])
+}
+
+enum AlertType {
+  FRIEND_DELETED
+  REQUEST_ACCEPTED
+  REQUEST_DECLINED
+  CHAT_ACCESS_REVOKED
+  CHAT_ACCESS_GRANTED
+  CHAT_ROLE_CHANGED
+  CHAT_DELETED
+}
+
+model Member {
+  id          Int          @id @default(autoincrement())
+  user        User         @relation(fields: [userId], references: [id])
+  userId      Int
+  chat        Chat         @relation(fields: [chatId], references: [id])
+  chatId      Int
+  role        Role         @default(BASIC)
+  chatUpdates ChatUpdate[]
+  addedBy     User         @relation("AddedBy", fields: [addedById], references: [id])
+  addedById   Int
+  createdAt   DateTime     @default(now())
+
+  removedAt   DateTime?
+  removedBy   User?     @relation("RemovedMembers", fields: [removedById], references: [id])
+  removedById Int?
+
+  @@unique([userId, chatId])
+  @@index([userId, chatId])
+}
+
+enum Role {
+  BASIC
+  ADMIN
+  OWNER
+}
+
+model Chat {
+  id          Int       @id @default(autoincrement())
+  type        ChatType
+  name        String?
+  description String?
+  createdBy   User      @relation("ChatCreatedBy", fields: [createdById], references: [id])
+  createdById Int
+  members     Member[]
+  updatedAt   DateTime  @updatedAt
+  createdAt   DateTime  @default(now())
+  deletedAt   DateTime?
+  event       Event[]   @relation("ChatEvents")
+  alerts      Alert[]
+}
+
+enum ChatType {
+  DIRECT_MESSAGE
+  GROUP
+}
+
+model Event {
+  id          Int         @id @default(autoincrement())
+  type        EventType
+  chat        Chat        @relation("ChatEvents", fields: [chatId], references: [id])
+  chatId      Int
+  createdBy   User        @relation("EventsCreated", fields: [createdById], references: [id])
+  createdById Int
+  updatedAt   DateTime    @updatedAt
+  createdAt   DateTime    @default(now())
+  deletedAt   DateTime?
+  message     Message?
+  chatUpdate  ChatUpdate?
+}
+
+enum EventType {
+  MESSAGE
+  CHAT_UPDATE
+}
+
+model Message {
+  event   Event  @relation(fields: [eventId], references: [id])
+  eventId Int    @unique
+  content String
+  likedBy User[] @relation("MessageLikedBy")
+
+  @@id([eventId])
+}
+
+model ChatUpdate {
+  event             Event          @relation(fields: [eventId], references: [id])
+  eventId           Int            @unique
+  type              ChatUpdateType
+  nameBefore        String?
+  nameAfter         String?
+  descriptionBefore String?
+  descriptionAfter  String?
+  newRole           Role?
+  members           Member[]
+
+  @@id([eventId])
+}
+
+enum ChatUpdateType {
+  MEMBERS_ADDED
+  MEMBERS_REMOVED
+  ROLE_CHANGED
+  NAME_UPDATED
+  DESCRIPTION_UPDATED
+}
