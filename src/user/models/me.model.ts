@@ -1,5 +1,5 @@
 import { ObjectType } from '@nestjs/graphql';
-import Chat from 'src/chat/chat.model';
+import Chat from 'src/chat/models/interfaces/chat.interfaces';
 import KnownUser from 'src/user/models/interfaces/known-user.interface';
 import User from 'src/user/models/interfaces/user.interface';
 

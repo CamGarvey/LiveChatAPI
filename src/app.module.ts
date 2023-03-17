@@ -7,6 +7,8 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthorizationModule } from './authorization/authorization.module';
 import { RequestModule } from './request/request.module';
 import { join } from 'path';
+import { AlertModule } from './alert/alert.module';
+import { EventModule } from './event/event.module';
 
 @Module({
   imports: [
@@ -23,6 +25,8 @@ import { join } from 'path';
     AuthorizationModule,
     RequestModule,
     RequestModule,
+    AlertModule,
+    EventModule,
   ],
   // providers: [UserService, KnownUserService, FriendService],
 })

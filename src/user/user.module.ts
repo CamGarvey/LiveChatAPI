@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { PubSubModule } from 'src/pubsub/pubsub.module';
 import { PrismaModule } from '../prisma/prisma.module';
 import { FriendResolver } from './resolvers/friend.resolver';
 import { KnownUserInterfaceResolver } from './resolvers/known-user.resolver';
@@ -14,6 +15,7 @@ import { UserService } from './user.service';
     KnownUserInterfaceResolver,
     UserService,
   ],
-  imports: [PrismaModule],
+  imports: [PrismaModule, PubSubModule],
+  exports: [UserService],
 })
 export class UserModule {}

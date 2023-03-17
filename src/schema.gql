@@ -2,11 +2,45 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+interface Alert {
+  createdAt: DateTime!
+  createdBy: User!
+  createdById: Float!
+  id: ID!
+  isCreator: Boolean!
+  recipient: User!
+  recipientId: Float!
+}
+
 interface Chat {
   createdAt: DateTime!
   createdBy: User!
   id: ID!
   updatedAt: DateTime!
+}
+
+interface ChatAlert implements Alert {
+  chat: Chat!
+  chatId: Float!
+  createdAt: DateTime!
+  createdBy: User!
+  createdById: Float!
+  id: ID!
+  isCreator: Boolean!
+  recipient: User!
+  recipientId: Float!
+}
+
+type ChatDeletedAlert implements Alert {
+  chat: User!
+  chatId: Float!
+  createdAt: DateTime!
+  createdBy: User!
+  createdById: Float!
+  id: ID!
+  isCreator: Boolean!
+  recipient: User!
+  recipientId: Float!
 }
 
 """
@@ -23,9 +57,32 @@ type Friend implements KnownUser & User {
   username: String!
 }
 
+type FriendDeletedAlert implements Alert {
+  createdAt: DateTime!
+  createdBy: User!
+  createdById: Float!
+  id: ID!
+  isCreator: Boolean!
+  recipient: User!
+  recipientId: Float!
+  user: User!
+  userId: Float!
+}
+
 type FriendEdge {
   cursor: String!
   node: Friend!
+}
+
+type FriendRequest implements Request {
+  createdAt: DateTime!
+  createdBy: User!
+  createdById: Float!
+  id: ID!
+  isCreator: Boolean!
+  recipient: User!
+  recipientId: Float!
+  state: RequestState!
 }
 
 interface KnownUser {
@@ -43,8 +100,11 @@ type Me implements KnownUser & User {
 
 type Mutation {
   acceptRequest(requestId: Float!): Request!
+  acknowledgeAlert: Alert!
   cancelRequest(requestId: Float!): Request!
   declineRequest(requestId: Float!): Request!
+  deleteFriend(userId: Float!): Stranger!
+  sendFriendRequest(userId: Float!): FriendRequest!
 }
 
 type PageInfo {
@@ -61,6 +121,7 @@ type PaginatedUser {
 }
 
 type Query {
+  alerts: [Alert!]!
   me: Me!
   users(after: String, before: String, filter: String, first: Int, last: Int): PaginatedUser!
 }
@@ -76,11 +137,32 @@ interface Request {
   state: RequestState!
 }
 
+interface RequestResponseAlert implements Alert {
+  createdAt: DateTime!
+  createdBy: User!
+  createdById: Float!
+  id: ID!
+  isCreator: Boolean!
+  recipient: User!
+  recipientId: Float!
+  request: Request!
+  requestId: Float!
+}
+
 enum RequestState {
   ACCEPTED
   CANCELLED
   DECLINED
   SENT
+}
+
+type Stranger implements User {
+  createdAt: DateTime!
+  friendRequest: FriendRequest
+  id: ID!
+  name: String
+  updatedAt: DateTime!
+  username: String!
 }
 
 interface User {

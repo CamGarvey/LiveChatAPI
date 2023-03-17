@@ -1,12 +1,7 @@
 import { Field, ID, InterfaceType } from '@nestjs/graphql';
-import Friend from '../friend.model';
 
-@InterfaceType({
-  resolveType: () => {
-    return Friend;
-  },
-})
-export default class User {
+@InterfaceType()
+export default class Event {
   @Field(() => ID)
   id: number;
 
