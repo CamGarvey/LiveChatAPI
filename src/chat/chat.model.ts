@@ -1,5 +1,5 @@
 import { Field, ID, InterfaceType } from '@nestjs/graphql';
-import User from 'src/user/user.model';
+import User from 'src/user/models/interfaces/user.interface';
 
 @InterfaceType()
 export default abstract class Chat {

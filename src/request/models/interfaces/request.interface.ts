@@ -1,17 +1,31 @@
 import { Field, ID, InterfaceType, registerEnumType } from '@nestjs/graphql';
-import Notification from 'src/notification/notification.model';
-import User from '../user/user.model';
+import User from '../../../user/models/interfaces/user.interface';
 
 @InterfaceType()
-export default abstract class Request extends Notification {
+export default abstract class Request {
+  @Field(() => ID)
+  id: number;
+
+  @Field(() => User)
+  createdBy: User;
+
+  @Field()
+  createdById: number;
+
+  @Field()
+  isCreator: boolean;
+
   @Field(() => User)
   recipient: User;
 
-  @Field(() => ID)
+  @Field()
   recipientId: number;
 
   @Field(() => RequestState)
   state: RequestState;
+
+  @Field(() => Date)
+  createdAt: Date;
 }
 
 export enum RequestState {

@@ -24,7 +24,7 @@ model User {
   alerts             Alert[]   @relation("AlertsReceived")
   alertsSent         Alert[]   @relation("AlertsSent")
   requests           Request[] @relation("RequestsReceived")
-  requestsSent       Request[] @relation("RequestsSent")
+  sentRequests       Request[] @relation("SentRequests")
   eventsCreated      Event[]   @relation("EventsCreated")
   memberOfChats      Member[]  @relation()
   membersAddedToChat Member[]  @relation("AddedBy")
@@ -42,7 +42,7 @@ model Request {
   state       RequestState @default(SENT)
   recipient   User         @relation("RequestsReceived", fields: [recipientId], references: [id])
   recipientId Int
-  createdBy   User         @relation("RequestsSent", fields: [createdById], references: [id])
+  createdBy   User         @relation("SentRequests", fields: [createdById], references: [id])
   createdById Int
   createdAt   DateTime     @unique @default(now())
   alert       Alert?

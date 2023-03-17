@@ -32,6 +32,21 @@ interface KnownUser {
   chats(after: String, before: String, filter: String, first: Int, last: Int): [Chat!]!
 }
 
+type Me implements KnownUser & User {
+  chats(after: String, before: String, filter: String, first: Int, last: Int): [Chat!]!
+  createdAt: DateTime!
+  id: ID!
+  name: String
+  updatedAt: DateTime!
+  username: String!
+}
+
+type Mutation {
+  acceptRequest(requestId: Float!): Request!
+  cancelRequest(requestId: Float!): Request!
+  declineRequest(requestId: Float!): Request!
+}
+
 type PageInfo {
   endCursor: String!
   hasNextPage: Boolean!
@@ -39,13 +54,33 @@ type PageInfo {
   startCursor: String!
 }
 
-type PaginatedFriend {
-  edges: [FriendEdge!]
+type PaginatedUser {
+  edges: [UserEdge!]
   pageInfo: PageInfo!
+  totalCount: Float!
 }
 
 type Query {
-  friends(after: String, before: String, filter: String, first: Int, last: Int): PaginatedFriend!
+  me: Me!
+  users(after: String, before: String, filter: String, first: Int, last: Int): PaginatedUser!
+}
+
+interface Request {
+  createdAt: DateTime!
+  createdBy: User!
+  createdById: Float!
+  id: ID!
+  isCreator: Boolean!
+  recipient: User!
+  recipientId: Float!
+  state: RequestState!
+}
+
+enum RequestState {
+  ACCEPTED
+  CANCELLED
+  DECLINED
+  SENT
 }
 
 interface User {
@@ -54,4 +89,9 @@ interface User {
   name: String
   updatedAt: DateTime!
   username: String!
+}
+
+type UserEdge {
+  cursor: String!
+  node: User!
 }

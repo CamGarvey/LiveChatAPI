@@ -1,7 +1,11 @@
 import { Field, ID, InterfaceType } from '@nestjs/graphql';
+import { User as PrismaUser } from '@prisma/client';
+import Friend from '../friend.model';
 
-@InterfaceType()
-export default abstract class User {
+@InterfaceType({
+  resolveType: () => Friend,
+})
+export default class User {
   @Field(() => ID)
   id: number;
 

@@ -1,6 +1,5 @@
 import { Field, ObjectType, Int, ArgsType } from '@nestjs/graphql';
 import { Type } from '@nestjs/common';
-import { PageInfo } from '@devoxa/prisma-relay-cursor-connection';
 
 interface IPageInfo {
   endCursor: string;
@@ -17,24 +16,25 @@ interface IEdgeType<T> {
 export interface IPaginatedType<T> {
   edges: IEdgeType<T>[];
   pageInfo: PageInfo;
+  totalCount: number;
+}
+
+@ObjectType()
+class PageInfo implements IPageInfo {
+  @Field((type) => String)
+  endCursor: string;
+
+  @Field((type) => Boolean)
+  hasNextPage: boolean;
+
+  @Field((type) => Boolean)
+  hasPreviousPage: boolean;
+
+  @Field((type) => String)
+  startCursor: string;
 }
 
 export function Paginated<T>(classRef: Type<T>): Type<IPaginatedType<T>> {
-  @ObjectType()
-  class PageInfo implements IPageInfo {
-    @Field((type) => String)
-    endCursor: string;
-
-    @Field((type) => Boolean)
-    hasNextPage: boolean;
-
-    @Field((type) => Boolean)
-    hasPreviousPage: boolean;
-
-    @Field((type) => String)
-    startCursor: string;
-  }
-
   @ObjectType(`${classRef.name}Edge`)
   abstract class EdgeType {
     @Field((type) => String)
@@ -51,6 +51,9 @@ export function Paginated<T>(classRef: Type<T>): Type<IPaginatedType<T>> {
 
     @Field((type) => PageInfo)
     pageInfo: PageInfo;
+
+    @Field()
+    totalCount: number;
   }
   return PaginatedType as Type<IPaginatedType<T>>;
 }
