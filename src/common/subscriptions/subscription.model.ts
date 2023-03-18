@@ -1,4 +1,4 @@
-import { Alert, Chat, Request } from '@prisma/client';
+import { Alert, Chat, Event, Request } from '@prisma/client';
 
 export type EventPayload = {
   recipients: number[];

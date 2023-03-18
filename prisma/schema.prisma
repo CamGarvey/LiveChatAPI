@@ -166,9 +166,8 @@ model Message {
 }
 
 model ChatUpdate {
-  event             Event          @relation(fields: [eventId], references: [id])
-  eventId           Int            @unique
-  type              ChatUpdateType
+  event             Event    @relation(fields: [eventId], references: [id])
+  eventId           Int      @unique
   nameBefore        String?
   nameAfter         String?
   descriptionBefore String?

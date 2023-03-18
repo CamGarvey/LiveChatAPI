@@ -48,6 +48,29 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type DeletedEvent implements Event {
+  chat: Chat!
+  chatId: Float!
+  createdAt: DateTime!
+  createdBy: User!
+  createdById: Float!
+  deletedAt: DateTime!
+  id: ID!
+  isCreator: Boolean!
+  updatedAt: DateTime!
+}
+
+interface Event {
+  chat: Chat!
+  chatId: Float!
+  createdAt: DateTime!
+  createdBy: User!
+  createdById: Float!
+  id: ID!
+  isCreator: Boolean!
+  updatedAt: DateTime!
+}
+
 type Friend implements KnownUser & User {
   chats(after: String, before: String, filter: String, first: Int, last: Int): [Chat!]!
   createdAt: DateTime!
@@ -104,6 +127,7 @@ type Mutation {
   cancelRequest(requestId: Float!): Request!
   declineRequest(requestId: Float!): Request!
   deleteFriend(userId: Float!): Stranger!
+  deletedEvent(eventId: Float!): DeletedEvent!
   sendFriendRequest(userId: Float!): FriendRequest!
 }
 
