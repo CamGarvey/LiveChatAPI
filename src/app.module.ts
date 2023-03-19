@@ -9,6 +9,7 @@ import { RequestModule } from './request/request.module';
 import { join } from 'path';
 import { AlertModule } from './alert/alert.module';
 import { EventModule } from './event/event.module';
+import { MemberModule } from './member/member.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { EventModule } from './event/event.module';
     RequestModule,
     AlertModule,
     EventModule,
+    MemberModule,
   ],
   // providers: [UserService, KnownUserService, FriendService],
 })
