@@ -10,6 +10,9 @@ import { join } from 'path';
 import { AlertModule } from './alert/alert.module';
 import { EventModule } from './event/event.module';
 import { MemberModule } from './member/member.module';
+import { PayloadModule } from './payload/payload.module';
+import { MessageModule } from './message/message.module';
+import { ChatUpdateModule } from './chat-update/chat-update.module';
 
 @Module({
   imports: [
@@ -29,6 +32,9 @@ import { MemberModule } from './member/member.module';
     AlertModule,
     EventModule,
     MemberModule,
+    PayloadModule,
+    MessageModule,
+    ChatUpdateModule,
   ],
   // providers: [UserService, KnownUserService, FriendService],
 })

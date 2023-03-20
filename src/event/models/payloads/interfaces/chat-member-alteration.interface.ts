@@ -1,14 +1,9 @@
-import { InterfaceType } from '@nestjs/graphql';
-import { ChatUpdate as PrismaChatUpdate } from '@prisma/client';
+import { Field, InterfaceType } from '@nestjs/graphql';
+import Member from 'src/member/models/interfaces/member.interface';
 import ChatUpdate from './chat-update.interface';
 
-@InterfaceType({
-  implements: () => ChatUpdate,
-  resolveType: (value: PrismaChatUpdate) => {
-    switch (value.type) {
-      case 'NAME_UPDATED':
-        return null;
-    }
-  },
-})
-export default abstract class ChatMemberAlteration implements ChatUpdate {}
+@InterfaceType()
+export default class ChatMemberAlteration implements ChatUpdate {
+  @Field(() => [Member])
+  members: Member[];
+}

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
+import { Event, Prisma } from '@prisma/client';
 import { Subscription } from 'src/common/subscriptions/subscription.enum';
 import { EventPayload } from 'src/common/subscriptions/subscription.model';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -14,7 +14,15 @@ export class EventService {
     private readonly pubsub: PubSubService,
   ) {}
 
-  async deleteEvent(eventId: number) {
+  getEvent(eventId: number): Prisma.Prisma__EventClient<Event> {
+    return this.prisma.event.findUniqueOrThrow({
+      where: {
+        id: eventId,
+      },
+    });
+  }
+
+  async deleteEvent(eventId: number): Promise<Event> {
     const event = await this.prisma.event.update({
       data: {
         deletedAt: new Date(),

@@ -1,13 +1,5 @@
-import {
-  Resolver,
-  Args,
-  Query,
-  ObjectType,
-  ResolveField,
-  Mutation,
-} from '@nestjs/graphql';
+import { Resolver, Args, Query, ObjectType, Mutation } from '@nestjs/graphql';
 import { FilterPaginationArgs, Paginated } from 'src/common/pagination';
-import Friend from '../models/friend.model';
 import User from '../models/interfaces/user.interface';
 import Stranger from '../models/stranger.model';
 import { UserService } from '../user.service';

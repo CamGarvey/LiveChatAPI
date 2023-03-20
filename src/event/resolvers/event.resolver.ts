@@ -12,7 +12,7 @@ import DeletedEvent from '../models/deleted-event.model';
 import Event from '../models/interfaces/event.interface';
 
 @Resolver(() => Event)
-export class EventResolver {
+export class EventInterfaceResolver {
   constructor(
     private readonly eventService: EventService,
     private readonly chatService: ChatService,
