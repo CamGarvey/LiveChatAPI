@@ -4,9 +4,11 @@ import { PrismaModule } from 'src/prisma/prisma.module';
 import { PubSubModule } from 'src/pubsub/pubsub.module';
 import { UserModule } from 'src/user/user.module';
 import { EventService } from './event.service';
+import { CreatedEventResolver } from './resolvers/created-event.resolver';
+import { EventInterfaceResolver } from './resolvers/event.resolver';
 
 @Module({
-  providers: [EventService],
+  providers: [EventService, EventInterfaceResolver, CreatedEventResolver],
   imports: [PrismaModule, PubSubModule, ChatModule, UserModule],
 })
 export class EventModule {}

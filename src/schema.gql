@@ -121,6 +121,22 @@ type Me implements KnownUser & User {
   username: String!
 }
 
+interface Member {
+  addedBy: User!
+  addedById: Float!
+  chat: Chat!
+  chatId: Float!
+  role: MemberRole!
+  user: User!
+  userId: Float!
+}
+
+enum MemberRole {
+  Admin
+  Basic
+  Owner
+}
+
 type Mutation {
   acceptRequest(requestId: Float!): Request!
   acknowledgeAlert: Alert!

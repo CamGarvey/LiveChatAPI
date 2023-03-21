@@ -1,12 +1,11 @@
 import { Parent, ResolveField, Resolver } from '@nestjs/graphql';
 import { EventService } from '../event.service';
-import Event from '../models/interfaces/event.interface';
 import CreatedEvent from '../models/created-event.model';
 import { GraphQLError } from 'graphql';
 import ChatUpdate from '../models/payloads/interfaces/chat-update.interface';
 import Message from '../models/payloads/message.model';
 
-@Resolver(() => Event)
+@Resolver(() => CreatedEvent)
 export class CreatedEventResolver {
   constructor(private readonly eventService: EventService) {}
 
