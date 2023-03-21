@@ -10,7 +10,7 @@ export class CreatedEventResolver {
   constructor(private readonly eventService: EventService) {}
 
   @ResolveField()
-  async payload(@Parent() parent: CreatedEvent): Promise<Message | ChatUpdate> {
+  async payload(@Parent() parent: CreatedEvent) {
     const event = this.eventService.getEvent(parent.id);
 
     switch (parent.type) {

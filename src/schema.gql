@@ -15,7 +15,9 @@ interface Alert {
 interface Chat {
   createdAt: DateTime!
   createdBy: User!
+  createdById: Float!
   id: ID!
+  isCreator: Boolean!
   updatedAt: DateTime!
 }
 
@@ -41,6 +43,42 @@ type ChatDeletedAlert implements Alert {
   isCreator: Boolean!
   recipient: User!
   recipientId: Float!
+}
+
+type ChatDescriptionUpdate implements ChatUpdate {
+  descriptionAfter: String!
+  descriptionBefore: String!
+  event: Event!
+  eventId: Float!
+}
+
+interface ChatMemberAlteration {
+  members: [Member!]!
+}
+
+type ChatMembersAddedUpdate implements ChatMemberAlteration {
+  members: [Member!]!
+}
+
+type ChatMembersRemovedUpdate implements ChatMemberAlteration {
+  members: [Member!]!
+}
+
+interface ChatUpdate {
+  event: Event!
+  eventId: Float!
+}
+
+type CreatedEvent implements Event {
+  chat: Chat!
+  chatId: Float!
+  createdAt: DateTime!
+  createdBy: User!
+  createdById: Float!
+  id: ID!
+  isCreator: Boolean!
+  payload: PayloadUnion!
+  updatedAt: DateTime!
 }
 
 """
@@ -69,6 +107,11 @@ interface Event {
   id: ID!
   isCreator: Boolean!
   updatedAt: DateTime!
+}
+
+type EventEdge {
+  cursor: String!
+  node: Event!
 }
 
 type Friend implements KnownUser & User {
@@ -108,6 +151,19 @@ type FriendRequest implements Request {
   state: RequestState!
 }
 
+type GroupChat implements Chat {
+  createdAt: DateTime!
+  createdBy: User!
+  createdById: Float!
+  description: String!
+  id: ID!
+  isCreator: Boolean!
+  members(after: String, before: String, first: Int, last: Int): PaginatedMember!
+  name: String!
+  role: MemberRole!
+  updatedAt: DateTime!
+}
+
 interface KnownUser {
   chats(after: String, before: String, filter: String, first: Int, last: Int): [Chat!]!
 }
@@ -131,10 +187,20 @@ interface Member {
   userId: Float!
 }
 
+type MemberEdge {
+  cursor: String!
+  node: Member!
+}
+
 enum MemberRole {
   Admin
   Basic
   Owner
+}
+
+type Message {
+  content: String!
+  likedBy: [User!]!
 }
 
 type Mutation {
@@ -154,14 +220,31 @@ type PageInfo {
   startCursor: String!
 }
 
+type PaginatedEvent {
+  edges: [EventEdge!]
+  pageInfo: PageInfo!
+  totalCount: Float!
+}
+
+type PaginatedMember {
+  edges: [MemberEdge!]
+  pageInfo: PageInfo!
+  totalCount: Float!
+}
+
 type PaginatedUser {
   edges: [UserEdge!]
   pageInfo: PageInfo!
   totalCount: Float!
 }
 
+union PayloadUnion = ChatDescriptionUpdate | ChatMembersAddedUpdate | ChatMembersRemovedUpdate | Message
+
 type Query {
   alerts: [Alert!]!
+  chat(chatId: Float!): Chat!
+  event(eventId: Float!): Event!
+  events(after: String, before: String, chatId: Float!, first: Int, last: Int): PaginatedEvent!
   me: Me!
   users(after: String, before: String, filter: String, first: Int, last: Int): PaginatedUser!
 }

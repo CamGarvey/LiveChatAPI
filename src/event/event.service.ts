@@ -1,5 +1,10 @@
+import {
+  Connection,
+  findManyCursorConnection,
+} from '@devoxa/prisma-relay-cursor-connection';
 import { Injectable } from '@nestjs/common';
 import { Event, Prisma } from '@prisma/client';
+import { PaginationArgs } from 'src/common/pagination';
 import { Subscription } from 'src/common/subscriptions/subscription.enum';
 import { EventPayload } from 'src/common/subscriptions/subscription.model';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -20,6 +25,40 @@ export class EventService {
         id: eventId,
       },
     });
+  }
+
+  getEvents(chatId: number, args: PaginationArgs): Promise<Connection<Event>> {
+    return findManyCursorConnection<
+      Event,
+      Pick<Prisma.UserWhereUniqueInput, 'id'>
+    >(
+      (args) => {
+        return this.prisma.event.findMany({
+          ...args,
+          ...{
+            where: { chatId },
+            orderBy: {
+              createdAt: 'asc',
+            },
+          },
+        });
+      },
+
+      () =>
+        this.prisma.event.count({
+          where: {
+            id: chatId,
+          },
+        }),
+      args,
+      {
+        getCursor: (record) => ({ id: record.id }),
+        encodeCursor: (cursor) =>
+          Buffer.from(JSON.stringify(cursor)).toString('base64'),
+        decodeCursor: (cursor) =>
+          JSON.parse(Buffer.from(cursor, 'base64').toString('ascii')),
+      },
+    );
   }
 
   async deleteEvent(eventId: number): Promise<Event> {

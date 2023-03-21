@@ -37,7 +37,4 @@ export default class Event {
 
   @Field(() => Date)
   updatedAt: Date;
-
-  // @Field(() => EventType)
-  // type: EventType;
 }

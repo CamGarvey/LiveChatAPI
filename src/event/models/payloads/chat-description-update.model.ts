@@ -1,4 +1,5 @@
 import { Field, ObjectType } from '@nestjs/graphql';
+import Event from '../interfaces/event.interface';
 import ChatUpdate from './interfaces/chat-update.interface';
 
 @ObjectType({
@@ -10,4 +11,7 @@ export default class ChatDescriptionUpdate implements ChatUpdate {
 
   @Field()
   descriptionAfter: string;
+
+  event: Event;
+  eventId: number;
 }

@@ -1,9 +1,8 @@
-import { Connection } from '@devoxa/prisma-relay-cursor-connection';
-import { Resolver, Args, Query, ObjectType } from '@nestjs/graphql';
-import { ChatService } from 'src/chat/chat.service';
-import { Paginated, PaginationArgs } from 'src/common/pagination';
+import { Resolver, Args, Query } from '@nestjs/graphql';
+import { PaginationArgs } from 'src/common/pagination';
 import { MemberService } from '../member.service';
 import Member from '../models/interfaces/member.interface';
+import { PaginatedMember } from '../models/paginated-member.model';
 
 @Resolver(() => Member)
 export class MemberInterfaceResolver {
@@ -14,6 +13,3 @@ export class MemberInterfaceResolver {
     return await this.memberService.getMembers(chatId, args);
   }
 }
-
-@ObjectType()
-export class PaginatedMember extends Paginated(Member) {}

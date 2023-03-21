@@ -1,11 +1,15 @@
 import {
   Args,
   Mutation,
+  ObjectType,
   Parent,
+  Query,
   ResolveField,
   Resolver,
 } from '@nestjs/graphql';
 import { ChatService } from 'src/chat/chat.service';
+import { Paginated, PaginationArgs } from 'src/common/pagination';
+import { CurrentUser } from 'src/common/user.decorator';
 import { UserService } from 'src/user/user.service';
 import { EventService } from '../event.service';
 import DeletedEvent from '../models/deleted-event.model';
@@ -29,8 +33,26 @@ export class EventInterfaceResolver {
     return this.userService.getUser(parent.createdById);
   }
 
+  @ResolveField()
+  async isCreator(@Parent() parent: Event, @CurrentUser() userId: number) {
+    return parent.createdById === userId;
+  }
+
+  @Query(() => Event)
+  async event(@Args('eventId') eventId: number) {
+    return this.eventService.getEvent(eventId);
+  }
+
+  @Query(() => PaginatedEvent)
+  async events(@Args('chatId') chatId: number, @Args() args: PaginationArgs) {
+    return this.eventService.getEvents(chatId, args);
+  }
+
   @Mutation(() => DeletedEvent)
   async deletedEvent(@Args('eventId') eventId: number) {
     return this.eventService.deleteEvent(eventId);
   }
 }
+
+@ObjectType()
+export class PaginatedEvent extends Paginated(Event) {}

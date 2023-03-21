@@ -9,6 +9,12 @@ export default abstract class Chat {
   @Field(() => User)
   createdBy: User;
 
+  @Field()
+  createdById: number;
+
+  @Field()
+  isCreator: boolean;
+
   @Field(() => Date)
   createdAt: Date;
 

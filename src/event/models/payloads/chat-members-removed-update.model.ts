@@ -1,5 +1,6 @@
 import { ObjectType } from '@nestjs/graphql';
 import Member from 'src/member/models/interfaces/member.interface';
+import Event from '../interfaces/event.interface';
 import ChatMemberAlteration from './interfaces/chat-member-alteration.interface';
 
 @ObjectType({
@@ -7,4 +8,7 @@ import ChatMemberAlteration from './interfaces/chat-member-alteration.interface'
 })
 export default class ChatMembersRemovedUpdate implements ChatMemberAlteration {
   members: Member[];
+
+  event: Event;
+  eventId: number;
 }
