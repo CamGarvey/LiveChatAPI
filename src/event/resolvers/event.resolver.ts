@@ -9,7 +9,7 @@ import {
 } from '@nestjs/graphql';
 import { ChatService } from 'src/chat/chat.service';
 import { Paginated, PaginationArgs } from 'src/common/pagination';
-import { CurrentUser } from 'src/common/user.decorator';
+import { CurrentUserId } from 'src/current-user-id/user-id.decorator';
 import { UserService } from 'src/user/user.service';
 import { EventService } from '../event.service';
 import DeletedEvent from '../models/deleted-event.model';
@@ -34,7 +34,7 @@ export class EventInterfaceResolver {
   }
 
   @ResolveField()
-  async isCreator(@Parent() parent: Event, @CurrentUser() userId: number) {
+  async isCreator(@Parent() parent: Event, @CurrentUserId() userId: number) {
     return parent.createdById === userId;
   }
 

@@ -1,4 +1,6 @@
 import { Module } from '@nestjs/common';
+import { CommonModule } from 'src/common/common.module';
+import { HashModule } from 'src/hash/hash.module';
 import { PubSubModule } from 'src/pubsub/pubsub.module';
 import { PrismaModule } from '../prisma/prisma.module';
 import { FriendResolver } from './resolvers/friend.resolver';

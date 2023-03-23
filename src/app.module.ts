@@ -16,6 +16,11 @@ import corsConfig from './config/cors.config';
 import databaseConfig from './config/database.config';
 import hashConfig from './config/hash.config';
 import redisConfig from './config/redis.config';
+import { JwtStrategy } from './auth/jwt.strategy';
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
+import { CommonModule } from './common/common.module';
+import { HashModule } from './hash/hash.module';
+import { CurrentUserIdModule } from './current-user-id/current-user-id.module';
 
 @Module({
   imports: [
@@ -36,6 +41,8 @@ import redisConfig from './config/redis.config';
         'graphql-ws': true,
       },
       sortSchema: true,
+      playground: false,
+      plugins: [ApolloServerPluginLandingPageLocalDefault()],
     }),
     UserModule,
     RequestModule,
@@ -44,6 +51,10 @@ import redisConfig from './config/redis.config';
     EventModule,
     MemberModule,
     AuthModule,
+    CommonModule,
+    HashModule,
+    CurrentUserIdModule,
   ],
+  providers: [JwtStrategy],
 })
 export class AppModule {}

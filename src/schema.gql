@@ -117,7 +117,7 @@ type EventEdge {
 type Friend implements KnownUser & User {
   chats(after: String, before: String, filter: String, first: Int, last: Int): [Chat!]!
   createdAt: DateTime!
-  id: ID!
+  id: HashId!
   name: String
   updatedAt: DateTime!
   username: String!
@@ -164,6 +164,9 @@ type GroupChat implements Chat {
   updatedAt: DateTime!
 }
 
+"""Hash Id custom scalar type"""
+scalar HashId
+
 interface KnownUser {
   chats(after: String, before: String, filter: String, first: Int, last: Int): [Chat!]!
 }
@@ -171,7 +174,7 @@ interface KnownUser {
 type Me implements KnownUser & User {
   chats(after: String, before: String, filter: String, first: Int, last: Int): [Chat!]!
   createdAt: DateTime!
-  id: ID!
+  id: HashId!
   name: String
   updatedAt: DateTime!
   username: String!
@@ -282,7 +285,7 @@ enum RequestState {
 type Stranger implements User {
   createdAt: DateTime!
   friendRequest: FriendRequest
-  id: ID!
+  id: HashId!
   name: String
   updatedAt: DateTime!
   username: String!
@@ -290,7 +293,7 @@ type Stranger implements User {
 
 interface User {
   createdAt: DateTime!
-  id: ID!
+  id: HashId!
   name: String
   updatedAt: DateTime!
   username: String!

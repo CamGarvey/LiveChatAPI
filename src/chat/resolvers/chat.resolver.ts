@@ -1,6 +1,6 @@
 import { Args, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { ChatService } from 'src/chat/chat.service';
-import { CurrentUser } from 'src/common/user.decorator';
+import { CurrentUserId } from 'src/common/user.decorator';
 import { UserService } from 'src/user/user.service';
 import Chat from '../models/interfaces/chat.interfaces';
 
@@ -17,7 +17,7 @@ export class ChatInterfaceResolver {
   }
 
   @ResolveField()
-  async isCreator(@Parent() parent: Chat, @CurrentUser() userId: number) {
+  async isCreator(@Parent() parent: Chat, @CurrentUserId() userId: number) {
     return parent.createdById === userId;
   }
 
