@@ -33,7 +33,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  validate(payload: IChatJwtPayload) {
+  async validate(payload: IChatJwtPayload): Promise<IAuthUser> {
     if (!this.hasRequireScope(payload)) {
       throw new UnauthorizedException(
         'JWT does not possess the required scope (`openid profile email`).',
@@ -44,7 +44,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       payload['http://localhost:4000/user_id'],
     );
 
-    return { id: userId, user: { id: 2 } };
+    return { id: userId };
   }
 
   hasRequireScope(payload: IChatJwtPayload) {

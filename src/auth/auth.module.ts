@@ -8,7 +8,7 @@ import { JwtStrategy } from './jwt.strategy';
 @Module({
   imports: [
     ConfigModule.forFeature(authConfig),
-    // PassportModule.register({ defaultStrategy: 'jwt' }),
+    PassportModule.register({ defaultStrategy: 'jwt' }),
     HashModule,
   ],
   providers: [JwtStrategy],

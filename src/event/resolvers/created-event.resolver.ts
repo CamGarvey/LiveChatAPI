@@ -1,4 +1,5 @@
 import {
+  GqlExecutionContext,
   Parent,
   Query,
   ResolveField,
@@ -10,6 +11,8 @@ import CreatedEvent from '../models/created-event.model';
 import { GraphQLError } from 'graphql';
 import { PubSubService } from 'src/pubsub/pubsub.service';
 import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-triggers.enum';
+import { IContext } from 'src/auth/interfaces/context.interface';
+import { EventPayload } from 'src/common/subscriptions/subscription.model';
 
 @Resolver(() => CreatedEvent)
 export class CreatedEventResolver {
@@ -32,14 +35,18 @@ export class CreatedEventResolver {
     }
   }
 
-  @Subscription(() => CreatedEvent)
+  @Subscription(() => CreatedEvent, {
+    filter(payload: EventPayload, variables, { user }: IContext) {
+      if (variables.chatId) {
+        return (
+          payload.content.createdById !== user.id &&
+          payload.content.chatId == variables.chatId
+        );
+      }
+      return payload.recipients.includes(user.id);
+    },
+  })
   async eventCreated() {
     return this.pubsub.asyncIterator(SubscriptionTriggers.EventCreated);
-  }
-
-  @Query(() => CreatedEvent)
-  async test() {
-    this.pubsub.publish(SubscriptionTriggers.EventCreated, {});
-    return { deletedAt: new Date() };
   }
 }
