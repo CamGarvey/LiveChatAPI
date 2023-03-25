@@ -7,9 +7,10 @@ import {
   ResolveField,
   Resolver,
 } from '@nestjs/graphql';
+import { IAuthUser } from 'src/auth/interfaces/auth-user.interface';
 import { ChatService } from 'src/chat/chat.service';
+import { CurrentUser } from 'src/common/current-user.decorator';
 import { Paginated, PaginationArgs } from 'src/common/pagination';
-import { CurrentUserId } from 'src/current-user-id/current-user-id.decorator';
 import { UserService } from 'src/user/user.service';
 import { EventService } from '../event.service';
 import DeletedEvent from '../models/deleted-event.model';
@@ -34,8 +35,8 @@ export class EventInterfaceResolver {
   }
 
   @ResolveField()
-  async isCreator(@Parent() parent: Event, @CurrentUserId() userId: number) {
-    return parent.createdById === userId;
+  async isCreator(@Parent() parent: Event, @CurrentUser() user: IAuthUser) {
+    return parent.createdById === user.id;
   }
 
   @Query(() => Event)

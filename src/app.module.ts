@@ -20,7 +20,8 @@ import { JwtStrategy } from './auth/jwt.strategy';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { CommonModule } from './common/common.module';
 import { HashModule } from './hash/hash.module';
-import { CurrentUserIdModule } from './current-user-id/current-user-id.module';
+import { APP_GUARD } from '@nestjs/core';
+import { GqlAuthGuard } from './auth/gql-auth.guard';
 
 @Module({
   imports: [
@@ -36,13 +37,13 @@ import { CurrentUserIdModule } from './current-user-id/current-user-id.module';
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
-      context: ({ req }) => ({ req, currentUserId: 2 }),
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       subscriptions: {
         'graphql-ws': true,
       },
       sortSchema: true,
       playground: false,
+
       plugins: [ApolloServerPluginLandingPageLocalDefault()],
     }),
     UserModule,
@@ -54,8 +55,13 @@ import { CurrentUserIdModule } from './current-user-id/current-user-id.module';
     AuthModule,
     CommonModule,
     HashModule,
-    CurrentUserIdModule,
   ],
-  providers: [JwtStrategy],
+  providers: [
+    JwtStrategy,
+    {
+      provide: APP_GUARD,
+      useClass: GqlAuthGuard,
+    },
+  ],
 })
 export class AppModule {}

@@ -249,6 +249,7 @@ type Query {
   event(eventId: Float!): Event!
   events(after: String, before: String, chatId: Float!, first: Int, last: Int): PaginatedEvent!
   me: Me!
+  test: CreatedEvent!
   users(after: String, before: String, filter: String, first: Int, last: Int): PaginatedUser!
 }
 

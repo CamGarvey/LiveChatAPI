@@ -8,8 +8,6 @@ import {
 import { EventService } from '../event.service';
 import CreatedEvent from '../models/created-event.model';
 import { GraphQLError } from 'graphql';
-import ChatUpdate from '../models/payloads/interfaces/chat-update.interface';
-import Message from '../models/payloads/message.model';
 import { PubSubService } from 'src/pubsub/pubsub.service';
 import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-triggers.enum';
 
@@ -34,13 +32,14 @@ export class CreatedEventResolver {
     }
   }
 
-  @Subscription(() => CreatedEvent, {
-    filter(payload, variables, context) {
-      console.log({ payload, variables, context });
-      return true;
-    },
-  })
+  @Subscription(() => CreatedEvent)
   async eventCreated() {
     return this.pubsub.asyncIterator(SubscriptionTriggers.EventCreated);
+  }
+
+  @Query(() => CreatedEvent)
+  async test() {
+    this.pubsub.publish(SubscriptionTriggers.EventCreated, {});
+    return { deletedAt: new Date() };
   }
 }

@@ -1,4 +1,6 @@
 import { Query, Resolver } from '@nestjs/graphql';
+import { IAuthUser } from 'src/auth/interfaces/auth-user.interface';
+import { CurrentUser } from 'src/common/current-user.decorator';
 import Me from '../models/me.model';
 import { UserService } from '../user.service';
 
@@ -7,7 +9,7 @@ export class MeResolver {
   constructor(private readonly userService: UserService) {}
 
   @Query(() => Me)
-  async me() {
-    return this.userService.getUser(204);
+  async me(@CurrentUser() user: IAuthUser) {
+    return this.userService.getUser(user.id);
   }
 }
