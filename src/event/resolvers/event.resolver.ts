@@ -21,6 +21,20 @@ import { EventService } from '../event.service';
 import DeletedEvent from '../models/deleted-event.model';
 import Event from '../models/interfaces/event.interface';
 
+const eventFilter = (
+  payload: EventPayload,
+  variables: any,
+  { user }: IContext,
+) => {
+  if (variables.chatId) {
+    return (
+      payload.content.createdById !== user.id &&
+      payload.content.chatId == variables.chatId
+    );
+  }
+  return payload.recipients.includes(user.id);
+};
+
 @Resolver(() => Event)
 export class EventInterfaceResolver {
   constructor(
@@ -82,20 +96,6 @@ export class EventInterfaceResolver {
     return this.pubsub.asyncIterator(SubscriptionTriggers.EventDeleted);
   }
 }
-
-const eventFilter = (
-  payload: EventPayload,
-  variables: any,
-  { user }: IContext,
-) => {
-  if (variables.chatId) {
-    return (
-      payload.content.createdById !== user.id &&
-      payload.content.chatId == variables.chatId
-    );
-  }
-  return payload.recipients.includes(user.id);
-};
 
 @ObjectType()
 export class PaginatedEvent extends Paginated(Event) {}

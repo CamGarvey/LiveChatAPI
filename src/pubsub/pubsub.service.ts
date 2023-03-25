@@ -1,13 +1,18 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { ConfigType } from '@nestjs/config';
 import { RedisPubSub } from 'graphql-redis-subscriptions';
 import { Redis, RedisOptions } from 'ioredis';
+import redisConfig from 'src/config/redis.config';
 
 @Injectable()
 export class PubSubService extends RedisPubSub {
-  constructor() {
+  constructor(
+    @Inject(redisConfig.KEY)
+    configuration: ConfigType<typeof redisConfig>,
+  ) {
     const redisOptions: RedisOptions = {
-      host: process.env.REDIS_HOST,
-      port: parseInt(process.env.REDIS_PORT),
+      host: configuration.host,
+      port: configuration.port,
       retryStrategy: (times: any) => {
         // reconnect after
         return Math.min(times * 50, 2000);

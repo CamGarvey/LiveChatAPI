@@ -122,7 +122,7 @@ export class RequestService {
         id: requestId,
       },
     });
-    // create an response alert
+    // Create an response alert
     const alert = await this.prisma.alert.upsert({
       create: {
         type: 'REQUEST_DECLINED',
