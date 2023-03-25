@@ -1,4 +1,4 @@
-export enum Subscription {
+export enum SubscriptionTriggers {
   ChatCreated = 'chat.created',
 
   // In chat events

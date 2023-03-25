@@ -1,13 +1,24 @@
-import { Parent, ResolveField, Resolver } from '@nestjs/graphql';
+import {
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+  Subscription,
+} from '@nestjs/graphql';
 import { EventService } from '../event.service';
 import CreatedEvent from '../models/created-event.model';
 import { GraphQLError } from 'graphql';
 import ChatUpdate from '../models/payloads/interfaces/chat-update.interface';
 import Message from '../models/payloads/message.model';
+import { PubSubService } from 'src/pubsub/pubsub.service';
+import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-triggers.enum';
 
 @Resolver(() => CreatedEvent)
 export class CreatedEventResolver {
-  constructor(private readonly eventService: EventService) {}
+  constructor(
+    private readonly eventService: EventService,
+    private readonly pubsub: PubSubService,
+  ) {}
 
   @ResolveField()
   async payload(@Parent() parent: CreatedEvent) {
@@ -21,5 +32,15 @@ export class CreatedEventResolver {
       default:
         throw new GraphQLError('Event type not supported');
     }
+  }
+
+  @Subscription(() => CreatedEvent, {
+    filter(payload, variables, context) {
+      console.log({ payload, variables, context });
+      return true;
+    },
+  })
+  async eventCreated() {
+    return this.pubsub.asyncIterator(SubscriptionTriggers.EventCreated);
   }
 }

@@ -36,6 +36,7 @@ import { CurrentUserIdModule } from './current-user-id/current-user-id.module';
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
+      context: ({ req }) => ({ req, currentUserId: 2 }),
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       subscriptions: {
         'graphql-ws': true,

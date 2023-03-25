@@ -291,6 +291,10 @@ type Stranger implements User {
   username: String!
 }
 
+type Subscription {
+  eventCreated: CreatedEvent!
+}
+
 interface User {
   createdAt: DateTime!
   id: HashId!

@@ -9,7 +9,7 @@ import {
 } from '@nestjs/graphql';
 import { ChatService } from 'src/chat/chat.service';
 import { Paginated, PaginationArgs } from 'src/common/pagination';
-import { CurrentUserId } from 'src/current-user-id/user-id.decorator';
+import { CurrentUserId } from 'src/current-user-id/current-user-id.decorator';
 import { UserService } from 'src/user/user.service';
 import { EventService } from '../event.service';
 import DeletedEvent from '../models/deleted-event.model';

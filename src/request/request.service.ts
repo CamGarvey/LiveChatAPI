@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Request } from '@prisma/client';
-import { Subscription } from 'src/common/subscriptions/subscription.enum';
+import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-triggers.enum';
 import { NotificationPayload } from 'src/common/subscriptions/subscription.model';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PubSubService } from 'src/pubsub/pubsub.service';
@@ -43,7 +43,7 @@ export class RequestService {
     });
 
     // Publish this new request
-    this.pubsub.publish<NotificationPayload>(Subscription.RequestSent, {
+    this.pubsub.publish<NotificationPayload>(SubscriptionTriggers.RequestSent, {
       recipients: [userId],
       content: request,
     });
@@ -102,7 +102,7 @@ export class RequestService {
 
     // Publish alert
     this.pubsub.publish<NotificationPayload>(
-      Subscription.RequestAcceptedAlert,
+      SubscriptionTriggers.RequestAcceptedAlert,
       {
         recipients: [request.createdById],
         content: alert,
@@ -141,10 +141,13 @@ export class RequestService {
     });
 
     // Publish alert to the creator
-    this.pubsub.publish<NotificationPayload>(Subscription.RequestCancelled, {
-      recipients: [request.createdById],
-      content: alert,
-    });
+    this.pubsub.publish<NotificationPayload>(
+      SubscriptionTriggers.RequestCancelled,
+      {
+        recipients: [request.createdById],
+        content: alert,
+      },
+    );
 
     return request;
   }
@@ -160,10 +163,13 @@ export class RequestService {
     });
 
     // Publish this deleted request
-    this.pubsub.publish<NotificationPayload>(Subscription.RequestCancelled, {
-      recipients: [request.recipientId],
-      content: request,
-    });
+    this.pubsub.publish<NotificationPayload>(
+      SubscriptionTriggers.RequestCancelled,
+      {
+        recipients: [request.recipientId],
+        content: request,
+      },
+    );
 
     return request;
   }

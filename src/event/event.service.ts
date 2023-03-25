@@ -5,7 +5,7 @@ import {
 import { Injectable } from '@nestjs/common';
 import { Event, Prisma } from '@prisma/client';
 import { PaginationArgs } from 'src/common/pagination';
-import { Subscription } from 'src/common/subscriptions/subscription.enum';
+import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-triggers.enum';
 import { EventPayload } from 'src/common/subscriptions/subscription.model';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PubSubService } from 'src/pubsub/pubsub.service';
@@ -82,7 +82,7 @@ export class EventService {
       },
     });
 
-    this.pubsub.publish<EventPayload>(Subscription.EventDeleted, {
+    this.pubsub.publish<EventPayload>(SubscriptionTriggers.EventDeleted, {
       recipients: event.chat.members
         .map((x) => x.id)
         .filter((x) => x !== this.currentUserId),

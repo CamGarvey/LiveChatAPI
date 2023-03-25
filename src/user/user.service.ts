@@ -3,14 +3,12 @@ import {
   findManyCursorConnection,
 } from '@devoxa/prisma-relay-cursor-connection';
 import { Injectable } from '@nestjs/common';
-import { GqlExecutionContext } from '@nestjs/graphql';
 import { Prisma, User } from '@prisma/client';
 import { FilterPaginationArgs } from 'src/common/pagination';
-import { Subscription } from 'src/common/subscriptions/subscription.enum';
+import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-triggers.enum';
 import { NotificationPayload } from 'src/common/subscriptions/subscription.model';
 import { PubSubService } from 'src/pubsub/pubsub.service';
 import { PrismaService } from '../prisma/prisma.service';
-import Friend from './models/friend.model';
 
 @Injectable()
 export class UserService {
@@ -81,10 +79,13 @@ export class UserService {
     });
 
     // Publish notification to deleted friend
-    this.pubsub.publish<NotificationPayload>(Subscription.FriendDeletedAlert, {
-      recipients: [userId],
-      content: alert,
-    });
+    this.pubsub.publish<NotificationPayload>(
+      SubscriptionTriggers.FriendDeletedAlert,
+      {
+        recipients: [userId],
+        content: alert,
+      },
+    );
 
     return deletedUser;
   }

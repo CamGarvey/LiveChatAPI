@@ -1,6 +1,6 @@
 import { Args, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { ChatService } from 'src/chat/chat.service';
-import { CurrentUserId } from 'src/common/user.decorator';
+import { CurrentUserId } from 'src/current-user-id/current-user-id.decorator';
 import { UserService } from 'src/user/user.service';
 import Chat from '../models/interfaces/chat.interfaces';
 
