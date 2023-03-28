@@ -1,6 +1,8 @@
+import { UseGuards } from '@nestjs/common';
 import { Args, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { IAuthUser } from 'src/auth/interfaces/auth-user.interface';
 import { ChatService } from 'src/chat/chat.service';
+import { ChatMemberGuard } from 'src/common/chat-member.guard';
 import { CurrentUser } from 'src/common/current-user.decorator';
 import { UserService } from 'src/user/user.service';
 import Chat from '../models/interfaces/chat.interfaces';
@@ -23,6 +25,7 @@ export class ChatInterfaceResolver {
   }
 
   @Query(() => Chat)
+  // @UseGuards(ChatMemberGuard)
   async chat(@Args('chatId') chatId: number) {
     return this.chatService.getChat(chatId);
   }

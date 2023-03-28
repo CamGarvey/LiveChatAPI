@@ -1,6 +1,4 @@
-import { Connection } from '@devoxa/prisma-relay-cursor-connection';
 import { Field, ObjectType } from '@nestjs/graphql';
-import { EventType } from '@prisma/client';
 import Chat from 'src/chat/models/interfaces/chat.interfaces';
 import { MemberRole } from 'src/member/models/member-role.enum';
 import { PaginatedMember } from 'src/member/models/paginated-member.model';

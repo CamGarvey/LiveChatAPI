@@ -21,7 +21,7 @@ import { EventService } from '../event.service';
 import DeletedEvent from '../models/deleted-event.model';
 import Event from '../models/interfaces/event.interface';
 
-const eventFilter = (
+const isUserRecipient = (
   payload: EventPayload,
   variables: any,
   { user }: IContext,
@@ -76,21 +76,21 @@ export class EventInterfaceResolver {
 
   @Subscription(() => Event, {
     name: 'events',
-    filter: eventFilter,
+    filter: isUserRecipient,
   })
   async eventSubscription() {
     return this.pubsub.asyncIterator('event.*', { pattern: true });
   }
 
   @Subscription(() => Event, {
-    filter: eventFilter,
+    filter: isUserRecipient,
   })
   async eventUpdated() {
     return this.pubsub.asyncIterator(SubscriptionTriggers.EventUpdated);
   }
 
   @Subscription(() => DeletedEvent, {
-    filter: eventFilter,
+    filter: isUserRecipient,
   })
   async eventDeleted() {
     return this.pubsub.asyncIterator(SubscriptionTriggers.EventDeleted);

@@ -7,7 +7,7 @@ import Alert from './alert.interface';
 import ChatAlert from './chat-alert.interface';
 
 @InterfaceType({
-  implements: () => ChatAlert,
+  implements: () => [ChatAlert, Alert],
   resolveType: (source: PrimsaAlert) => {
     return source.type;
   },

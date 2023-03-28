@@ -21,6 +21,18 @@ interface Chat {
   updatedAt: DateTime!
 }
 
+interface ChatAccessAlert implements Alert & ChatAlert {
+  chat: Chat!
+  chatId: Float!
+  createdAt: DateTime!
+  createdBy: User!
+  createdById: Float!
+  id: ID!
+  isCreator: Boolean!
+  recipient: User!
+  recipientId: Float!
+}
+
 interface ChatAlert implements Alert {
   chat: Chat!
   chatId: Float!
@@ -50,6 +62,18 @@ type ChatDescriptionUpdate implements ChatUpdate {
   descriptionBefore: String!
   event: Event!
   eventId: Float!
+}
+
+type ChatMemberAccessGrantedAlert implements Alert & ChatAccessAlert & ChatAlert {
+  chat: Chat!
+  chatId: Float!
+  createdAt: DateTime!
+  createdBy: User!
+  createdById: Float!
+  id: ID!
+  isCreator: Boolean!
+  recipient: User!
+  recipientId: Float!
 }
 
 interface ChatMemberAlteration {
@@ -190,6 +214,11 @@ interface Member {
   userId: Float!
 }
 
+input MemberAlterationInput {
+  chatId: Float!
+  userIds: [HashId!]!
+}
+
 type MemberEdge {
   cursor: String!
   node: Member!
@@ -209,10 +238,12 @@ type Message {
 type Mutation {
   acceptRequest(requestId: Float!): Request!
   acknowledgeAlert: Alert!
+  addMembers(addMembersData: MemberAlterationInput!): ChatMembersAddedUpdate!
   cancelRequest(requestId: Float!): Request!
   declineRequest(requestId: Float!): Request!
   deleteFriend(userId: Float!): Stranger!
   deletedEvent(eventId: Float!): DeletedEvent!
+  removeMembers(removeMembersData: MemberAlterationInput!): ChatMembersRemovedUpdate!
   sendFriendRequest(userId: Float!): FriendRequest!
 }
 
@@ -292,9 +323,12 @@ type Stranger implements User {
 }
 
 type Subscription {
+  alerts: ChatAlert!
   eventCreated: CreatedEvent!
   eventDeleted: DeletedEvent!
   eventUpdated: Event!
+  events: Event!
+  requests: Request!
 }
 
 interface User {
