@@ -1,11 +1,4 @@
-import {
-  GqlExecutionContext,
-  Parent,
-  Query,
-  ResolveField,
-  Resolver,
-  Subscription,
-} from '@nestjs/graphql';
+import { Parent, ResolveField, Resolver, Subscription } from '@nestjs/graphql';
 import { EventService } from '../event.service';
 import CreatedEvent from '../models/created-event.model';
 import { GraphQLError } from 'graphql';
@@ -46,7 +39,7 @@ export class CreatedEventResolver {
       return payload.recipients.includes(user.id);
     },
   })
-  async eventCreated() {
+  eventCreated() {
     return this.pubsub.asyncIterator(SubscriptionTriggers.EventCreated);
   }
 }

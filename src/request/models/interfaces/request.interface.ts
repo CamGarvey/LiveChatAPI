@@ -1,9 +1,10 @@
-import { Field, ID, InterfaceType, registerEnumType } from '@nestjs/graphql';
+import { Field, InterfaceType, registerEnumType } from '@nestjs/graphql';
+import { HashIdScalar } from 'src/common/scalars/hash-id.scalar';
 import User from '../../../user/models/interfaces/user.interface';
 
 @InterfaceType()
 export default abstract class Request {
-  @Field(() => ID)
+  @Field(() => HashIdScalar)
   id: number;
 
   @Field(() => User)

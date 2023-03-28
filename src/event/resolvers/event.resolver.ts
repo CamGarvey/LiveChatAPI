@@ -1,3 +1,4 @@
+import { UseGuards } from '@nestjs/common';
 import {
   Args,
   Mutation,
@@ -11,6 +12,7 @@ import {
 import { IAuthUser } from 'src/auth/interfaces/auth-user.interface';
 import { IContext } from 'src/auth/interfaces/context.interface';
 import { ChatService } from 'src/chat/chat.service';
+import { ChatGuard } from 'src/common/chat.guard';
 import { CurrentUser } from 'src/common/current-user.decorator';
 import { Paginated, PaginationArgs } from 'src/common/pagination';
 import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-triggers.enum';
@@ -65,12 +67,13 @@ export class EventInterfaceResolver {
   }
 
   @Query(() => PaginatedEvent)
+  @UseGuards(ChatGuard)
   async events(@Args('chatId') chatId: number, @Args() args: PaginationArgs) {
     return this.eventService.getEvents(chatId, args);
   }
 
   @Mutation(() => DeletedEvent)
-  async deletedEvent(@Args('eventId') eventId: number) {
+  async deleteEvent(@Args('eventId') eventId: number) {
     return this.eventService.deleteEvent(eventId);
   }
 

@@ -1,5 +1,5 @@
 import { Field, ID, InterfaceType } from '@nestjs/graphql';
-import { HashIdScalar as HashId } from 'src/common/scalars/hash-id.scalar';
+import { HashIdScalar } from 'src/common/scalars/hash-id.scalar';
 import Friend from '../friend.model';
 
 @InterfaceType({
@@ -8,7 +8,7 @@ import Friend from '../friend.model';
   },
 })
 export default class User {
-  @Field(() => HashId)
+  @Field(() => HashIdScalar)
   id: number;
 
   @Field(() => String)

@@ -1,3 +1,4 @@
+import { UseGuards } from '@nestjs/common';
 import {
   Args,
   Mutation,
@@ -5,9 +6,12 @@ import {
   ResolveField,
   Resolver,
 } from '@nestjs/graphql';
+import { Role } from '@prisma/client';
 import { IAuthUser } from 'src/auth/interfaces/auth-user.interface';
+import { ChatGuard } from 'src/common/chat.guard';
 import { CurrentUser } from 'src/common/current-user.decorator';
 import { PaginationArgs } from 'src/common/pagination';
+import { MemberRoles } from 'src/common/roles.decorator';
 import ChatMembersAddedUpdate from 'src/event/models/payloads/chat-members-added-update.model';
 import ChatMembersRemovedUpdate from 'src/event/models/payloads/chat-members-removed-update.model';
 import { MemberService } from 'src/member/member.service';
@@ -28,6 +32,8 @@ export class GroupChatResolver {
   }
 
   @Mutation(() => ChatMembersAddedUpdate)
+  @UseGuards(ChatGuard)
+  @MemberRoles(Role.ADMIN, Role.OWNER)
   async addMembers(
     @Args('addMembersData') { chatId, userIds }: MemberAlterationInput,
     @CurrentUser() user: IAuthUser,
@@ -36,6 +42,8 @@ export class GroupChatResolver {
   }
 
   @Mutation(() => ChatMembersRemovedUpdate)
+  @UseGuards(ChatGuard)
+  @MemberRoles(Role.ADMIN, Role.OWNER)
   async removeMembers(
     @Args('removeMembersData') { chatId, userIds }: MemberAlterationInput,
     @CurrentUser() user: IAuthUser,

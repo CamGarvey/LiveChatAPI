@@ -5,7 +5,7 @@ import { MemberRole } from '../member-role.enum';
 
 @InputType()
 export class ChangeRoleInput {
-  @Field()
+  @Field(() => HashIdScalar)
   chatId: number;
 
   @Field(() => [HashIdScalar])

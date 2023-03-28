@@ -14,7 +14,9 @@ export default class GroupChat implements Chat {
   @Field()
   name: string;
 
-  @Field()
+  @Field({
+    nullable: true,
+  })
   description?: string;
 
   @Field(() => PaginatedMember)

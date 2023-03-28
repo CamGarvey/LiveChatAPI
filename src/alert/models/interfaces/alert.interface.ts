@@ -1,5 +1,6 @@
 import { Field, ID, InterfaceType } from '@nestjs/graphql';
 import { Alert as PrimsaAlert } from '@prisma/client';
+import { HashIdScalar } from 'src/common/scalars/hash-id.scalar';
 import User from 'src/user/models/interfaces/user.interface';
 import ChatDeletedAlert from '../chat-deleted-alert.model';
 import ChatMemberAccessGrantedAlert from '../chat-member-access-granted-alert.model';
@@ -31,13 +32,13 @@ import RequestDeclinedAlert from '../request-declined-alert.model';
   },
 })
 export default class Alert {
-  @Field(() => ID)
+  @Field(() => HashIdScalar)
   id: number;
 
   @Field(() => User)
   createdBy: User;
 
-  @Field()
+  @Field(() => HashIdScalar)
   createdById: number;
 
   @Field()
@@ -46,7 +47,7 @@ export default class Alert {
   @Field(() => User)
   recipient: User;
 
-  @Field()
+  @Field(() => HashIdScalar)
   recipientId: number;
 
   @Field(() => Date)

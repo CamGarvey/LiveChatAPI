@@ -3,7 +3,7 @@ import { HashIdScalar } from 'src/common/scalars/hash-id.scalar';
 
 @InputType()
 export class MemberAlterationInput {
-  @Field()
+  @Field(() => HashIdScalar)
   chatId: number;
 
   @Field(() => [HashIdScalar])

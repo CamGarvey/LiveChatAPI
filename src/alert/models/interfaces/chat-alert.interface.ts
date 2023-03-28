@@ -1,7 +1,6 @@
-import { Field, ID, InterfaceType } from '@nestjs/graphql';
-import { Alert as PrimsaAlert, AlertType } from '@prisma/client';
+import { Field, InterfaceType } from '@nestjs/graphql';
 import Chat from 'src/chat/models/interfaces/chat.interfaces';
-import Request from 'src/request/models/interfaces/request.interface';
+import { HashIdScalar } from 'src/common/scalars/hash-id.scalar';
 import User from 'src/user/models/interfaces/user.interface';
 import Alert from './alert.interface';
 
@@ -9,7 +8,7 @@ import Alert from './alert.interface';
   implements: () => Alert,
 })
 export default class ChatAlert implements Alert {
-  @Field()
+  @Field(() => HashIdScalar)
   chatId: number;
 
   @Field(() => Chat)
