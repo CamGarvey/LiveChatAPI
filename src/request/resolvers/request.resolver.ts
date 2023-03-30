@@ -1,7 +1,10 @@
+import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Resolver, Subscription } from '@nestjs/graphql';
 import { IContext } from 'src/auth/interfaces/context.interface';
 import { NotificationPayload } from 'src/common/subscriptions/subscription.model';
 import { PubSubService } from 'src/pubsub/pubsub.service';
+import { RequestReceiverGuard } from '../guards/request-receiver/request-receiver.guard';
+import { RequestSenderGuard } from '../guards/request-sender/request-sender.guard';
 import Request from '../models/interfaces/request.interface';
 import { RequestService } from '../request.service';
 
@@ -13,16 +16,19 @@ export class RequestInterfaceResolver {
   ) {}
 
   @Mutation(() => Request)
+  @UseGuards(RequestReceiverGuard)
   async acceptRequest(@Args('requestId') requestId: number) {
     return this.requestService.acceptRequest(requestId);
   }
 
   @Mutation(() => Request)
+  @UseGuards(RequestReceiverGuard)
   async declineRequest(@Args('requestId') requestId: number) {
     return this.requestService.declineRequest(requestId);
   }
 
   @Mutation(() => Request)
+  @UseGuards(RequestSenderGuard)
   async cancelRequest(@Args('requestId') requestId: number) {
     return this.requestService.cancelRequest(requestId);
   }

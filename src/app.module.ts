@@ -43,7 +43,6 @@ import { GqlAuthGuard } from './auth/gql-auth.guard';
       },
       sortSchema: true,
       playground: false,
-
       plugins: [ApolloServerPluginLandingPageLocalDefault()],
     }),
     UserModule,

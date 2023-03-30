@@ -306,6 +306,12 @@ type PaginatedEvent {
   totalCount: Float!
 }
 
+type PaginatedFriend {
+  edges: [FriendEdge!]
+  pageInfo: PageInfo!
+  totalCount: Float!
+}
+
 type PaginatedMember {
   edges: [MemberEdge!]
   pageInfo: PageInfo!
@@ -325,6 +331,7 @@ type Query {
   chat(chatId: HashId!): Chat!
   event(eventId: Float!): Event!
   events(after: String, before: String, chatId: Float!, first: Int, last: Int): PaginatedEvent!
+  friends(after: String, before: String, filter: String, first: Int, last: Int): PaginatedFriend!
   me: Me!
   users(after: String, before: String, filter: String, first: Int, last: Int): PaginatedUser!
 }

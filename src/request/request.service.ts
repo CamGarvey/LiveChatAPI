@@ -151,7 +151,7 @@ export class RequestService {
       },
     });
 
-    // Publish this deleted request
+    // Publish deleted request
     this.pubsub.publish<NotificationPayload>(
       SubscriptionTriggers.RequestCancelled,
       {

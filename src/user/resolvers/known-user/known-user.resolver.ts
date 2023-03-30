@@ -12,8 +12,8 @@ import { User } from '@prisma/client';
 import Chat from 'src/chat/models/interfaces/chat.interfaces';
 import { FilterPaginationArgs, Paginated } from 'src/common/pagination';
 import Friend from 'src/user/models/friend.model';
-import KnownUser from '../models/interfaces/known-user.interface';
-import { UserService } from '../user.service';
+import KnownUser from '../../models/interfaces/known-user.interface';
+import { UserService } from '../../user.service';
 
 @Resolver((type) => KnownUser)
 export class KnownUserInterfaceResolver {

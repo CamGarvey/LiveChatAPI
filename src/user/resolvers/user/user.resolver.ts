@@ -1,8 +1,8 @@
 import { Resolver, Args, Query, ObjectType, Mutation } from '@nestjs/graphql';
 import { FilterPaginationArgs, Paginated } from 'src/common/pagination';
-import User from '../models/interfaces/user.interface';
-import Stranger from '../models/stranger.model';
-import { UserService } from '../user.service';
+import User from '../../models/interfaces/user.interface';
+import Stranger from '../../models/stranger.model';
+import { UserService } from '../../user.service';
 
 @Resolver(() => User)
 export class UserInterfaceResolver {
