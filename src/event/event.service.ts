@@ -12,8 +12,6 @@ import { PubSubService } from 'src/pubsub/pubsub.service';
 
 @Injectable()
 export class EventService {
-  currentUserId: number;
-
   constructor(
     private readonly prisma: PrismaService,
     private readonly pubsub: PubSubService,
@@ -61,7 +59,7 @@ export class EventService {
     );
   }
 
-  async deleteEvent(eventId: number): Promise<Event> {
+  async deleteEvent(eventId: number, deletedById: number): Promise<Event> {
     const event = await this.prisma.event.update({
       data: {
         deletedAt: new Date(),
@@ -85,7 +83,7 @@ export class EventService {
     this.pubsub.publish<EventPayload>(SubscriptionTriggers.EventDeleted, {
       recipients: event.chat.members
         .map((x) => x.id)
-        .filter((x) => x !== this.currentUserId),
+        .filter((x) => x !== deletedById),
       content: event,
     });
 

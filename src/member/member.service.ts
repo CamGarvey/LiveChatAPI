@@ -13,7 +13,6 @@ import {
 } from 'src/common/subscriptions/subscription.model';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PubSubService } from 'src/pubsub/pubsub.service';
-import { MemberAlterationInput } from '../chat/models/interfaces/member-alteration.input';
 import { ChangeRoleInput } from './models/inputs/change-role.input';
 
 @Injectable()

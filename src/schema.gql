@@ -88,9 +88,27 @@ type ChatMembersRemovedUpdate implements ChatMemberAlteration {
   members: [Member!]!
 }
 
+type ChatNameUpdate implements ChatUpdate {
+  event: Event!
+  eventId: Float!
+  nameAfter: String!
+  nameBefore: String!
+}
+
 interface ChatUpdate {
   event: Event!
   eventId: Float!
+}
+
+input CreateGroupChatInput {
+  """Short description of the group chat"""
+  description: String!
+
+  """Name of the group chat"""
+  name: String!
+
+  """Ids of the users to be added to the group chat"""
+  userIds: [HashId!]!
 }
 
 type CreatedEvent implements Event {
@@ -110,6 +128,16 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type DeletedChat implements Chat {
+  createdAt: DateTime!
+  createdBy: User!
+  createdById: HashId!
+  deletedAt: DateTime!
+  id: HashId!
+  isCreator: Boolean!
+  updatedAt: DateTime!
+}
+
 type DeletedEvent implements Event {
   chat: Chat!
   chatId: HashId!
@@ -120,6 +148,13 @@ type DeletedEvent implements Event {
   id: HashId!
   isCreator: Boolean!
   updatedAt: DateTime!
+}
+
+input DescriptionUpdateInput {
+  chatId: HashId!
+
+  """New name for chat"""
+  description: String!
 }
 
 interface Event {
@@ -240,11 +275,22 @@ type Mutation {
   acknowledgeAlert: Alert!
   addMembers(addMembersData: MemberAlterationInput!): ChatMembersAddedUpdate!
   cancelRequest(requestId: Float!): Request!
+  createGroupChat(createGroupChatData: CreateGroupChatInput!): GroupChat!
   declineRequest(requestId: Float!): Request!
   deleteEvent(eventId: Float!): DeletedEvent!
   deleteFriend(userId: Float!): Stranger!
+  deletedChat(chatId: HashId!): DeletedChat!
   removeMembers(removeMembersData: MemberAlterationInput!): ChatMembersRemovedUpdate!
   sendFriendRequest(userId: Float!): FriendRequest!
+  updateGroupChatDescription(chatDescriptionData: DescriptionUpdateInput!): ChatDescriptionUpdate!
+  updateGroupChatName(chatNameData: NameUpdateInput!): ChatNameUpdate!
+}
+
+input NameUpdateInput {
+  chatId: HashId!
+
+  """New name for chat"""
+  name: String!
 }
 
 type PageInfo {

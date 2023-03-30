@@ -40,8 +40,8 @@ export class EventGuard implements CanActivate {
 
     const roles = this.reflector.get<Role[]>('roles', context.getHandler());
 
-    if (!roles) {
-      // If not roles are specified then canActivate
+    if (!roles || event.createdById == userId) {
+      // If not roles are specified or the user is the creator of the event then canActivate
       return true;
     }
 

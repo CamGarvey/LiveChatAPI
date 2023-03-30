@@ -47,6 +47,26 @@ export class UserService {
     );
   }
 
+  async createFriend(userId: number, createdById: number): Promise<User> {
+    return this.prisma.user.update({
+      where: {
+        id: createdById,
+      },
+      data: {
+        friends: {
+          connect: {
+            id: userId,
+          },
+        },
+        friendsOf: {
+          connect: {
+            id: userId,
+          },
+        },
+      },
+    });
+  }
+
   async deleteFriend(userId: number): Promise<User> {
     const deletedUser = await this.prisma.user.update({
       where: {

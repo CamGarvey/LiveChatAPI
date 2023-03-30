@@ -4,17 +4,20 @@ import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-trig
 import { NotificationPayload } from 'src/common/subscriptions/subscription.model';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PubSubService } from 'src/pubsub/pubsub.service';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class RequestService {
-  private currentUserId: number;
-
   constructor(
     private readonly prisma: PrismaService,
     private readonly pubsub: PubSubService,
+    private readonly userService: UserService,
   ) {}
 
-  async sendFriendRequest(userId: number): Promise<Request> {
+  async sendFriendRequest(
+    userId: number,
+    createdById: number,
+  ): Promise<Request> {
     const request = await this.prisma.request.upsert({
       create: {
         type: 'FRIEND_REQUEST',
@@ -25,7 +28,7 @@ export class RequestService {
         },
         createdBy: {
           connect: {
-            id: this.currentUserId,
+            id: createdById,
           },
         },
       },
@@ -36,7 +39,7 @@ export class RequestService {
       where: {
         recipientId_createdById_type: {
           type: 'FRIEND_REQUEST',
-          createdById: this.currentUserId,
+          createdById: createdById,
           recipientId: userId,
         },
       },
@@ -52,7 +55,7 @@ export class RequestService {
   }
 
   async acceptRequest(requestId: number): Promise<Request> {
-    // Get the request
+    // Update the request
     const request = await this.prisma.request.update({
       data: {
         state: 'ACCEPTED',
@@ -65,7 +68,7 @@ export class RequestService {
     const alert = await this.prisma.alert.upsert({
       create: {
         type: 'REQUEST_ACCEPTED',
-        createdById: this.currentUserId,
+        createdById: request.recipientId,
         recipients: {
           connect: {
             id: request.createdById,
@@ -80,24 +83,10 @@ export class RequestService {
     });
 
     if (request.type === 'FRIEND_REQUEST') {
-      // Add as friend
-      await this.prisma.user.update({
-        where: {
-          id: this.currentUserId,
-        },
-        data: {
-          friends: {
-            connect: {
-              id: request.createdById,
-            },
-          },
-          friendsOf: {
-            connect: {
-              id: request.createdById,
-            },
-          },
-        },
-      });
+      await this.userService.createFriend(
+        request.createdById,
+        request.recipientId,
+      );
     }
 
     // Publish alert
@@ -126,7 +115,7 @@ export class RequestService {
     const alert = await this.prisma.alert.upsert({
       create: {
         type: 'REQUEST_DECLINED',
-        createdById: this.currentUserId,
+        createdById: request.recipientId,
         recipients: {
           connect: {
             id: request.createdById,

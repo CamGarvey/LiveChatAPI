@@ -24,6 +24,300 @@ export class ChatService {
     });
   }
 
+  async createGroupChat(
+    name: string,
+    description: string,
+    userIds: number[],
+    createdById: number,
+  ): Promise<Chat> {
+    // Remove duplicates and add creator
+    const userIdSet: Set<number> = new Set(userIds);
+    userIdSet.add(createdById);
+
+    // Create the chat
+    const chat = await this.prisma.chat.create({
+      data: {
+        type: 'GROUP',
+        name,
+        description,
+        createdById,
+        members: {
+          createMany: {
+            // Creating members
+            // Creator has OWNER role
+            // Others have BASIC role
+            data: [...userIdSet].map((id) => ({
+              userId: id,
+              role: id == createdById ? 'OWNER' : 'BASIC',
+              addedById: createdById,
+            })),
+          },
+        },
+      },
+    });
+
+    const recipients = [...userIdSet].filter((id) => id !== createdById);
+
+    // Create an alert for members
+    const alert = await this.prisma.alert.create({
+      data: {
+        type: 'CHAT_ACCESS_GRANTED',
+        chat: {
+          connect: {
+            id: chat.id,
+          },
+        },
+        recipients: {
+          connect: recipients.map((id) => ({ id })),
+        },
+        createdBy: {
+          connect: {
+            id: createdById,
+          },
+        },
+      },
+    });
+
+    await this.pubsub.publish<NotificationPayload>(
+      SubscriptionTriggers.ChatMemberAccessGrantedAlert,
+      {
+        recipients,
+        content: alert,
+      },
+    );
+
+    return chat;
+  }
+
+  async createDirectMessageChat(userId: number, createdById: number) {
+    const existingChat = await this.prisma.chat.findFirst({
+      where: {
+        type: 'DIRECT_MESSAGE',
+        members: {
+          every: {
+            userId: {
+              in: [userId, createdById],
+            },
+          },
+        },
+      },
+    });
+
+    if (existingChat !== null) {
+      // No need to create one
+      return existingChat;
+    }
+
+    // Create new direct message chat
+    const chat = await this.prisma.chat.create({
+      data: {
+        type: 'DIRECT_MESSAGE',
+        name: `${createdById}.${userId}`,
+        createdById,
+        members: {
+          createMany: {
+            // Creating members
+            // Both users have ADMIN roles
+            data: [createdById, userId].map((id) => ({
+              userId: id,
+              role: 'ADMIN',
+              addedById: createdById,
+            })),
+          },
+        },
+      },
+    });
+
+    // Create an alert for members
+    const alert = await this.prisma.alert.create({
+      data: {
+        type: 'CHAT_ACCESS_GRANTED',
+        chat: {
+          connect: {
+            id: chat.id,
+          },
+        },
+        recipients: {
+          connect: {
+            id: userId,
+          },
+        },
+        createdBy: {
+          connect: {
+            id: createdById,
+          },
+        },
+      },
+    });
+
+    await this.pubsub.publish<NotificationPayload>(
+      SubscriptionTriggers.ChatMemberAccessGrantedAlert,
+      {
+        recipients: [userId],
+        content: alert,
+      },
+    );
+
+    return chat;
+  }
+
+  async updateGroupChatName(
+    chatId: number,
+    name: string,
+    updatedById: number,
+  ): Promise<ChatUpdate> {
+    const chatBeforeUpdate = await this.prisma.chat.findUniqueOrThrow({
+      where: {
+        id: chatId,
+      },
+      select: {
+        name: true,
+        type: true,
+      },
+    });
+
+    if (chatBeforeUpdate.type !== 'GROUP') {
+      throw new GraphQLError('Invalid chat');
+    }
+
+    if (name === chatBeforeUpdate.name) {
+      throw new GraphQLError('Name has not changed');
+    }
+
+    const chatAfterUpdate = await this.prisma.chat.update({
+      data: {
+        name,
+      },
+      include: {
+        members: {
+          select: {
+            userId: true,
+          },
+        },
+      },
+      where: {
+        id: chatId,
+      },
+    });
+
+    const event = await this.prisma.event.create({
+      data: {
+        type: 'CHAT_UPDATE',
+        chat: {
+          connect: {
+            id: chatId,
+          },
+        },
+        createdBy: {
+          connect: {
+            id: updatedById,
+          },
+        },
+        chatUpdate: {
+          create: {
+            type: 'NAME_UPDATED',
+            nameBefore: chatBeforeUpdate.name,
+            nameAfter: chatAfterUpdate.name,
+          },
+        },
+      },
+      include: {
+        chatUpdate: true,
+      },
+    });
+
+    const recipients = chatAfterUpdate.members
+      .map((x) => x.userId)
+      .filter((x) => x !== updatedById);
+
+    // Publish new chat event
+    await this.pubsub.publish<EventPayload>(SubscriptionTriggers.EventCreated, {
+      recipients,
+      content: event,
+    });
+
+    return event.chatUpdate;
+  }
+
+  async updateGroupChatDescription(
+    chatId: number,
+    description: string,
+    updatedById: number,
+  ): Promise<ChatUpdate> {
+    const chatBeforeUpdate = await this.prisma.chat.findUniqueOrThrow({
+      where: {
+        id: chatId,
+      },
+      select: {
+        description: true,
+        type: true,
+      },
+    });
+
+    if (chatBeforeUpdate.type !== 'GROUP') {
+      throw new GraphQLError('Invalid chat');
+    }
+
+    if (description === chatBeforeUpdate.description) {
+      throw new GraphQLError('Description has not changed');
+    }
+
+    const chatAfterUpdate = await this.prisma.chat.update({
+      data: {
+        description,
+      },
+      select: {
+        description: true,
+        members: {
+          select: {
+            userId: true,
+          },
+        },
+      },
+      where: {
+        id: chatId,
+      },
+    });
+
+    const event = await this.prisma.event.create({
+      data: {
+        type: 'CHAT_UPDATE',
+        chat: {
+          connect: {
+            id: chatId,
+          },
+        },
+        createdBy: {
+          connect: {
+            id: updatedById,
+          },
+        },
+        chatUpdate: {
+          create: {
+            type: 'DESCRIPTION_UPDATED',
+            descriptionBefore: chatBeforeUpdate.description,
+            descriptionAfter: chatAfterUpdate.description,
+          },
+        },
+      },
+      include: {
+        chatUpdate: true,
+      },
+    });
+
+    const recipients = chatAfterUpdate.members
+      .map((x) => x.userId)
+      .filter((x) => x !== updatedById);
+
+    // Publish new chat event
+    await this.pubsub.publish<EventPayload>(SubscriptionTriggers.EventCreated, {
+      recipients,
+      content: event,
+    });
+
+    return event.chatUpdate;
+  }
+
   async addMembers(
     chatId: number,
     userIds: number[],
@@ -260,5 +554,54 @@ export class ChatService {
     );
 
     return event.chatUpdate;
+  }
+
+  async deleteChat(chatId: number, deletedById: number) {
+    const chat = await this.prisma.chat.update({
+      where: {
+        id: chatId,
+      },
+      data: {
+        deletedAt: new Date().toISOString(),
+      },
+      // Including member ids for pubsub
+      include: {
+        members: {
+          select: {
+            userId: true,
+          },
+        },
+      },
+    });
+
+    const alert = await this.prisma.alert.create({
+      data: {
+        type: 'CHAT_DELETED',
+        chat: {
+          connect: {
+            id: chat.id,
+          },
+        },
+        createdBy: {
+          connect: {
+            id: deletedById,
+          },
+        },
+      },
+    });
+
+    // Publish the deleted chat alert to every member
+    // except from the user who deleted it (deletedById)
+    await this.pubsub.publish<NotificationPayload>(
+      SubscriptionTriggers.ChatDeletedAlert,
+      {
+        recipients: chat.members
+          .map((x) => x.userId)
+          .filter((x) => x !== deletedById),
+        content: alert,
+      },
+    );
+
+    return chat;
   }
 }

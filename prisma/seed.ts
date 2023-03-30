@@ -79,7 +79,7 @@ const loadChats = async (
         createMany: {
           data: [...otherUsers, masterUser].map((x) => ({
             userId: x.id,
-            role: x.id === masterUser.id ? 'OWNER' : 'BASIC',
+            chatRole: x.id === masterUser.id ? 'OWNER' : 'BASIC',
             addedById: masterUser.id,
           })),
         },

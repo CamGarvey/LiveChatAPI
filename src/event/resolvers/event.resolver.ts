@@ -14,7 +14,9 @@ import { IContext } from 'src/auth/interfaces/context.interface';
 import { ChatService } from 'src/chat/chat.service';
 import { ChatGuard } from 'src/common/chat.guard';
 import { CurrentUser } from 'src/common/current-user.decorator';
+import { EventGuard } from 'src/common/event.guard';
 import { Paginated, PaginationArgs } from 'src/common/pagination';
+import { Roles } from 'src/common/roles.decorator';
 import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-triggers.enum';
 import { EventPayload } from 'src/common/subscriptions/subscription.model';
 import { PubSubService } from 'src/pubsub/pubsub.service';
@@ -73,8 +75,13 @@ export class EventInterfaceResolver {
   }
 
   @Mutation(() => DeletedEvent)
-  async deleteEvent(@Args('eventId') eventId: number) {
-    return this.eventService.deleteEvent(eventId);
+  @Roles('ADMIN', 'OWNER')
+  @UseGuards(EventGuard)
+  async deleteEvent(
+    @Args('eventId') eventId: number,
+    @CurrentUser() user: IAuthUser,
+  ) {
+    return this.eventService.deleteEvent(eventId, user.id);
   }
 
   @Subscription(() => Event, {
