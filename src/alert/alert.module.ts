@@ -5,10 +5,16 @@ import { PubSubModule } from 'src/pubsub/pubsub.module';
 import { UserModule } from 'src/user/user.module';
 import { AlertService } from './alert.service';
 import { AlertInterfaceResolver } from './resolvers/alert.resolver';
-import { ChatAlertInterfaceResolver } from './resolvers/chat-alert.resolver';
+import { ChatAlertModule } from './chat-alert/chat-alert.module';
 
 @Module({
-  providers: [AlertService, AlertInterfaceResolver, ChatAlertInterfaceResolver],
-  imports: [PrismaModule, ChatModule, UserModule, PubSubModule],
+  providers: [AlertService, AlertInterfaceResolver],
+  imports: [
+    PrismaModule,
+    ChatModule,
+    UserModule,
+    PubSubModule,
+    ChatAlertModule,
+  ],
 })
 export class AlertModule {}

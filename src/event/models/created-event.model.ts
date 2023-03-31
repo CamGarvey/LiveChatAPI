@@ -3,7 +3,7 @@ import { EventType } from '@prisma/client';
 import Chat from 'src/chat/models/interfaces/chat.interfaces';
 import User from 'src/user/models/interfaces/user.interface';
 import Event from './interfaces/event.interface';
-import { PayloadUnion } from './payload.union';
+import { PayloadUnion } from '../payload/models/payload.union';
 
 @ObjectType({
   implements: () => Event,

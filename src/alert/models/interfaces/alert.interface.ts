@@ -1,10 +1,10 @@
 import { Field, ID, InterfaceType } from '@nestjs/graphql';
 import { Alert as PrimsaAlert } from '@prisma/client';
+import ChatMemberAccessGrantedAlert from 'src/alert/chat-alert/models/chat-member-access-granted-alert.model';
+import ChatMemberAccessRevokedAlert from 'src/alert/chat-alert/models/chat-member-access-revoked-alert.model';
 import { HashIdScalar } from 'src/common/scalars/hash-id.scalar';
 import User from 'src/user/models/interfaces/user.interface';
-import ChatDeletedAlert from '../chat-deleted-alert.model';
-import ChatMemberAccessGrantedAlert from '../chat-member-access-granted-alert.model';
-import ChatMemberAccessRevokedAlert from '../chat-member-access-revoked-alert.model';
+import ChatDeletedAlert from '../../chat-alert/models/chat-deleted-alert.model';
 import FriendDeletedAlert from '../friend-deleted-alert.model';
 import RequestAcceptedAlert from '../request-accepted-alert.model';
 import RequestDeclinedAlert from '../request-declined-alert.model';

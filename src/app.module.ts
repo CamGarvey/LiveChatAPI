@@ -54,7 +54,6 @@ import { GqlAuthGuard } from './auth/gql-auth.guard';
     AuthModule,
     CommonModule,
     HashModule,
-    FriendRequestModule,
   ],
   providers: [
     JwtStrategy,

@@ -14,7 +14,7 @@ import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { HashIdScalar } from 'src/common/scalars/hash-id.scalar';
 import { UserService } from 'src/user/user.service';
-import DeletedChat from '../models/deleted-chat.model';
+import DeletedChat from '../deleted-chat/models/deleted-chat.model';
 import Chat from '../models/interfaces/chat.interfaces';
 
 @Resolver(() => Chat)

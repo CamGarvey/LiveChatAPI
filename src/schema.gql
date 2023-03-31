@@ -88,27 +88,9 @@ type ChatMembersRemovedUpdate implements ChatMemberAlteration {
   members: [Member!]!
 }
 
-type ChatNameUpdate implements ChatUpdate {
-  event: Event!
-  eventId: Float!
-  nameAfter: String!
-  nameBefore: String!
-}
-
 interface ChatUpdate {
   event: Event!
   eventId: Float!
-}
-
-input CreateGroupChatInput {
-  """Short description of the group chat"""
-  description: String!
-
-  """Name of the group chat"""
-  name: String!
-
-  """Ids of the users to be added to the group chat"""
-  userIds: [HashId!]!
 }
 
 type CreatedEvent implements Event {
@@ -150,13 +132,6 @@ type DeletedEvent implements Event {
   updatedAt: DateTime!
 }
 
-input DescriptionUpdateInput {
-  chatId: HashId!
-
-  """New name for chat"""
-  description: String!
-}
-
 interface Event {
   chat: Chat!
   chatId: HashId!
@@ -174,7 +149,7 @@ type EventEdge {
 }
 
 type Friend implements KnownUser & User {
-  chats(after: String, before: String, filter: String, first: Int, last: Int): [Chat!]!
+  chats: [Chat!]!
   createdAt: DateTime!
   id: HashId!
   name: String
@@ -217,7 +192,7 @@ type GroupChat implements Chat {
   description: String
   id: HashId!
   isCreator: Boolean!
-  members(after: String, before: String, first: Int, last: Int): PaginatedMember!
+  members: PaginatedMember!
   name: String!
   role: MemberRole!
   updatedAt: DateTime!
@@ -227,11 +202,11 @@ type GroupChat implements Chat {
 scalar HashId
 
 interface KnownUser {
-  chats(after: String, before: String, filter: String, first: Int, last: Int): [Chat!]!
+  chats: [Chat!]!
 }
 
 type Me implements KnownUser & User {
-  chats(after: String, before: String, filter: String, first: Int, last: Int): [Chat!]!
+  chats: [Chat!]!
   createdAt: DateTime!
   id: HashId!
   name: String
@@ -247,11 +222,6 @@ interface Member {
   role: MemberRole!
   user: User!
   userId: HashId!
-}
-
-input MemberAlterationInput {
-  chatId: HashId!
-  userIds: [HashId!]!
 }
 
 type MemberEdge {
@@ -273,24 +243,12 @@ type Message {
 type Mutation {
   acceptRequest(requestId: Float!): Request!
   acknowledgeAlert: Alert!
-  addMembers(addMembersData: MemberAlterationInput!): ChatMembersAddedUpdate!
   cancelRequest(requestId: Float!): Request!
-  createGroupChat(createGroupChatData: CreateGroupChatInput!): GroupChat!
   declineRequest(requestId: Float!): Request!
   deleteEvent(eventId: Float!): DeletedEvent!
   deleteFriend(userId: Float!): Stranger!
   deletedChat(chatId: HashId!): DeletedChat!
-  removeMembers(removeMembersData: MemberAlterationInput!): ChatMembersRemovedUpdate!
   sendFriendRequest(userId: Float!): FriendRequest!
-  updateGroupChatDescription(chatDescriptionData: DescriptionUpdateInput!): ChatDescriptionUpdate!
-  updateGroupChatName(chatNameData: NameUpdateInput!): ChatNameUpdate!
-}
-
-input NameUpdateInput {
-  chatId: HashId!
-
-  """New name for chat"""
-  name: String!
 }
 
 type PageInfo {
@@ -370,6 +328,7 @@ type Stranger implements User {
   createdAt: DateTime!
   friendRequest: FriendRequest
   id: HashId!
+  mutualFriends(after: String, before: String, filter: String, first: Int, last: Int): [Friend!]!
   name: String
   updatedAt: DateTime!
   username: String!

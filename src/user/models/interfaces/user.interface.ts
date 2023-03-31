@@ -1,4 +1,4 @@
-import { Field, ID, InterfaceType } from '@nestjs/graphql';
+import { Field, InterfaceType } from '@nestjs/graphql';
 import { HashIdScalar } from 'src/common/scalars/hash-id.scalar';
 import Friend from '../friend.model';
 
