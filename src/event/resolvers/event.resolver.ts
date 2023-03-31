@@ -12,11 +12,11 @@ import {
 import { IAuthUser } from 'src/auth/interfaces/auth-user.interface';
 import { IContext } from 'src/auth/interfaces/context.interface';
 import { ChatService } from 'src/chat/chat.service';
-import { ChatGuard } from 'src/common/chat.guard';
-import { CurrentUser } from 'src/common/current-user.decorator';
-import { EventGuard } from 'src/common/event.guard';
-import { Paginated, PaginationArgs } from 'src/common/pagination';
-import { Roles } from 'src/common/roles.decorator';
+import { ChatGuard } from 'src/common/guards/chat.guard';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
+import { EventGuard } from 'src/common/guards/event.guard';
+import { Paginated, PaginationArgs } from 'src/common/models/pagination';
+import { Roles } from 'src/common/decorators/roles.decorator';
 import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-triggers.enum';
 import { EventPayload } from 'src/common/subscriptions/subscription.model';
 import { PubSubService } from 'src/pubsub/pubsub.service';

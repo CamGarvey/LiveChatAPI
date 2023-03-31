@@ -1,7 +1,7 @@
 import { UseGuards } from '@nestjs/common';
 import { Resolver, Args, Query } from '@nestjs/graphql';
-import { ChatGuard } from 'src/common/chat.guard';
-import { PaginationArgs } from 'src/common/pagination';
+import { ChatGuard } from 'src/common/guards/chat.guard';
+import { PaginationArgs } from 'src/common/models/pagination';
 import { MemberService } from '../member.service';
 import Member from '../models/interfaces/member.interface';
 import { PaginatedMember } from '../models/paginated-member.model';

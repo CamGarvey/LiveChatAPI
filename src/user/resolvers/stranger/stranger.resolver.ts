@@ -1,6 +1,6 @@
 import { Connection } from '@devoxa/prisma-relay-cursor-connection';
 import { Args, Parent, ResolveField, Resolver } from '@nestjs/graphql';
-import { FilterPaginationArgs } from 'src/common/pagination';
+import { FilterPaginationArgs } from 'src/common/models/pagination';
 import User from '../../models/interfaces/user.interface';
 import Stranger from '../../models/stranger.model';
 import { UserService } from '../../user.service';

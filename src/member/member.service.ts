@@ -5,7 +5,7 @@ import {
 import { Injectable } from '@nestjs/common';
 import { ChatUpdate, Member, Prisma } from '@prisma/client';
 import { GraphQLError } from 'graphql';
-import { PaginationArgs } from 'src/common/pagination';
+import { PaginationArgs } from 'src/common/models/pagination';
 import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-triggers.enum';
 import {
   EventPayload,

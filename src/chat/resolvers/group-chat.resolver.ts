@@ -8,10 +8,10 @@ import {
 } from '@nestjs/graphql';
 import { Role } from '@prisma/client';
 import { IAuthUser } from 'src/auth/interfaces/auth-user.interface';
-import { ChatGuard } from 'src/common/chat.guard';
-import { CurrentUser } from 'src/common/current-user.decorator';
-import { PaginationArgs } from 'src/common/pagination';
-import { Roles } from 'src/common/roles.decorator';
+import { ChatGuard } from 'src/common/guards/chat.guard';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
+import { PaginationArgs } from 'src/common/models/pagination';
+import { Roles } from 'src/common/decorators/roles.decorator';
 import ChatDescriptionUpdate from 'src/event/models/payloads/chat-description-update.model';
 import ChatMembersAddedUpdate from 'src/event/models/payloads/chat-members-added-update.model';
 import ChatMembersRemovedUpdate from 'src/event/models/payloads/chat-members-removed-update.model';

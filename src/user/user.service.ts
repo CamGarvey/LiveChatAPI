@@ -4,7 +4,7 @@ import {
 } from '@devoxa/prisma-relay-cursor-connection';
 import { Injectable } from '@nestjs/common';
 import { Prisma, User } from '@prisma/client';
-import { FilterPaginationArgs } from 'src/common/pagination';
+import { FilterPaginationArgs } from 'src/common/models/pagination';
 import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-triggers.enum';
 import { NotificationPayload } from 'src/common/subscriptions/subscription.model';
 import { PubSubService } from 'src/pubsub/pubsub.service';

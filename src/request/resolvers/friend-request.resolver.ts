@@ -1,6 +1,6 @@
 import { Args, Mutation, Resolver } from '@nestjs/graphql';
 import { IAuthUser } from 'src/auth/interfaces/auth-user.interface';
-import { CurrentUser } from 'src/common/current-user.decorator';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { FriendRequest } from '../models/friend-request.model';
 import { RequestService } from '../request.service';
 

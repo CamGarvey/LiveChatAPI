@@ -1,7 +1,10 @@
 import { Args, ObjectType, Query, Resolver } from '@nestjs/graphql';
 import { IAuthUser } from 'src/auth/interfaces/auth-user.interface';
-import { CurrentUser } from 'src/common/current-user.decorator';
-import { FilterPaginationArgs, Paginated } from '../../../common/pagination';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
+import {
+  FilterPaginationArgs,
+  Paginated,
+} from '../../../common/models/pagination';
 import Friend from '../../models/friend.model';
 import { UserService } from '../../user.service';
 
