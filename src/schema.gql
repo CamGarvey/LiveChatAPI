@@ -249,6 +249,7 @@ type Mutation {
   deleteFriend(userId: Float!): Stranger!
   deletedChat(chatId: HashId!): DeletedChat!
   sendFriendRequest(userId: Float!): FriendRequest!
+  trigger: Event!
 }
 
 type PageInfo {

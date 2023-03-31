@@ -87,6 +87,7 @@ export class EventInterfaceResolver {
   @Subscription(() => Event, {
     name: 'events',
     filter: isUserRecipient,
+    resolve: (payload: EventPayload) => payload.content,
   })
   async eventSubscription() {
     return this.pubsub.asyncIterator('event.*', { pattern: true });
@@ -94,6 +95,7 @@ export class EventInterfaceResolver {
 
   @Subscription(() => Event, {
     filter: isUserRecipient,
+    resolve: (payload: EventPayload) => payload.content,
   })
   async eventUpdated() {
     return this.pubsub.asyncIterator(SubscriptionTriggers.EventUpdated);
@@ -101,6 +103,7 @@ export class EventInterfaceResolver {
 
   @Subscription(() => DeletedEvent, {
     filter: isUserRecipient,
+    resolve: (payload: EventPayload) => payload.content,
   })
   async eventDeleted() {
     return this.pubsub.asyncIterator(SubscriptionTriggers.EventDeleted);
