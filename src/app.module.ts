@@ -1,6 +1,6 @@
 import { ApolloDriverConfig } from '@nestjs/apollo';
 import { ApolloDriver } from '@nestjs/apollo/dist/drivers';
-import { Module } from '@nestjs/common';
+import { CacheModule, Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { UserModule } from './user/user.module';
 import { ConfigModule } from '@nestjs/config';
@@ -22,6 +22,8 @@ import { CommonModule } from './common/common.module';
 import { HashModule } from './hash/hash.module';
 import { APP_GUARD } from '@nestjs/core';
 import { GqlAuthGuard } from './auth/gql-auth.guard';
+import { redisStore } from 'cache-manager-ioredis-yet';
+import { RedisOptions } from 'ioredis';
 
 @Module({
   imports: [
@@ -34,6 +36,14 @@ import { GqlAuthGuard } from './auth/gql-auth.guard';
         hashConfig,
         redisConfig,
       ],
+    }),
+    CacheModule.register<RedisOptions>({
+      store: redisStore,
+
+      // Store-specific configuration:
+      host: 'localhost',
+      port: 6379,
+      isGlobal: true,
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,

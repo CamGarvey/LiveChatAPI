@@ -110,6 +110,23 @@ export class UserService {
     return deletedUser;
   }
 
+  async getAllFriendIds(userId: number): Promise<number[]> {
+    return this.prisma.user
+      .findMany({
+        select: {
+          id: true,
+        },
+        where: {
+          friends: {
+            some: {
+              id: userId,
+            },
+          },
+        },
+      })
+      .then((result) => result.map((user) => user.id));
+  }
+
   async getFriends(
     userId: number,
     args: FilterPaginationArgs,

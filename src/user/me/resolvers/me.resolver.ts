@@ -3,6 +3,8 @@ import { IAuthUser } from 'src/auth/interfaces/auth-user.interface';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import Me from '../models/me.model';
 import { UserService } from '../../user.service';
+import { Cache } from 'cache-manager';
+import { CACHE_MANAGER, Inject } from '@nestjs/common';
 
 @Resolver(() => Me)
 export class MeResolver {
