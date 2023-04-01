@@ -2,13 +2,14 @@ import {
   Connection,
   findManyCursorConnection,
 } from '@devoxa/prisma-relay-cursor-connection';
-import { Injectable } from '@nestjs/common';
+import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
 import { Prisma, User } from '@prisma/client';
 import { FilterPaginationArgs } from 'src/common/models/pagination';
 import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-triggers.enum';
 import { NotificationPayload } from 'src/common/subscriptions/subscription.model';
 import { PubSubService } from 'src/pubsub/pubsub.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class UserService {
@@ -17,6 +18,7 @@ export class UserService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly pubsub: PubSubService,
+    @Inject(CACHE_MANAGER) private cache: Cache,
   ) {}
 
   async getUser(userId: number): Promise<User> {
@@ -30,7 +32,7 @@ export class UserService {
   async getUsers(args: FilterPaginationArgs): Promise<Connection<User>> {
     const where = this.getUserWhereValidator(args.filter);
 
-    return findManyCursorConnection<
+    const users = await findManyCursorConnection<
       User,
       Pick<Prisma.UserWhereUniqueInput, 'id'>
     >(
@@ -45,10 +47,12 @@ export class UserService {
           JSON.parse(Buffer.from(cursor, 'base64').toString('ascii')),
       },
     );
+
+    return users;
   }
 
   async createFriend(userId: number, createdById: number): Promise<User> {
-    return this.prisma.user.update({
+    const user = await this.prisma.user.update({
       where: {
         id: createdById,
       },
@@ -65,10 +69,12 @@ export class UserService {
         },
       },
     });
+
+    return user;
   }
 
   async deleteFriend(userId: number): Promise<User> {
-    const deletedUser = await this.prisma.user.update({
+    const deletedFriend = await this.prisma.user.update({
       where: {
         id: userId,
       },
@@ -91,7 +97,7 @@ export class UserService {
         type: 'FRIEND_DELETED',
         recipients: {
           connect: {
-            id: deletedUser.id,
+            id: deletedFriend.id,
           },
         },
         createdById: this.currentUserId,
@@ -107,7 +113,7 @@ export class UserService {
       },
     );
 
-    return deletedUser;
+    return deletedFriend;
   }
 
   async getAllFriendIds(userId: number): Promise<number[]> {
