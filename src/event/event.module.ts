@@ -11,5 +11,6 @@ import { PayloadModule } from './payload/payload.module';
 @Module({
   providers: [EventService, EventInterfaceResolver, CreatedEventResolver],
   imports: [PrismaModule, PubSubModule, ChatModule, UserModule, PayloadModule],
+  exports: [EventService],
 })
 export class EventModule {}

@@ -2,26 +2,24 @@ import {
   Connection,
   findManyCursorConnection,
 } from '@devoxa/prisma-relay-cursor-connection';
-import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Prisma, User } from '@prisma/client';
 import { FilterPaginationArgs } from 'src/common/models/pagination';
 import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-triggers.enum';
 import { NotificationPayload } from 'src/common/subscriptions/subscription.model';
 import { PubSubService } from 'src/pubsub/pubsub.service';
-import { PrismaService } from '../prisma/prisma.service';
-import { Cache } from 'cache-manager';
+import { PrismaService } from '../../prisma/prisma.service';
+import { UserCacheService } from './user-cache.service';
 
 @Injectable()
 export class UserService {
-  private currentUserId: number;
-
   constructor(
     private readonly prisma: PrismaService,
     private readonly pubsub: PubSubService,
-    @Inject(CACHE_MANAGER) private cache: Cache,
+    private readonly userCacheService: UserCacheService,
   ) {}
 
-  async getUser(userId: number): Promise<User> {
+  getUser(userId: number): Prisma.Prisma__UserClient<User> {
     return this.prisma.user.findUniqueOrThrow({
       where: {
         id: userId,
@@ -29,16 +27,30 @@ export class UserService {
     });
   }
 
-  async getUsers(args: FilterPaginationArgs): Promise<Connection<User>> {
-    const where = this.getUserWhereValidator(args.filter);
+  async getUserChats(userId: number) {
+    const members = await this.prisma.member.findMany({
+      where: {
+        userId,
+      },
+      include: {
+        chat: true,
+      },
+    });
+    return members.map((x) => x.chat);
+  }
 
-    const users = await findManyCursorConnection<
+  async getUsers(
+    filterPaginationArgs: FilterPaginationArgs,
+  ): Promise<Connection<User>> {
+    const where = this.getUserWhereValidator(filterPaginationArgs.filter);
+
+    return findManyCursorConnection<
       User,
       Pick<Prisma.UserWhereUniqueInput, 'id'>
     >(
       (args) => this.prisma.user.findMany({ ...args, where }),
       () => this.prisma.user.count({ where }),
-      args,
+      filterPaginationArgs,
       {
         getCursor: (record) => ({ id: record.id }),
         encodeCursor: (cursor) =>
@@ -47,8 +59,6 @@ export class UserService {
           JSON.parse(Buffer.from(cursor, 'base64').toString('ascii')),
       },
     );
-
-    return users;
   }
 
   async createFriend(userId: number, createdById: number): Promise<User> {
@@ -70,10 +80,12 @@ export class UserService {
       },
     });
 
+    await this.userCacheService.addFriendship(userId, createdById);
+
     return user;
   }
 
-  async deleteFriend(userId: number): Promise<User> {
+  async deleteFriend(userId: number, deletedById: number): Promise<User> {
     const deletedFriend = await this.prisma.user.update({
       where: {
         id: userId,
@@ -81,16 +93,19 @@ export class UserService {
       data: {
         friends: {
           disconnect: {
-            id: this.currentUserId,
+            id: deletedById,
           },
         },
         friendsOf: {
           disconnect: {
-            id: this.currentUserId,
+            id: deletedById,
           },
         },
       },
     });
+
+    await this.userCacheService.removeFriendship(userId, deletedById);
+
     // Create alert for deleted friend
     const alert = await this.prisma.alert.create({
       data: {
@@ -100,7 +115,7 @@ export class UserService {
             id: deletedFriend.id,
           },
         },
-        createdById: this.currentUserId,
+        createdById: deletedById,
       },
     });
 
@@ -116,28 +131,38 @@ export class UserService {
     return deletedFriend;
   }
 
-  async getAllFriendIds(userId: number): Promise<number[]> {
-    return this.prisma.user
-      .findMany({
-        select: {
-          id: true,
-        },
-        where: {
-          friends: {
-            some: {
-              id: userId,
-            },
+  async getAllFriendIds(userId: number): Promise<Set<number>> {
+    const cached = await this.userCacheService.getFriends(userId);
+
+    if (cached) {
+      return cached;
+    }
+
+    const friends = await this.prisma.user.findMany({
+      select: {
+        id: true,
+      },
+      where: {
+        friends: {
+          some: {
+            id: userId,
           },
         },
-      })
-      .then((result) => result.map((user) => user.id));
+      },
+    });
+
+    const friendIds: Set<number> = new Set(friends.map(({ id }) => id));
+
+    await this.userCacheService.setFriends(userId, friendIds);
+
+    return friendIds;
   }
 
   async getFriends(
     userId: number,
-    args: FilterPaginationArgs,
+    filterPaginationArgs: FilterPaginationArgs,
   ): Promise<Connection<User>> {
-    const where = this.getUserWhereValidator(args.filter);
+    const where = this.getUserWhereValidator(filterPaginationArgs.filter);
 
     return findManyCursorConnection<
       User,
@@ -166,7 +191,7 @@ export class UserService {
             ...where,
           },
         }),
-      args,
+      filterPaginationArgs,
       {
         getCursor: (record) => ({ id: record.id }),
         encodeCursor: (cursor) =>
@@ -179,9 +204,10 @@ export class UserService {
 
   async getMutualFriends(
     userId: number,
-    args: FilterPaginationArgs,
+    otherUserId: number,
+    filterPaginationArgs: FilterPaginationArgs,
   ): Promise<Connection<User>> {
-    const userWhere = this.getUserWhereValidator(args.filter);
+    const userWhere = this.getUserWhereValidator(filterPaginationArgs.filter);
     // Find all users where friends with both
     const where: Prisma.UserWhereInput = {
       AND: [
@@ -195,7 +221,7 @@ export class UserService {
         {
           friends: {
             some: {
-              id: this.currentUserId,
+              id: otherUserId,
             },
           },
         },
@@ -217,7 +243,7 @@ export class UserService {
       },
 
       () => this.prisma.user.count({ where }),
-      args,
+      filterPaginationArgs,
       {
         getCursor: (record) => ({ id: record.id }),
         encodeCursor: (cursor) =>

@@ -25,7 +25,10 @@ export class EventService {
     });
   }
 
-  getEvents(chatId: number, args: PaginationArgs): Promise<Connection<Event>> {
+  async getEvents(
+    chatId: number,
+    paginationArgs: PaginationArgs,
+  ): Promise<Connection<Event>> {
     return findManyCursorConnection<
       Event,
       Pick<Prisma.UserWhereUniqueInput, 'id'>
@@ -48,7 +51,7 @@ export class EventService {
             id: chatId,
           },
         }),
-      args,
+      paginationArgs,
       {
         getCursor: (record) => ({ id: record.id }),
         encodeCursor: (cursor) =>

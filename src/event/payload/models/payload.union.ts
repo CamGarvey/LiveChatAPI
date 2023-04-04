@@ -1,8 +1,9 @@
 import { createUnionType } from '@nestjs/graphql';
-import ChatDescriptionUpdate from './chat-description-update.model';
-import ChatMembersAddedUpdate from './chat-members-added-update.model';
-import ChatMembersRemovedUpdate from './chat-members-removed-update.model';
-import Message from './message.model';
+import ChatDescriptionUpdate from '../chat-update/models/interface/chat-description-update.model';
+
+import Message from '../message/models/message.model';
+import ChatMembersAddedUpdate from '../chat-update/chat-member-alteration/models/chat-members-added-update.model';
+import ChatMembersRemovedUpdate from '../chat-update/chat-member-alteration/models/chat-members-removed-update.model';
 
 export const PayloadUnion = createUnionType({
   name: 'PayloadUnion',

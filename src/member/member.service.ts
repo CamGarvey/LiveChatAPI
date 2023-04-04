@@ -22,17 +22,44 @@ export class MemberService {
     private readonly pubsub: PubSubService,
   ) {}
 
-  getMembers(
+  getMember(memberId: number): Prisma.Prisma__MemberClient<Member> {
+    return this.prisma.member.findUniqueOrThrow({
+      where: {
+        id: memberId,
+      },
+    });
+  }
+
+  async getMembers(
     chatId: number,
-    args: PaginationArgs,
+    paginationArgs: PaginationArgs,
   ): Promise<Connection<Member>> {
-    return findManyCursorConnection<
+    return await findManyCursorConnection<
       Member,
-      Pick<Prisma.MemberWhereInput, 'id'>
+      Pick<Prisma.MemberWhereUniqueInput, 'id'>
     >(
-      (args) => this.prisma.member.findMany({ where: { chatId, ...args } }),
-      () => this.prisma.member.count({ where: { chatId, ...args } }),
-      args,
+      (args) =>
+        this.prisma.chat
+          .findUniqueOrThrow({
+            ...{ where: { id: chatId || undefined } },
+          })
+          .members({
+            ...args,
+          }),
+      () =>
+        this.prisma.chat
+          .findUniqueOrThrow({
+            ...{ where: { id: chatId || undefined } },
+            select: {
+              _count: {
+                select: {
+                  members: true,
+                },
+              },
+            },
+          })
+          .then((x) => x._count.members),
+      paginationArgs,
       {
         getCursor: (record) => ({ id: record.id }),
         encodeCursor: (cursor) =>
@@ -44,12 +71,12 @@ export class MemberService {
   }
 
   async changeMemberRoles(
-    currentUserId: number,
     { chatId, userIds, role }: ChangeRoleInput,
+    changedById,
   ): Promise<ChatUpdate> {
     // Remove duplicates
     const userIdSet: Set<number> = new Set(userIds);
-    userIdSet.delete(currentUserId);
+    userIdSet.delete(changedById);
 
     if (userIdSet.size === 0) {
       throw new GraphQLError('Member list must not be empty');
@@ -93,7 +120,7 @@ export class MemberService {
         },
         createdBy: {
           connect: {
-            id: currentUserId,
+            id: changedById,
           },
         },
         chatUpdate: {
@@ -120,7 +147,7 @@ export class MemberService {
 
     const recipients = chat.members
       .map((x) => x.userId)
-      .filter((x) => x !== currentUserId);
+      .filter((x) => x !== changedById);
 
     // Publish new chat event
     await this.pubsub.publish<EventPayload>(SubscriptionTriggers.EventCreated, {
@@ -139,7 +166,7 @@ export class MemberService {
         },
         createdBy: {
           connect: {
-            id: currentUserId,
+            id: changedById,
           },
         },
         recipients: userIdSet

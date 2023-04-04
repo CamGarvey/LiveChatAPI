@@ -8,6 +8,7 @@ import { MemberRole } from './member-role.enum';
   implements: () => [Member],
 })
 export default class ChatMember implements Member {
+  id: number;
   role: MemberRole;
   user: User;
   userId: number;

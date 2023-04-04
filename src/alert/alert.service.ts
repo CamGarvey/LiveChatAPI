@@ -4,26 +4,27 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class AlertService {
-  currentUserId: number;
-
   constructor(private readonly prisma: PrismaService) {}
 
-  async getAlerts(): Promise<Alert[]> {
+  async getAlerts(userId: number): Promise<Alert[]> {
     return await this.prisma.user
       .findUnique({
         where: {
-          id: this.currentUserId,
+          id: userId,
         },
       })
       .alerts();
   }
 
-  async acknowledgeAlert(alertId: number): Promise<Alert> {
+  async acknowledgeAlert(
+    alertId: number,
+    acknowledgedById: number,
+  ): Promise<Alert> {
     const alert = await this.prisma.alert.update({
       data: {
         recipients: {
           disconnect: {
-            id: this.currentUserId,
+            id: acknowledgedById,
           },
         },
       },

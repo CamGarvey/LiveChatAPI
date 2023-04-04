@@ -4,13 +4,14 @@ import Friend from '../friend.model';
 import { IContext } from 'src/auth/interfaces/context.interface';
 import Me from 'src/user/me/models/me.model';
 import Stranger from '../stranger.model';
+import { PaginatedUser } from 'src/user/resolvers/user.resolver';
 
 @InterfaceType({
   resolveType: (value: User, { user }: IContext) => {
     if (value.id == user.id) {
       return Me;
     }
-    if (user.friendIds.includes(value.id)) {
+    if (user.friendIds.has(value.id)) {
       return Friend;
     }
     return Stranger;
@@ -31,4 +32,7 @@ export default class User {
 
   @Field(() => Date)
   updatedAt: Date;
+
+  @Field(() => PaginatedUser)
+  friends: PaginatedUser;
 }

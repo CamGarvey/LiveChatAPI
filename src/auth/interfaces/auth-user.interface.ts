@@ -1,4 +1,4 @@
 export interface IAuthUser {
   id: number;
-  friendIds: number[];
+  friendIds: Set<number>;
 }

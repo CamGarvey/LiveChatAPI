@@ -1,4 +1,5 @@
 import {
+  Args,
   Mutation,
   Parent,
   Query,
@@ -10,8 +11,11 @@ import { AlertService } from 'src/alert/alert.service';
 import { IContext } from 'src/auth/interfaces/context.interface';
 import { NotificationPayload } from 'src/common/subscriptions/subscription.model';
 import { PubSubService } from 'src/pubsub/pubsub.service';
-import { UserService } from 'src/user/user.service';
+import { UserService } from 'src/user/services/user.service';
 import Alert from '../models/interfaces/alert.interface';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
+import { IAuthUser } from 'src/auth/interfaces/auth-user.interface';
+import { HashIdScalar } from 'src/common/scalars/hash-id.scalar';
 
 @Resolver(() => Alert)
 export class AlertInterfaceResolver {
@@ -32,13 +36,16 @@ export class AlertInterfaceResolver {
   }
 
   @Query(() => [Alert])
-  async alerts() {
-    return this.alertService.getAlerts();
+  async alerts(@CurrentUser() user: IAuthUser) {
+    return this.alertService.getAlerts(user.id);
   }
 
   @Mutation(() => Alert)
-  async acknowledgeAlert(alertId: number) {
-    return this.alertService.acknowledgeAlert(alertId);
+  async acknowledgeAlert(
+    @Args('alertId', { type: () => HashIdScalar }) alertId: number,
+    @CurrentUser() user: IAuthUser,
+  ) {
+    return this.alertService.acknowledgeAlert(alertId, user.id);
   }
 
   @Subscription(() => Alert, {

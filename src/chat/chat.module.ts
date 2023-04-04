@@ -5,10 +5,20 @@ import { PubSubModule } from 'src/pubsub/pubsub.module';
 import { UserModule } from 'src/user/user.module';
 import { ChatService } from './chat.service';
 import { ChatInterfaceResolver } from './resolvers/chat.resolver';
+import { GroupChatModule } from './group-chat/group-chat.module';
+import { DirectMessageChatModule } from './direct-message-chat/direct-message-chat.module';
 
 @Module({
   providers: [ChatService, ChatInterfaceResolver],
-  imports: [PrismaModule, UserModule, MemberModule, ChatModule, PubSubModule],
+  imports: [
+    PrismaModule,
+    UserModule,
+    MemberModule,
+    ChatModule,
+    GroupChatModule,
+    DirectMessageChatModule,
+    PubSubModule,
+  ],
   exports: [ChatService],
 })
 export class ChatModule {}

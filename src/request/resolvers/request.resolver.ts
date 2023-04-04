@@ -7,6 +7,7 @@ import { RequestReceiverGuard } from '../guards/request-receiver/request-receive
 import { RequestSenderGuard } from '../guards/request-sender/request-sender.guard';
 import Request from '../models/interfaces/request.interface';
 import { RequestService } from '../request.service';
+import { HashIdScalar } from 'src/common/scalars/hash-id.scalar';
 
 @Resolver(() => Request)
 export class RequestInterfaceResolver {
@@ -17,19 +18,25 @@ export class RequestInterfaceResolver {
 
   @Mutation(() => Request)
   @UseGuards(RequestReceiverGuard)
-  async acceptRequest(@Args('requestId') requestId: number) {
+  async acceptRequest(
+    @Args('requestId', { type: () => HashIdScalar }) requestId: number,
+  ) {
     return this.requestService.acceptRequest(requestId);
   }
 
   @Mutation(() => Request)
   @UseGuards(RequestReceiverGuard)
-  async declineRequest(@Args('requestId') requestId: number) {
+  async declineRequest(
+    @Args('requestId', { type: () => HashIdScalar }) requestId: number,
+  ) {
     return this.requestService.declineRequest(requestId);
   }
 
   @Mutation(() => Request)
   @UseGuards(RequestSenderGuard)
-  async cancelRequest(@Args('requestId') requestId: number) {
+  async cancelRequest(
+    @Args('requestId', { type: () => HashIdScalar }) requestId: number,
+  ) {
     return this.requestService.cancelRequest(requestId);
   }
 

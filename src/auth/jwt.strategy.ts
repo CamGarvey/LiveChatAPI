@@ -13,8 +13,7 @@ import authConfig from 'src/config/auth.config';
 import { HashService } from 'src/hash/hash.service';
 import { IAuthUser } from './interfaces/auth-user.interface';
 import { IChatJwtPayload } from './interfaces/chat-jwt-payload.interface';
-import { Cache } from 'cache-manager';
-import { UserService } from 'src/user/user.service';
+import { UserService } from 'src/user/services/user.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -24,7 +23,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     private readonly hashService: HashService,
     @Inject(authConfig.KEY)
     configuration: ConfigType<typeof authConfig>,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private readonly userService: UserService,
   ) {
     super({
@@ -53,18 +51,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       payload['http://localhost:4000/user_id'],
     );
 
-    const friendIds = await this.getUserFriendIds(userId);
+    const friendIds = await this.userService.getAllFriendIds(userId);
 
     return { id: userId, friendIds };
-  }
-
-  async getUserFriendIds(userId: number): Promise<number[]> {
-    let friendIds = await this.cacheManager.get<number[]>(`${userId}.friends`);
-    if (!friendIds) {
-      friendIds = await this.userService.getAllFriendIds(userId);
-      this.cacheManager.set(`${userId}.friends`, friendIds);
-    }
-    return friendIds;
   }
 
   hasRequireScope(payload: IChatJwtPayload) {

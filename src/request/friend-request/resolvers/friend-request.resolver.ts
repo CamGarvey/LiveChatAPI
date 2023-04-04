@@ -3,6 +3,7 @@ import { IAuthUser } from 'src/auth/interfaces/auth-user.interface';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { FriendRequest } from '../models/friend-request.model';
 import { RequestService } from '../../request.service';
+import { HashIdScalar } from 'src/common/scalars/hash-id.scalar';
 
 @Resolver(() => FriendRequest)
 export class FriendRequestResolver {
@@ -10,7 +11,7 @@ export class FriendRequestResolver {
 
   @Mutation(() => FriendRequest)
   async sendFriendRequest(
-    @Args('userId') userId: number,
+    @Args('userId', { type: () => HashIdScalar }) userId: number,
     @CurrentUser() user: IAuthUser,
   ) {
     return this.requestService.sendFriendRequest(userId, user.id);

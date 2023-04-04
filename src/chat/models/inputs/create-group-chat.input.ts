@@ -10,11 +10,13 @@ export class CreateGroupChatInput {
 
   @Field({
     description: 'Short description of the group chat',
+    nullable: true,
   })
-  description: string;
+  description?: string;
 
   @Field(() => [HashIdScalar], {
     description: 'Ids of the users to be added to the group chat',
+    nullable: true,
   })
   userIds: number[];
 }

@@ -6,7 +6,7 @@ import {
   Paginated,
 } from '../../../common/models/pagination';
 import Friend from '../../models/friend.model';
-import { UserService } from '../../user.service';
+import { UserService } from '../../services/user.service';
 
 @Resolver(() => Friend)
 export class FriendResolver {
@@ -14,10 +14,10 @@ export class FriendResolver {
 
   @Query(() => PaginatedFriend)
   async friends(
-    @Args() args: FilterPaginationArgs,
+    @Args() filterPaginationArgs: FilterPaginationArgs,
     @CurrentUser() user: IAuthUser,
   ) {
-    return this.userService.getFriends(user.id, args);
+    return this.userService.getFriends(user.id, filterPaginationArgs);
   }
 }
 

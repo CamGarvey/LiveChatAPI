@@ -13,7 +13,7 @@ import { ChatGuard } from 'src/common/guards/chat.guard';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { HashIdScalar } from 'src/common/scalars/hash-id.scalar';
-import { UserService } from 'src/user/user.service';
+import { UserService } from 'src/user/services/user.service';
 import DeletedChat from '../deleted-chat/models/deleted-chat.model';
 import Chat from '../models/interfaces/chat.interfaces';
 

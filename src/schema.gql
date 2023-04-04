@@ -64,6 +64,17 @@ type ChatDescriptionUpdate implements ChatUpdate {
   eventId: Float!
 }
 
+type ChatMember implements Member {
+  addedBy: User!
+  addedById: HashId!
+  chat: Chat!
+  chatId: HashId!
+  id: HashId!
+  role: MemberRole!
+  user: User!
+  userId: HashId!
+}
+
 type ChatMemberAccessGrantedAlert implements Alert & ChatAccessAlert & ChatAlert {
   chat: Chat!
   chatId: HashId!
@@ -88,9 +99,27 @@ type ChatMembersRemovedUpdate implements ChatMemberAlteration {
   members: [Member!]!
 }
 
+type ChatNameUpdate implements ChatUpdate {
+  event: Event!
+  eventId: Float!
+  nameAfter: String!
+  nameBefore: String!
+}
+
 interface ChatUpdate {
   event: Event!
   eventId: Float!
+}
+
+input CreateGroupChatInput {
+  """Short description of the group chat"""
+  description: String
+
+  """Name of the group chat"""
+  name: String!
+
+  """Ids of the users to be added to the group chat"""
+  userIds: [HashId!]
 }
 
 type CreatedEvent implements Event {
@@ -132,6 +161,16 @@ type DeletedEvent implements Event {
   updatedAt: DateTime!
 }
 
+type DirectMessageChat implements Chat {
+  createdAt: DateTime!
+  createdBy: User!
+  createdById: HashId!
+  id: HashId!
+  isCreator: Boolean!
+  receipent: Member!
+  updatedAt: DateTime!
+}
+
 interface Event {
   chat: Chat!
   chatId: HashId!
@@ -148,9 +187,9 @@ type EventEdge {
   node: Event!
 }
 
-type Friend implements KnownUser & User {
-  chats: [Chat!]!
+type Friend implements User {
   createdAt: DateTime!
+  friends(after: String, before: String, filter: String, first: Int, last: Int): PaginatedUser!
   id: HashId!
   name: String
   updatedAt: DateTime!
@@ -192,7 +231,7 @@ type GroupChat implements Chat {
   description: String
   id: HashId!
   isCreator: Boolean!
-  members: PaginatedMember!
+  members(after: String, before: String, first: Int, last: Int): PaginatedMember!
   name: String!
   role: MemberRole!
   updatedAt: DateTime!
@@ -201,13 +240,10 @@ type GroupChat implements Chat {
 """Hash Id custom scalar type"""
 scalar HashId
 
-interface KnownUser {
-  chats: [Chat!]!
-}
-
-type Me implements KnownUser & User {
+type Me implements User {
   chats: [Chat!]!
   createdAt: DateTime!
+  friends(after: String, before: String, filter: String, first: Int, last: Int): PaginatedUser!
   id: HashId!
   name: String
   updatedAt: DateTime!
@@ -219,6 +255,7 @@ interface Member {
   addedById: HashId!
   chat: Chat!
   chatId: HashId!
+  id: HashId!
   role: MemberRole!
   user: User!
   userId: HashId!
@@ -241,14 +278,20 @@ type Message {
 }
 
 type Mutation {
-  acceptRequest(requestId: Float!): Request!
-  acknowledgeAlert: Alert!
-  cancelRequest(requestId: Float!): Request!
-  declineRequest(requestId: Float!): Request!
-  deleteEvent(eventId: Float!): DeletedEvent!
-  deleteFriend(userId: Float!): Stranger!
+  acceptRequest(requestId: HashId!): Request!
+  acknowledgeAlert(alertId: HashId!): Alert!
+  addMembers(chatId: HashId!, userIds: [HashId!]!): ChatMembersAddedUpdate!
+  cancelRequest(requestId: HashId!): Request!
+  createDirectMessageChat(receipentUserId: HashId!): DirectMessageChat!
+  createGroupChat(createGroupChatData: CreateGroupChatInput!): GroupChat!
+  declineRequest(requestId: HashId!): Request!
+  deleteEvent(eventId: HashId!): DeletedEvent!
+  deleteFriend(userId: HashId!): Stranger!
   deletedChat(chatId: HashId!): DeletedChat!
-  sendFriendRequest(userId: Float!): FriendRequest!
+  removeMembers(chatId: HashId!, userIds: [HashId!]!): ChatMembersRemovedUpdate!
+  sendFriendRequest(userId: HashId!): FriendRequest!
+  updateGroupChatDescription(chatId: HashId!, description: String!): ChatDescriptionUpdate!
+  updateGroupChatName(chatId: HashId!, name: String!): ChatNameUpdate!
 }
 
 type PageInfo {
@@ -287,11 +330,25 @@ union PayloadUnion = ChatDescriptionUpdate | ChatMembersAddedUpdate | ChatMember
 type Query {
   alerts: [Alert!]!
   chat(chatId: HashId!): Chat!
-  event(eventId: Float!): Event!
-  events(after: String, before: String, chatId: Float!, first: Int, last: Int): PaginatedEvent!
+  event(eventId: HashId!): Event!
+  events(after: String, before: String, chatId: HashId!, first: Int, last: Int): PaginatedEvent!
   friends(after: String, before: String, filter: String, first: Int, last: Int): PaginatedFriend!
   me: Me!
+  members(after: String, before: String, chatId: HashId!, first: Int, last: Int): PaginatedMember!
   users(after: String, before: String, filter: String, first: Int, last: Int): PaginatedUser!
+}
+
+type RemovedMember implements Member {
+  addedBy: User!
+  addedById: HashId!
+  chat: Chat!
+  chatId: HashId!
+  id: HashId!
+  removedBy: User!
+  removedById: HashId!
+  role: MemberRole!
+  user: User!
+  userId: HashId!
 }
 
 interface Request {
@@ -327,6 +384,7 @@ enum RequestState {
 type Stranger implements User {
   createdAt: DateTime!
   friendRequest: FriendRequest
+  friends(after: String, before: String, filter: String, first: Int, last: Int): PaginatedUser!
   id: HashId!
   mutualFriends(after: String, before: String, filter: String, first: Int, last: Int): [Friend!]!
   name: String
@@ -345,6 +403,7 @@ type Subscription {
 
 interface User {
   createdAt: DateTime!
+  friends(after: String, before: String, filter: String, first: Int, last: Int): PaginatedUser!
   id: HashId!
   name: String
   updatedAt: DateTime!

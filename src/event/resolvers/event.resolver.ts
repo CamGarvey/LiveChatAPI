@@ -20,10 +20,11 @@ import { Roles } from 'src/common/decorators/roles.decorator';
 import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-triggers.enum';
 import { EventPayload } from 'src/common/subscriptions/subscription.model';
 import { PubSubService } from 'src/pubsub/pubsub.service';
-import { UserService } from 'src/user/user.service';
+import { UserService } from 'src/user/services/user.service';
 import { EventService } from '../event.service';
 import DeletedEvent from '../models/deleted-event.model';
 import Event from '../models/interfaces/event.interface';
+import { HashIdScalar } from 'src/common/scalars/hash-id.scalar';
 
 const isUserRecipient = (
   payload: EventPayload,
@@ -64,21 +65,25 @@ export class EventInterfaceResolver {
   }
 
   @Query(() => Event)
-  async event(@Args('eventId') eventId: number) {
+  @UseGuards(EventGuard)
+  async event(@Args('eventId', { type: () => HashIdScalar }) eventId: number) {
     return this.eventService.getEvent(eventId);
   }
 
   @Query(() => PaginatedEvent)
   @UseGuards(ChatGuard)
-  async events(@Args('chatId') chatId: number, @Args() args: PaginationArgs) {
-    return this.eventService.getEvents(chatId, args);
+  async events(
+    @Args('chatId', { type: () => HashIdScalar }) chatId: number,
+    @Args() paginationArgs: PaginationArgs,
+  ) {
+    return this.eventService.getEvents(chatId, paginationArgs);
   }
 
   @Mutation(() => DeletedEvent)
   @Roles('ADMIN', 'OWNER')
   @UseGuards(EventGuard)
   async deleteEvent(
-    @Args('eventId') eventId: number,
+    @Args('eventId', { type: () => HashIdScalar }) eventId: number,
     @CurrentUser() user: IAuthUser,
   ) {
     return this.eventService.deleteEvent(eventId, user.id);

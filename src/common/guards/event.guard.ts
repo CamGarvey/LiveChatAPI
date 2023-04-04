@@ -16,7 +16,14 @@ export class EventGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const ctx = GqlExecutionContext.create(context).getContext();
-    const eventId = +this.hashService.decode(ctx.req.body.variables.eventId);
+
+    const encodedEventId = ctx.req.body.variables.eventId;
+
+    if (!encodedEventId || !this.hashService.isValidId(encodedEventId)) {
+      throw new ForbiddenException('Invalid ID');
+    }
+
+    const eventId = +this.hashService.decode(encodedEventId);
     const userId = ctx.req.user.id;
 
     const event = await this.prisma.event.findUniqueOrThrow({

@@ -3,6 +3,7 @@ import { ForbiddenException } from '@nestjs/common/exceptions/forbidden.exceptio
 import { Reflector } from '@nestjs/core';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { Role } from '@prisma/client';
+import { log } from 'console';
 import { HashService } from 'src/hash/hash.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 
@@ -16,7 +17,15 @@ export class ChatGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const ctx = GqlExecutionContext.create(context).getContext();
-    const chatId = +this.hashService.decode(ctx.req.body.variables.chatId);
+
+    const encodeChatId = ctx.req.body.variables.chatId;
+
+    if (!encodeChatId || !this.hashService.isValidId(encodeChatId)) {
+      throw new ForbiddenException('Invalid ID');
+    }
+
+    const chatId = +this.hashService.decode(encodeChatId);
+
     const userId = ctx.req.user.id;
 
     const chat = await this.prisma.chat.findUniqueOrThrow({

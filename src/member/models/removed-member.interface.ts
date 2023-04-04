@@ -8,13 +8,14 @@ import { MemberRole } from './member-role.enum';
 @ObjectType({
   implements: () => [Member],
 })
-export default class DeletedMember implements Member {
+export default class RemovedMember implements Member {
   @Field(() => User)
   removedBy: User;
 
   @Field(() => HashIdScalar)
   removedById: number;
 
+  id: number;
   role: MemberRole;
   user: User;
   userId: number;
