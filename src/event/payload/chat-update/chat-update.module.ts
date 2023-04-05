@@ -1,10 +1,12 @@
-import { Module, forwardRef } from '@nestjs/common';
-import { ChatUpdateInterfaceResolver } from './resolvers/chat-update.resolver';
-import { EventModule } from 'src/event/event.module';
+import { Module } from '@nestjs/common';
 import { ChatMemberAlterationModule } from './chat-member-alteration/chat-member-alteration.module';
+import { ChatUpdateService } from './services/chat-update.service';
+import { ChatUpdateInterfaceResolver } from './resolvers/chat-update.resolver';
+import { PrismaModule } from 'src/prisma/prisma.module';
 
 @Module({
-  providers: [ChatUpdateInterfaceResolver],
-  imports: [ChatMemberAlterationModule, forwardRef(() => EventModule)],
+  providers: [ChatUpdateInterfaceResolver, ChatUpdateService],
+  imports: [ChatMemberAlterationModule, PrismaModule],
+  exports: [ChatUpdateService],
 })
 export class ChatUpdateModule {}

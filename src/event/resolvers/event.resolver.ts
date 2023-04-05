@@ -11,7 +11,6 @@ import {
 } from '@nestjs/graphql';
 import { IAuthUser } from 'src/auth/interfaces/auth-user.interface';
 import { IContext } from 'src/auth/interfaces/context.interface';
-import { ChatService } from 'src/chat/chat.service';
 import { ChatGuard } from 'src/common/guards/chat.guard';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { EventGuard } from 'src/common/guards/event.guard';
@@ -20,7 +19,6 @@ import { Roles } from 'src/common/decorators/roles.decorator';
 import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-triggers.enum';
 import { EventPayload } from 'src/common/subscriptions/subscription.model';
 import { PubSubService } from 'src/pubsub/pubsub.service';
-import { UserService } from 'src/user/services/user.service';
 import { EventService } from '../event.service';
 import DeletedEvent from '../models/deleted-event.model';
 import Event from '../models/interfaces/event.interface';
@@ -44,19 +42,17 @@ const isUserRecipient = (
 export class EventInterfaceResolver {
   constructor(
     private readonly eventService: EventService,
-    private readonly chatService: ChatService,
-    private readonly userService: UserService,
     private readonly pubsub: PubSubService,
   ) {}
 
   @ResolveField()
   async chat(@Parent() parent: Event) {
-    return this.chatService.getChat(parent.chatId);
+    return await this.eventService.getEvent(parent.id).chat();
   }
 
   @ResolveField()
   async createdBy(@Parent() parent: Event) {
-    return this.userService.getUser(parent.createdById);
+    return await this.eventService.getEvent(parent.id).createdBy();
   }
 
   @ResolveField()

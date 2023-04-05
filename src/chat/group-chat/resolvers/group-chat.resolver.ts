@@ -12,7 +12,7 @@ import { ChatGuard } from 'src/common/guards/chat.guard';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { PaginationArgs } from 'src/common/models/pagination';
 import { Roles } from 'src/common/decorators/roles.decorator';
-import ChatDescriptionUpdate from 'src/event/payload/chat-update/models/interface/chat-description-update.model';
+import ChatDescriptionUpdate from 'src/event/payload/chat-update/models/chat-description-update.model';
 import { MemberService } from 'src/member/member.service';
 import GroupChat from '../models/group-chat.model';
 import ChatNameUpdate from 'src/event/payload/chat-update/models/chat-name-update.model';

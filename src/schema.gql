@@ -274,6 +274,8 @@ enum MemberRole {
 
 type Message {
   content: String!
+  event: Event!
+  eventId: Float!
   likedBy: [User!]!
 }
 
@@ -284,6 +286,7 @@ type Mutation {
   cancelRequest(requestId: HashId!): Request!
   createDirectMessageChat(receipentUserId: HashId!): DirectMessageChat!
   createGroupChat(createGroupChatData: CreateGroupChatInput!): GroupChat!
+  createMessage(chatId: HashId!, content: String!): Message!
   declineRequest(requestId: HashId!): Request!
   deleteEvent(eventId: HashId!): DeletedEvent!
   deleteFriend(userId: HashId!): Stranger!
@@ -292,6 +295,7 @@ type Mutation {
   sendFriendRequest(userId: HashId!): FriendRequest!
   updateGroupChatDescription(chatId: HashId!, description: String!): ChatDescriptionUpdate!
   updateGroupChatName(chatId: HashId!, name: String!): ChatNameUpdate!
+  updateMessage(content: String!, eventId: HashId!): Message!
 }
 
 type PageInfo {

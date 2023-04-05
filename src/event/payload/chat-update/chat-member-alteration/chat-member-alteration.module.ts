@@ -1,9 +1,9 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { ChatMemberAlterationResolver } from './resolvers/chat-member-alteration.resolver';
-import { EventModule } from 'src/event/event.module';
+import { ChatUpdateModule } from '../chat-update.module';
 
 @Module({
   providers: [ChatMemberAlterationResolver],
-  imports: [forwardRef(() => EventModule)],
+  imports: [forwardRef(() => ChatUpdateModule)],
 })
 export class ChatMemberAlterationModule {}

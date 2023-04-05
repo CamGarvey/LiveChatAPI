@@ -1,6 +1,6 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import Event from '../../../../models/interfaces/event.interface';
-import ChatUpdate from './chat-update.interface';
+import Event from '../../../models/interfaces/event.interface';
+import ChatUpdate from './interface/chat-update.interface';
 
 @ObjectType({
   implements: () => ChatUpdate,

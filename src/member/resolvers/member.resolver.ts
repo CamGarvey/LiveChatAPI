@@ -6,7 +6,8 @@ import { MemberService } from '../member.service';
 import Member from '../models/interfaces/member.interface';
 import { PaginatedMember } from '../models/paginated-member.model';
 import { HashIdScalar } from 'src/common/scalars/hash-id.scalar';
-import { log } from 'console';
+import { ChatService } from 'src/chat/chat.service';
+import { UserService } from 'src/user/services/user.service';
 
 @Resolver(() => Member)
 export class MemberInterfaceResolver {
@@ -15,6 +16,16 @@ export class MemberInterfaceResolver {
   @ResolveField()
   async user(@Parent() parent: Member) {
     return await this.memberService.getMember(parent.id).user();
+  }
+
+  @ResolveField()
+  async chat(@Parent() parent: Member) {
+    return await this.memberService.getMember(parent.id).chat();
+  }
+
+  @ResolveField()
+  async addedBy(@Parent() parent: Member) {
+    return await this.memberService.getMember(parent.id).addedBy();
   }
 
   @Query(() => PaginatedMember)

@@ -7,7 +7,7 @@ import Member from 'src/member/models/interfaces/member.interface';
 @ObjectType({
   implements: () => ChatMemberAlteration,
 })
-export default class ChatMembersRoleChanged implements ChatMemberAlteration {
+export default class ChatMembersRoleUpdate implements ChatMemberAlteration {
   @Field(() => MemberRole)
   role: MemberRole;
 
