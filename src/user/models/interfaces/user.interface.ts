@@ -1,9 +1,9 @@
 import { Field, InterfaceType } from '@nestjs/graphql';
 import { HashIdScalar } from 'src/common/scalars/hash-id.scalar';
-import Friend from '../friend.model';
+import Friend from '../../friend/models/friend.model';
 import { IContext } from 'src/auth/interfaces/context.interface';
 import Me from 'src/user/me/models/me.model';
-import Stranger from '../stranger.model';
+import Stranger from '../../stranger/models/stranger.model';
 import { PaginatedUser } from 'src/user/resolvers/user.resolver';
 
 @InterfaceType({

@@ -6,8 +6,6 @@ import { MemberService } from '../member.service';
 import Member from '../models/interfaces/member.interface';
 import { PaginatedMember } from '../models/paginated-member.model';
 import { HashIdScalar } from 'src/common/scalars/hash-id.scalar';
-import { ChatService } from 'src/chat/chat.service';
-import { UserService } from 'src/user/services/user.service';
 
 @Resolver(() => Member)
 export class MemberInterfaceResolver {

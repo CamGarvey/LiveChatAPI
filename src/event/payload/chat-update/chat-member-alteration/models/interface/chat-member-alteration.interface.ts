@@ -8,6 +8,7 @@ import ChatMembersRoleUpdate from '../chat-members-role-update.model';
 import ChatUpdate from '../../../models/interface/chat-update.interface';
 
 @InterfaceType({
+  implements: () => ChatUpdate,
   resolveType: (source: PrismaChatUpdate) => {
     switch (source.type) {
       case 'MEMBERS_ADDED':

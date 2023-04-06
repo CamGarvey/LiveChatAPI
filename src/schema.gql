@@ -87,15 +87,21 @@ type ChatMemberAccessGrantedAlert implements Alert & ChatAccessAlert & ChatAlert
   recipientId: HashId!
 }
 
-interface ChatMemberAlteration {
+interface ChatMemberAlteration implements ChatUpdate {
+  event: Event!
+  eventId: Float!
   members: [Member!]!
 }
 
-type ChatMembersAddedUpdate implements ChatMemberAlteration {
+type ChatMembersAddedUpdate implements ChatMemberAlteration & ChatUpdate {
+  event: Event!
+  eventId: Float!
   members: [Member!]!
 }
 
-type ChatMembersRemovedUpdate implements ChatMemberAlteration {
+type ChatMembersRemovedUpdate implements ChatMemberAlteration & ChatUpdate {
+  event: Event!
+  eventId: Float!
   members: [Member!]!
 }
 

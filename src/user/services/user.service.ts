@@ -169,28 +169,31 @@ export class UserService {
       Pick<Prisma.UserWhereUniqueInput, 'id'>
     >(
       (args) =>
-        this.prisma.user.findMany({
-          ...args,
-          where: {
-            friendsOf: {
-              some: {
-                id: userId,
-              },
+        this.prisma.user
+          .findUniqueOrThrow({
+            where: {
+              id: userId,
             },
-            ...where,
-          },
-        }),
+          })
+          .friends({
+            where,
+            ...args,
+          }),
       () =>
-        this.prisma.user.count({
-          where: {
-            friendsOf: {
-              some: {
-                id: userId,
+        this.prisma.user
+          .findUniqueOrThrow({
+            include: {
+              _count: {
+                select: {
+                  friends: true,
+                },
               },
             },
-            ...where,
-          },
-        }),
+            where: {
+              id: userId,
+            },
+          })
+          .then((result) => result._count.friends),
       filterPaginationArgs,
       {
         getCursor: (record) => ({ id: record.id }),
@@ -241,7 +244,6 @@ export class UserService {
           },
         });
       },
-
       () => this.prisma.user.count({ where }),
       filterPaginationArgs,
       {

@@ -5,7 +5,7 @@ import {
   FilterPaginationArgs,
   Paginated,
 } from '../../../common/models/pagination';
-import Friend from '../../models/friend.model';
+import Friend from '../models/friend.model';
 import { UserService } from '../../services/user.service';
 
 @Resolver(() => Friend)
