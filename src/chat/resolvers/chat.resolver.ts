@@ -19,14 +19,11 @@ import Chat from '../models/interfaces/chat.interfaces';
 
 @Resolver(() => Chat)
 export class ChatInterfaceResolver {
-  constructor(
-    private readonly chatService: ChatService,
-    private readonly userService: UserService,
-  ) {}
+  constructor(private readonly chatService: ChatService) {}
 
   @ResolveField()
   async createdBy(@Parent() parent: Chat) {
-    return await this.userService.getUser(parent.createdById);
+    return await this.chatService.getChat(parent.id).createdBy();
   }
 
   @ResolveField()

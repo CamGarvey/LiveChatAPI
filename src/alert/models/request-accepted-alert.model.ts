@@ -13,7 +13,6 @@ export default class RequestAcceptedAlert implements RequestResponseAlert {
   createdBy: User;
   createdById: number;
   isCreator: boolean;
-  recipient: User;
-  recipientId: number;
+  recipients: User[];
   createdAt: Date;
 }

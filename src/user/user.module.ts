@@ -6,10 +6,10 @@ import { UserService } from './services/user.service';
 import { MeModule } from './me/me.module';
 import { StrangerModule } from './stranger/stranger.module';
 import { FriendModule } from './friend/friend.module';
-import { UserCacheService } from './services/user-cache.service';
+import { FriendService } from './friend/services/friend.service';
 
 @Module({
-  providers: [UserInterfaceResolver, UserService, UserCacheService],
+  providers: [UserInterfaceResolver, UserService],
   imports: [PrismaModule, PubSubModule, MeModule, StrangerModule, FriendModule],
   exports: [UserService],
 })

@@ -7,7 +7,7 @@ import {
   Resolver,
   Subscription,
 } from '@nestjs/graphql';
-import { AlertService } from 'src/alert/alert.service';
+import { AlertService } from 'src/alert/services/alert.service';
 import { IContext } from 'src/auth/interfaces/context.interface';
 import { NotificationPayload } from 'src/common/subscriptions/subscription.model';
 import { PubSubService } from 'src/pubsub/pubsub.service';
@@ -26,18 +26,18 @@ export class AlertInterfaceResolver {
   ) {}
 
   @ResolveField()
-  async recipient(@Parent() parent: Alert) {
-    return this.userService.getUser(parent.recipientId);
+  async recipients(@Parent() parent: Alert) {
+    return await this.alertService.getAlert(parent.id).recipients();
   }
 
   @ResolveField()
   async createdBy(@Parent() parent: Alert) {
-    return this.userService.getUser(parent.createdById);
+    return await this.alertService.getAlert(parent.id).createdBy();
   }
 
   @Query(() => [Alert])
   async alerts(@CurrentUser() user: IAuthUser) {
-    return this.alertService.getAlerts(user.id);
+    return await this.userService.getUser(user.id).alerts();
   }
 
   @Mutation(() => Alert)

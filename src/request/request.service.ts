@@ -4,14 +4,14 @@ import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-trig
 import { NotificationPayload } from 'src/common/subscriptions/subscription.model';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PubSubService } from 'src/pubsub/pubsub.service';
-import { UserService } from 'src/user/services/user.service';
+import { FriendService } from 'src/user/friend/services/friend.service';
 
 @Injectable()
 export class RequestService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly pubsub: PubSubService,
-    private readonly userService: UserService,
+    private readonly friendService: FriendService,
   ) {}
 
   async sendFriendRequest(
@@ -83,7 +83,7 @@ export class RequestService {
     });
 
     if (request.type === 'FRIEND_REQUEST') {
-      await this.userService.createFriend(
+      await this.friendService.createFriend(
         request.createdById,
         request.recipientId,
       );

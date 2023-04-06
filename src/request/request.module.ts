@@ -5,10 +5,17 @@ import { UserModule } from 'src/user/user.module';
 import { RequestService } from './request.service';
 import { RequestInterfaceResolver } from './resolvers/request.resolver';
 import { FriendRequestModule } from './friend-request/friend-request.module';
+import { FriendModule } from 'src/user/friend/friend.module';
 
 @Module({
   providers: [RequestService, RequestInterfaceResolver],
-  imports: [PubSubModule, PrismaModule, UserModule, FriendRequestModule],
+  imports: [
+    PubSubModule,
+    PrismaModule,
+    UserModule,
+    FriendRequestModule,
+    FriendModule,
+  ],
   exports: [RequestService],
 })
 export class RequestModule {}

@@ -44,11 +44,8 @@ export default class Alert {
   @Field()
   isCreator: boolean;
 
-  @Field(() => User)
-  recipient: User;
-
-  @Field(() => HashIdScalar)
-  recipientId: number;
+  @Field(() => [User])
+  recipients: User[];
 
   @Field(() => Date)
   createdAt: Date;

@@ -12,10 +12,12 @@ import { MemberService } from 'src/member/member.service';
 import { DirectMessageChatService } from '../services/direct-message-chat.service';
 import { HashIdScalar } from 'src/common/scalars/hash-id.scalar';
 import { log } from 'console';
+import { ChatService } from 'src/chat/chat.service';
 
 @Resolver(() => DirectMessageChat)
 export class DirectMessageChatResolver {
   constructor(
+    private readonly chatService: ChatService,
     private readonly memberSerivce: MemberService,
     private readonly directMessageChatService: DirectMessageChatService,
   ) {}
@@ -25,12 +27,8 @@ export class DirectMessageChatResolver {
     @Parent() parent: DirectMessageChat,
     @CurrentUser() user: IAuthUser,
   ) {
-    // There are only 2 users in a direct message chat
-    // so get and return the other
-    const members = await this.memberSerivce.getMembers(parent.id, {
-      first: 2,
-    });
-    return members.edges.find((edge) => edge.node.userId !== user.id).node;
+    const members = await this.chatService.getChat(parent.id).members();
+    return members.find((m) => m.userId !== user.id);
   }
 
   @Mutation(() => DirectMessageChat)

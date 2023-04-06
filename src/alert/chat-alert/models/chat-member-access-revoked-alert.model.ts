@@ -13,7 +13,6 @@ export default class ChatMemberAccessRevokedAlert implements ChatAccessAlert {
   createdBy: User;
   createdById: number;
   isCreator: boolean;
-  recipient: User;
-  recipientId: number;
+  recipients: User[];
   createdAt: Date;
 }

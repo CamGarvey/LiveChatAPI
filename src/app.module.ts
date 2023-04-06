@@ -23,6 +23,7 @@ import { HashModule } from './hash/hash.module';
 import { APP_GUARD } from '@nestjs/core';
 import { GqlAuthGuard } from './auth/gql-auth.guard';
 import { RedisOptions } from 'ioredis';
+import { FriendModule } from './user/friend/friend.module';
 
 @Module({
   imports: [
@@ -64,6 +65,7 @@ import { RedisOptions } from 'ioredis';
     AuthModule,
     CommonModule,
     HashModule,
+    FriendModule,
   ],
   providers: [
     JwtStrategy,

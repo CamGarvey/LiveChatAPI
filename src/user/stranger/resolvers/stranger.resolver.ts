@@ -6,10 +6,11 @@ import Stranger from '../models/stranger.model';
 import { UserService } from '../../services/user.service';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { IAuthUser } from 'src/auth/interfaces/auth-user.interface';
+import { FriendService } from 'src/user/friend/services/friend.service';
 
 @Resolver(() => Stranger)
 export class StrangerResolver {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly friendService: FriendService) {}
 
   @ResolveField()
   async mutualFriends(
@@ -17,7 +18,7 @@ export class StrangerResolver {
     @Args() filterPaginationArgs: FilterPaginationArgs,
     @CurrentUser() user: IAuthUser,
   ) {
-    return this.userService.getMutualFriends(
+    return this.friendService.getMutualFriends(
       parent.id,
       user.id,
       filterPaginationArgs,

@@ -14,6 +14,7 @@ import { HashService } from 'src/hash/hash.service';
 import { IAuthUser } from './interfaces/auth-user.interface';
 import { IChatJwtPayload } from './interfaces/chat-jwt-payload.interface';
 import { UserService } from 'src/user/services/user.service';
+import { FriendService } from 'src/user/friend/services/friend.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -23,7 +24,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     private readonly hashService: HashService,
     @Inject(authConfig.KEY)
     configuration: ConfigType<typeof authConfig>,
-    private readonly userService: UserService,
+    private readonly friendService: FriendService,
   ) {
     super({
       secretOrKeyProvider: passportJwtSecret({
@@ -51,7 +52,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       payload['http://localhost:4000/user_id'],
     );
 
-    const friendIds = await this.userService.getAllFriendIds(userId);
+    const friendIds = await this.friendService.getAllFriendIds(userId);
 
     return { id: userId, friendIds };
   }

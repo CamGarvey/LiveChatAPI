@@ -8,11 +8,6 @@ import { PubSubModule } from 'src/pubsub/pubsub.module';
 
 @Module({
   providers: [DirectMessageChatResolver, DirectMessageChatService],
-  imports: [
-    forwardRef(() => ChatModule),
-    MemberModule,
-    PrismaModule,
-    PubSubModule,
-  ],
+  imports: [forwardRef(() => ChatModule), PrismaModule, PubSubModule],
 })
 export class DirectMessageChatModule {}

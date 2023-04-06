@@ -4,14 +4,14 @@ import { PassportModule } from '@nestjs/passport';
 import authConfig from 'src/config/auth.config';
 import { HashModule } from 'src/hash/hash.module';
 import { JwtStrategy } from './jwt.strategy';
-import { UserModule } from 'src/user/user.module';
+import { FriendModule } from 'src/user/friend/friend.module';
 
 @Module({
   imports: [
     ConfigModule.forFeature(authConfig),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     HashModule,
-    UserModule,
+    FriendModule,
   ],
   providers: [JwtStrategy],
   exports: [PassportModule, JwtStrategy],

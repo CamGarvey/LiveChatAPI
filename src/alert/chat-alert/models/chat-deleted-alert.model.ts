@@ -18,7 +18,6 @@ export default class ChatDeletedAlert implements Alert {
   createdBy: User;
   createdById: number;
   isCreator: boolean;
-  recipient: User;
-  recipientId: number;
+  recipients: User[];
   createdAt: Date;
 }

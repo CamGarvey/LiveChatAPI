@@ -1,19 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { Alert } from '@prisma/client';
+import { Alert, Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class AlertService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getAlerts(userId: number): Promise<Alert[]> {
-    return await this.prisma.user
-      .findUnique({
-        where: {
-          id: userId,
-        },
-      })
-      .alerts();
+  getAlert(alertId: number): Prisma.Prisma__AlertClient<Alert> {
+    return this.prisma.alert.findUniqueOrThrow({
+      where: { id: alertId },
+    });
   }
 
   async acknowledgeAlert(
