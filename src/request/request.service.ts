@@ -15,30 +15,12 @@ export class RequestService {
   ) {}
 
   async acceptRequest(requestId: number): Promise<Request> {
-    // Update the request
     const request = await this.prisma.request.update({
       data: {
         state: 'ACCEPTED',
       },
       where: {
         id: requestId,
-      },
-    });
-    // Respond to the request and create an alert
-    const alert = await this.prisma.alert.upsert({
-      create: {
-        type: 'REQUEST_ACCEPTED',
-        createdById: request.recipientId,
-        recipients: {
-          connect: {
-            id: request.createdById,
-          },
-        },
-        requestId,
-      },
-      update: {},
-      where: {
-        requestId,
       },
     });
 
@@ -50,11 +32,11 @@ export class RequestService {
     }
 
     // Publish alert
-    this.pubsub.publish<SubscriptionPayload<Alert>>(
-      SubscriptionTriggers.RequestAcceptedAlert,
+    this.pubsub.publish<SubscriptionPayload<Request>>(
+      SubscriptionTriggers.RequestAccepted,
       {
         recipients: [request.createdById],
-        content: alert,
+        content: request,
       },
     );
 
@@ -71,30 +53,13 @@ export class RequestService {
         id: requestId,
       },
     });
-    // Create an response alert
-    const alert = await this.prisma.alert.upsert({
-      create: {
-        type: 'REQUEST_DECLINED',
-        createdById: request.recipientId,
-        recipients: {
-          connect: {
-            id: request.createdById,
-          },
-        },
-        requestId,
-      },
-      update: {},
-      where: {
-        requestId,
-      },
-    });
 
     // Publish alert to the creator
-    this.pubsub.publish<SubscriptionPayload<Alert>>(
+    this.pubsub.publish<SubscriptionPayload<Request>>(
       SubscriptionTriggers.RequestCancelled,
       {
         recipients: [request.createdById],
-        content: alert,
+        content: request,
       },
     );
 

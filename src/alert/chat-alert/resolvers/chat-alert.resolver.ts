@@ -25,7 +25,7 @@ export class ChatAlertInterfaceResolver {
     },
   })
   async chatAlerts() {
-    return this.pubsub.asyncIterator('notification.alert.chat.*', {
+    return this.pubsub.asyncIterator('alert.chat.*', {
       pattern: true,
     });
   }

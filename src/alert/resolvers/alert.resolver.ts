@@ -55,7 +55,7 @@ export class AlertInterfaceResolver {
     },
   })
   async alertSubscription() {
-    return this.pubsub.asyncIterator('notification.alert.*', {
+    return this.pubsub.asyncIterator('alert.*', {
       pattern: true,
     });
   }

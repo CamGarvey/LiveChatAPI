@@ -6,8 +6,6 @@ import { HashIdScalar } from 'src/common/scalars/hash-id.scalar';
 import User from 'src/user/models/interfaces/user.interface';
 import ChatDeletedAlert from '../../chat-alert/models/chat-deleted-alert.model';
 import FriendDeletedAlert from '../friend-deleted-alert.model';
-import RequestAcceptedAlert from '../request-accepted-alert.model';
-import RequestDeclinedAlert from '../request-declined-alert.model';
 
 @InterfaceType({
   resolveType: (source: PrimsaAlert) => {
@@ -16,10 +14,6 @@ import RequestDeclinedAlert from '../request-declined-alert.model';
         return ChatDeletedAlert;
       case 'FRIEND_DELETED':
         return FriendDeletedAlert;
-      case 'REQUEST_ACCEPTED':
-        return RequestAcceptedAlert;
-      case 'REQUEST_DECLINED':
-        return RequestDeclinedAlert;
       case 'CHAT_ACCESS_REVOKED':
         return ChatMemberAccessRevokedAlert;
       case 'CHAT_ACCESS_GRANTED':
