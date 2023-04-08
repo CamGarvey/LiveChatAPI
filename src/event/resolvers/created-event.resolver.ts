@@ -28,19 +28,4 @@ export class CreatedEventResolver {
         throw new GraphQLError('Event type not supported');
     }
   }
-
-  @Subscription(() => CreatedEvent, {
-    filter(payload: SubscriptionPayload<Event>, variables, { user }: IContext) {
-      if (variables.chatId) {
-        return (
-          payload.content.createdById !== user.id &&
-          payload.content.chatId == variables.chatId
-        );
-      }
-      return payload.recipients.includes(user.id);
-    },
-  })
-  eventCreated() {
-    return this.pubsub.asyncIterator(SubscriptionTriggers.EventCreated);
-  }
 }

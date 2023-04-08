@@ -60,7 +60,6 @@ import { ChatModule } from './chat/chat.module';
     UserModule,
     ChatModule,
     RequestModule,
-    RequestModule,
     AlertModule,
     EventModule,
     MemberModule,

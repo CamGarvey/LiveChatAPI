@@ -216,11 +216,11 @@ type FriendEdge {
 type FriendRequest implements Request {
   createdAt: DateTime!
   createdBy: User!
-  createdById: Float!
+  createdById: HashId!
   id: HashId!
   isCreator: Boolean!
   recipient: User!
-  recipientId: Float!
+  recipientId: HashId!
   state: RequestState!
 }
 
@@ -358,11 +358,11 @@ type RemovedMember implements Member {
 interface Request {
   createdAt: DateTime!
   createdBy: User!
-  createdById: Float!
+  createdById: HashId!
   id: HashId!
   isCreator: Boolean!
   recipient: User!
-  recipientId: Float!
+  recipientId: HashId!
   state: RequestState!
 }
 
@@ -419,9 +419,6 @@ type Stranger implements User {
 
 type Subscription {
   alerts: ChatAlert!
-  eventCreated: CreatedEvent!
-  eventDeleted: DeletedEvent!
-  eventUpdated: Event!
   events: Event!
   requests: Request!
 }

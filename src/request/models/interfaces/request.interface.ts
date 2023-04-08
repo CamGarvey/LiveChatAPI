@@ -3,14 +3,14 @@ import { HashIdScalar } from 'src/common/scalars/hash-id.scalar';
 import User from '../../../user/models/interfaces/user.interface';
 
 @InterfaceType()
-export default abstract class Request {
+export default class Request {
   @Field(() => HashIdScalar)
   id: number;
 
   @Field(() => User)
   createdBy: User;
 
-  @Field()
+  @Field(() => HashIdScalar)
   createdById: number;
 
   @Field()
@@ -19,7 +19,7 @@ export default abstract class Request {
   @Field(() => User)
   recipient: User;
 
-  @Field()
+  @Field(() => HashIdScalar)
   recipientId: number;
 
   @Field(() => RequestState)

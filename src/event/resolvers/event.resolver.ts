@@ -10,33 +10,17 @@ import {
   Subscription,
 } from '@nestjs/graphql';
 import { IAuthUser } from 'src/auth/interfaces/auth-user.interface';
-import { IContext } from 'src/auth/interfaces/context.interface';
 import { ChatGuard } from 'src/common/guards/chat.guard';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { EventGuard } from 'src/common/guards/event.guard';
 import { Paginated, PaginationArgs } from 'src/common/models/pagination';
 import { Roles } from 'src/common/decorators/roles.decorator';
-import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-triggers.enum';
 import { SubscriptionPayload } from 'src/common/subscriptions/subscription-payload.model';
 import { PubSubService } from 'src/pubsub/pubsub.service';
 import { EventService } from '../event.service';
 import DeletedEvent from '../models/deleted-event.model';
 import Event from '../models/interfaces/event.interface';
 import { HashIdScalar } from 'src/common/scalars/hash-id.scalar';
-
-const isUserRecipient = (
-  payload: SubscriptionPayload<Event>,
-  variables: any,
-  { user }: IContext,
-) => {
-  if (variables.chatId) {
-    return (
-      payload.content.createdById !== user.id &&
-      payload.content.chatId == variables.chatId
-    );
-  }
-  return payload.recipients.includes(user.id);
-};
 
 @Resolver(() => Event)
 export class EventInterfaceResolver {
@@ -87,27 +71,12 @@ export class EventInterfaceResolver {
 
   @Subscription(() => Event, {
     name: 'events',
-    filter: isUserRecipient,
+    filter: (payload: SubscriptionPayload<Event>, _, user: IAuthUser) =>
+      payload.recipients.includes(user.id),
     resolve: (payload: SubscriptionPayload<Event>) => payload.content,
   })
   async eventSubscription() {
     return this.pubsub.asyncIterator('event.*', { pattern: true });
-  }
-
-  @Subscription(() => Event, {
-    filter: isUserRecipient,
-    resolve: (payload: SubscriptionPayload<Event>) => payload.content,
-  })
-  async eventUpdated() {
-    return this.pubsub.asyncIterator(SubscriptionTriggers.EventUpdated);
-  }
-
-  @Subscription(() => DeletedEvent, {
-    filter: isUserRecipient,
-    resolve: (payload: SubscriptionPayload<Event>) => payload.content,
-  })
-  async eventDeleted() {
-    return this.pubsub.asyncIterator(SubscriptionTriggers.EventDeleted);
   }
 }
 
