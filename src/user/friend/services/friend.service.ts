@@ -3,10 +3,10 @@ import {
   findManyCursorConnection,
 } from '@devoxa/prisma-relay-cursor-connection';
 import { Injectable } from '@nestjs/common';
-import { Prisma, User } from '@prisma/client';
+import { Alert, Prisma, User } from '@prisma/client';
 import { FilterPaginationArgs } from 'src/common/models/pagination';
 import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-triggers.enum';
-import { NotificationPayload } from 'src/common/subscriptions/subscription.model';
+import { SubscriptionPayload } from 'src/common/subscriptions/subscription-payload.model';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PubSubService } from 'src/pubsub/pubsub.service';
 import { FriendCacheService } from 'src/user/friend/resolvers/friend-cache.service';
@@ -78,7 +78,7 @@ export class FriendService {
     });
 
     // Publish notification to deleted friend
-    this.pubsub.publish<NotificationPayload>(
+    this.pubsub.publish<SubscriptionPayload<Alert>>(
       SubscriptionTriggers.FriendDeletedAlert,
       {
         recipients: [userId],

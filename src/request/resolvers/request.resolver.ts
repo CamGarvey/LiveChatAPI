@@ -1,7 +1,7 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Resolver, Subscription } from '@nestjs/graphql';
 import { IContext } from 'src/auth/interfaces/context.interface';
-import { NotificationPayload } from 'src/common/subscriptions/subscription.model';
+import { SubscriptionPayload } from 'src/common/subscriptions/subscription-payload.model';
 import { PubSubService } from 'src/pubsub/pubsub.service';
 import { RequestReceiverGuard } from '../guards/request-receiver/request-receiver.guard';
 import { RequestSenderGuard } from '../guards/request-sender/request-sender.guard';
@@ -41,7 +41,7 @@ export class RequestInterfaceResolver {
   }
 
   @Subscription(() => Request, {
-    filter(payload: NotificationPayload, _, { user }: IContext) {
+    filter(payload: SubscriptionPayload<Request>, _, { user }: IContext) {
       return payload.recipients.includes(user.id);
     },
   })

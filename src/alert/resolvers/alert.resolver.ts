@@ -9,7 +9,7 @@ import {
 } from '@nestjs/graphql';
 import { AlertService } from 'src/alert/services/alert.service';
 import { IContext } from 'src/auth/interfaces/context.interface';
-import { NotificationPayload } from 'src/common/subscriptions/subscription.model';
+import { SubscriptionPayload } from 'src/common/subscriptions/subscription-payload.model';
 import { PubSubService } from 'src/pubsub/pubsub.service';
 import { UserService } from 'src/user/services/user.service';
 import Alert from '../models/interfaces/alert.interface';
@@ -50,7 +50,7 @@ export class AlertInterfaceResolver {
 
   @Subscription(() => Alert, {
     name: 'alerts',
-    filter(payload: NotificationPayload, _, { user }: IContext) {
+    filter(payload: SubscriptionPayload<Alert>, _, { user }: IContext) {
       return payload.recipients.includes(user.id);
     },
   })

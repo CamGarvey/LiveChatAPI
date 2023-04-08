@@ -17,7 +17,7 @@ import { EventGuard } from 'src/common/guards/event.guard';
 import { Paginated, PaginationArgs } from 'src/common/models/pagination';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-triggers.enum';
-import { EventPayload } from 'src/common/subscriptions/subscription.model';
+import { SubscriptionPayload } from 'src/common/subscriptions/subscription-payload.model';
 import { PubSubService } from 'src/pubsub/pubsub.service';
 import { EventService } from '../event.service';
 import DeletedEvent from '../models/deleted-event.model';
@@ -25,7 +25,7 @@ import Event from '../models/interfaces/event.interface';
 import { HashIdScalar } from 'src/common/scalars/hash-id.scalar';
 
 const isUserRecipient = (
-  payload: EventPayload,
+  payload: SubscriptionPayload<Event>,
   variables: any,
   { user }: IContext,
 ) => {
@@ -88,7 +88,7 @@ export class EventInterfaceResolver {
   @Subscription(() => Event, {
     name: 'events',
     filter: isUserRecipient,
-    resolve: (payload: EventPayload) => payload.content,
+    resolve: (payload: SubscriptionPayload<Event>) => payload.content,
   })
   async eventSubscription() {
     return this.pubsub.asyncIterator('event.*', { pattern: true });
@@ -96,7 +96,7 @@ export class EventInterfaceResolver {
 
   @Subscription(() => Event, {
     filter: isUserRecipient,
-    resolve: (payload: EventPayload) => payload.content,
+    resolve: (payload: SubscriptionPayload<Event>) => payload.content,
   })
   async eventUpdated() {
     return this.pubsub.asyncIterator(SubscriptionTriggers.EventUpdated);
@@ -104,7 +104,7 @@ export class EventInterfaceResolver {
 
   @Subscription(() => DeletedEvent, {
     filter: isUserRecipient,
-    resolve: (payload: EventPayload) => payload.content,
+    resolve: (payload: SubscriptionPayload<Event>) => payload.content,
   })
   async eventDeleted() {
     return this.pubsub.asyncIterator(SubscriptionTriggers.EventDeleted);

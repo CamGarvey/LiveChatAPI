@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Request } from '@prisma/client';
+import { SubscriptionPayload } from 'src/common/subscriptions/subscription-payload.model';
 import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-triggers.enum';
-import { NotificationPayload } from 'src/common/subscriptions/subscription.model';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PubSubService } from 'src/pubsub/pubsub.service';
 
@@ -44,10 +44,13 @@ export class FriendRequestService {
     });
 
     // Publish this new request
-    this.pubsub.publish<NotificationPayload>(SubscriptionTriggers.RequestSent, {
-      recipients: [userId],
-      content: request,
-    });
+    this.pubsub.publish<SubscriptionPayload<Request>>(
+      SubscriptionTriggers.RequestSent,
+      {
+        recipients: [userId],
+        content: request,
+      },
+    );
 
     return request;
   }

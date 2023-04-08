@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { Request } from '@prisma/client';
+import { Alert, Request } from '@prisma/client';
+import { SubscriptionPayload } from 'src/common/subscriptions/subscription-payload.model';
 import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-triggers.enum';
-import { NotificationPayload } from 'src/common/subscriptions/subscription.model';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PubSubService } from 'src/pubsub/pubsub.service';
 import { FriendService } from 'src/user/friend/services/friend.service';
@@ -50,7 +50,7 @@ export class RequestService {
     }
 
     // Publish alert
-    this.pubsub.publish<NotificationPayload>(
+    this.pubsub.publish<SubscriptionPayload<Alert>>(
       SubscriptionTriggers.RequestAcceptedAlert,
       {
         recipients: [request.createdById],
@@ -90,7 +90,7 @@ export class RequestService {
     });
 
     // Publish alert to the creator
-    this.pubsub.publish<NotificationPayload>(
+    this.pubsub.publish<SubscriptionPayload<Alert>>(
       SubscriptionTriggers.RequestCancelled,
       {
         recipients: [request.createdById],
@@ -112,7 +112,7 @@ export class RequestService {
     });
 
     // Publish deleted request
-    this.pubsub.publish<NotificationPayload>(
+    this.pubsub.publish<SubscriptionPayload<Request>>(
       SubscriptionTriggers.RequestCancelled,
       {
         recipients: [request.recipientId],

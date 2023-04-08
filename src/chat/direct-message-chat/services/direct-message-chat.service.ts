@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-triggers.enum';
-import { NotificationPayload } from 'src/common/subscriptions/subscription.model';
+import { SubscriptionPayload } from 'src/common/subscriptions/subscription-payload.model';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PubSubService } from 'src/pubsub/pubsub.service';
+import { Alert } from '@prisma/client';
 
 @Injectable()
 export class DirectMessageChatService {
@@ -72,7 +73,7 @@ export class DirectMessageChatService {
       },
     });
 
-    await this.pubsub.publish<NotificationPayload>(
+    await this.pubsub.publish<SubscriptionPayload<Alert>>(
       SubscriptionTriggers.ChatMemberAccessGrantedAlert,
       {
         recipients: [userId],

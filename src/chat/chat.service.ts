@@ -1,11 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { Chat, ChatUpdate, Prisma } from '@prisma/client';
-import { GraphQLError } from 'graphql';
+import { Alert, Chat, Prisma } from '@prisma/client';
+import { SubscriptionPayload } from 'src/common/subscriptions/subscription-payload.model';
 import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-triggers.enum';
-import {
-  EventPayload,
-  NotificationPayload,
-} from 'src/common/subscriptions/subscription.model';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PubSubService } from 'src/pubsub/pubsub.service';
 
@@ -60,7 +56,7 @@ export class ChatService {
 
     // Publish the deleted chat alert to every member
     // except from the user who deleted it (deletedById)
-    await this.pubsub.publish<NotificationPayload>(
+    await this.pubsub.publish<SubscriptionPayload<Alert>>(
       SubscriptionTriggers.ChatDeletedAlert,
       {
         recipients: chat.members

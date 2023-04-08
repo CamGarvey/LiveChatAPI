@@ -5,7 +5,8 @@ import { GraphQLError } from 'graphql';
 import { PubSubService } from 'src/pubsub/pubsub.service';
 import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-triggers.enum';
 import { IContext } from 'src/auth/interfaces/context.interface';
-import { EventPayload } from 'src/common/subscriptions/subscription.model';
+import { SubscriptionPayload } from 'src/common/subscriptions/subscription-payload.model';
+import { Event } from '@prisma/client';
 
 @Resolver(() => CreatedEvent)
 export class CreatedEventResolver {
@@ -29,7 +30,7 @@ export class CreatedEventResolver {
   }
 
   @Subscription(() => CreatedEvent, {
-    filter(payload: EventPayload, variables, { user }: IContext) {
+    filter(payload: SubscriptionPayload<Event>, variables, { user }: IContext) {
       if (variables.chatId) {
         return (
           payload.content.createdById !== user.id &&

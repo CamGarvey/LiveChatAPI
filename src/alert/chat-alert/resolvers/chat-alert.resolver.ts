@@ -1,10 +1,10 @@
 import { Parent, ResolveField, Resolver, Subscription } from '@nestjs/graphql';
 import { IContext } from 'src/auth/interfaces/context.interface';
-import { ChatService } from 'src/chat/chat.service';
-import { NotificationPayload } from 'src/common/subscriptions/subscription.model';
+import { SubscriptionPayload } from 'src/common/subscriptions/subscription-payload.model';
 import { PubSubService } from 'src/pubsub/pubsub.service';
 import ChatAlert from '../models/interfaces/chat-alert.interface';
 import { AlertService } from 'src/alert/services/alert.service';
+import { Alert } from '@prisma/client';
 
 @Resolver(() => ChatAlert)
 export class ChatAlertInterfaceResolver {
@@ -20,7 +20,7 @@ export class ChatAlertInterfaceResolver {
 
   @Subscription(() => ChatAlert, {
     name: 'alerts',
-    filter(payload: NotificationPayload, _, { user }: IContext) {
+    filter(payload: SubscriptionPayload<Alert>, _, { user }: IContext) {
       return payload.recipients.includes(user.id);
     },
   })

@@ -1,11 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { Chat, ChatUpdate } from '@prisma/client';
+import { Alert, Chat, ChatUpdate, Event } from '@prisma/client';
 import { GraphQLError } from 'graphql';
 import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-triggers.enum';
-import {
-  EventPayload,
-  NotificationPayload,
-} from 'src/common/subscriptions/subscription.model';
+import { SubscriptionPayload } from 'src/common/subscriptions/subscription-payload.model';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PubSubService } from 'src/pubsub/pubsub.service';
 
@@ -70,7 +67,7 @@ export class GroupChatService {
       },
     });
 
-    await this.pubsub.publish<NotificationPayload>(
+    await this.pubsub.publish<SubscriptionPayload<Alert>>(
       SubscriptionTriggers.ChatMemberAccessGrantedAlert,
       {
         recipients,
@@ -151,10 +148,13 @@ export class GroupChatService {
       .filter((x) => x !== updatedById);
 
     // Publish new chat event
-    await this.pubsub.publish<EventPayload>(SubscriptionTriggers.EventCreated, {
-      recipients,
-      content: event,
-    });
+    await this.pubsub.publish<SubscriptionPayload<Event>>(
+      SubscriptionTriggers.EventCreated,
+      {
+        recipients,
+        content: event,
+      },
+    );
 
     return event.chatUpdate;
   }
@@ -230,10 +230,13 @@ export class GroupChatService {
       .filter((x) => x !== updatedById);
 
     // Publish new chat event
-    await this.pubsub.publish<EventPayload>(SubscriptionTriggers.EventCreated, {
-      recipients,
-      content: event,
-    });
+    await this.pubsub.publish<SubscriptionPayload<Event>>(
+      SubscriptionTriggers.EventCreated,
+      {
+        recipients,
+        content: event,
+      },
+    );
 
     return event.chatUpdate;
   }
@@ -330,10 +333,13 @@ export class GroupChatService {
       .filter((x) => x !== addedById);
 
     // Publish new chat event
-    await this.pubsub.publish<EventPayload>(SubscriptionTriggers.EventCreated, {
-      recipients,
-      content: event,
-    });
+    await this.pubsub.publish<SubscriptionPayload<Event>>(
+      SubscriptionTriggers.EventCreated,
+      {
+        recipients,
+        content: event,
+      },
+    );
 
     const alert = await this.prisma.alert.create({
       data: {
@@ -357,7 +363,7 @@ export class GroupChatService {
     });
 
     // Publish new chat alert
-    await this.pubsub.publish<NotificationPayload>(
+    await this.pubsub.publish<SubscriptionPayload<Alert>>(
       SubscriptionTriggers.ChatMemberAccessGrantedAlert,
       {
         recipients,
@@ -436,12 +442,15 @@ export class GroupChatService {
     });
 
     // Publish new chat event
-    await this.pubsub.publish<EventPayload>(SubscriptionTriggers.EventCreated, {
-      recipients: chat.members
-        .map((x) => x.userId)
-        .filter((x) => x !== removedById),
-      content: event,
-    });
+    await this.pubsub.publish<SubscriptionPayload<Event>>(
+      SubscriptionTriggers.EventCreated,
+      {
+        recipients: chat.members
+          .map((x) => x.userId)
+          .filter((x) => x !== removedById),
+        content: event,
+      },
+    );
 
     const alert = await this.prisma.alert.create({
       data: {
@@ -465,7 +474,7 @@ export class GroupChatService {
     });
 
     // Publish new chat alert
-    await this.pubsub.publish<NotificationPayload>(
+    await this.pubsub.publish<SubscriptionPayload<Alert>>(
       SubscriptionTriggers.ChatMemberAccessRevokedAlert,
       {
         recipients: userIds,

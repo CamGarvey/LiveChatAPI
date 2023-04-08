@@ -3,14 +3,11 @@ import {
   findManyCursorConnection,
 } from '@devoxa/prisma-relay-cursor-connection';
 import { Injectable } from '@nestjs/common';
-import { ChatUpdate, Member, Prisma } from '@prisma/client';
+import { Alert, ChatUpdate, Event, Member, Prisma } from '@prisma/client';
 import { GraphQLError } from 'graphql';
 import { PaginationArgs } from 'src/common/models/pagination';
 import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-triggers.enum';
-import {
-  EventPayload,
-  NotificationPayload,
-} from 'src/common/subscriptions/subscription.model';
+import { SubscriptionPayload } from 'src/common/subscriptions/subscription-payload.model';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PubSubService } from 'src/pubsub/pubsub.service';
 import { ChangeRoleInput } from './models/inputs/change-role.input';
@@ -150,10 +147,13 @@ export class MemberService {
       .filter((x) => x !== changedById);
 
     // Publish new chat event
-    await this.pubsub.publish<EventPayload>(SubscriptionTriggers.EventCreated, {
-      recipients,
-      content: event,
-    });
+    await this.pubsub.publish<SubscriptionPayload<Event>>(
+      SubscriptionTriggers.EventCreated,
+      {
+        recipients,
+        content: event,
+      },
+    );
 
     // Create new alert for those affected
     const alert = await this.prisma.alert.create({
@@ -178,7 +178,7 @@ export class MemberService {
     });
 
     // Publish new chat alert
-    await this.pubsub.publish<NotificationPayload>(
+    await this.pubsub.publish<SubscriptionPayload<Alert>>(
       SubscriptionTriggers.ChatAdminAccessRevokedAlert,
       {
         recipients,
