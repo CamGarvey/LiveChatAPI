@@ -14,46 +14,6 @@ export class RequestService {
     private readonly friendService: FriendService,
   ) {}
 
-  async sendFriendRequest(
-    userId: number,
-    createdById: number,
-  ): Promise<Request> {
-    const request = await this.prisma.request.upsert({
-      create: {
-        type: 'FRIEND_REQUEST',
-        recipient: {
-          connect: {
-            id: userId,
-          },
-        },
-        createdBy: {
-          connect: {
-            id: createdById,
-          },
-        },
-      },
-      update: {
-        state: 'SENT',
-        createdAt: new Date().toISOString(),
-      },
-      where: {
-        recipientId_createdById_type: {
-          type: 'FRIEND_REQUEST',
-          createdById: createdById,
-          recipientId: userId,
-        },
-      },
-    });
-
-    // Publish this new request
-    this.pubsub.publish<NotificationPayload>(SubscriptionTriggers.RequestSent, {
-      recipients: [userId],
-      content: request,
-    });
-
-    return request;
-  }
-
   async acceptRequest(requestId: number): Promise<Request> {
     // Update the request
     const request = await this.prisma.request.update({
