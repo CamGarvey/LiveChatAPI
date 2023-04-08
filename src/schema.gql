@@ -339,6 +339,7 @@ type Query {
   friends(after: String, before: String, filter: String, first: Int, last: Int): PaginatedFriend!
   me: Me!
   members(after: String, before: String, chatId: HashId!, first: Int, last: Int): PaginatedMember!
+  requests: [Request!]!
   users(after: String, before: String, filter: String, first: Int, last: Int): PaginatedUser!
 }
 
