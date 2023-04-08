@@ -18,7 +18,6 @@ import { ChatService } from 'src/chat/chat.service';
 export class DirectMessageChatResolver {
   constructor(
     private readonly chatService: ChatService,
-    private readonly memberSerivce: MemberService,
     private readonly directMessageChatService: DirectMessageChatService,
   ) {}
 

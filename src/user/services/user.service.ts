@@ -5,11 +5,8 @@ import {
 import { Injectable } from '@nestjs/common';
 import { Chat, Prisma, User } from '@prisma/client';
 import { FilterPaginationArgs } from 'src/common/models/pagination';
-import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-triggers.enum';
-import { NotificationPayload } from 'src/common/subscriptions/subscription.model';
 import { PubSubService } from 'src/pubsub/pubsub.service';
 import { PrismaService } from '../../prisma/prisma.service';
-import { FriendCacheService } from '../friend/resolvers/friend-cache.service';
 
 @Injectable()
 export class UserService {

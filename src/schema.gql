@@ -100,9 +100,27 @@ type ChatMembersRemovedUpdate implements ChatMemberAlteration & ChatUpdate {
   members: [Member!]!
 }
 
+type ChatNameUpdate implements ChatUpdate {
+  event: Event!
+  eventId: Float!
+  nameAfter: String!
+  nameBefore: String!
+}
+
 interface ChatUpdate {
   event: Event!
   eventId: Float!
+}
+
+input CreateGroupChatInput {
+  """Short description of the group chat"""
+  description: String
+
+  """Name of the group chat"""
+  name: String!
+
+  """Ids of the users to be added to the group chat"""
+  userIds: [HashId!]
 }
 
 type CreatedEvent implements Event {
@@ -213,7 +231,7 @@ type GroupChat implements Chat {
   description: String
   id: HashId!
   isCreator: Boolean!
-  members: PaginatedMember!
+  members(after: String, before: String, first: Int, last: Int): PaginatedMember!
   name: String!
   role: MemberRole!
   updatedAt: DateTime!
@@ -264,12 +282,19 @@ type Message {
 type Mutation {
   acceptRequest(requestId: HashId!): Request!
   acknowledgeAlert(alertId: HashId!): Alert!
+  addMembers(chatId: HashId!, userIds: [HashId!]!): ChatMembersAddedUpdate!
   cancelRequest(requestId: HashId!): Request!
+  createDirectMessageChat(receipentUserId: HashId!): DirectMessageChat!
+  createGroupChat(createGroupChatData: CreateGroupChatInput!): GroupChat!
   createMessage(chatId: HashId!, content: String!): Message!
   declineRequest(requestId: HashId!): Request!
   deleteEvent(eventId: HashId!): DeletedEvent!
   deleteFriend(userId: HashId!): Stranger!
+  deletedChat(chatId: HashId!): DeletedChat!
+  removeMembers(chatId: HashId!, userIds: [HashId!]!): ChatMembersRemovedUpdate!
   sendFriendRequest(userId: HashId!): FriendRequest!
+  updateGroupChatDescription(chatId: HashId!, description: String!): ChatDescriptionUpdate!
+  updateGroupChatName(chatId: HashId!, name: String!): ChatNameUpdate!
   updateMessage(content: String!, eventId: HashId!): Message!
 }
 
@@ -308,6 +333,7 @@ union PayloadUnion = ChatDescriptionUpdate | ChatMembersAddedUpdate | ChatMember
 
 type Query {
   alerts: [Alert!]!
+  chat(chatId: HashId!): Chat!
   event(eventId: HashId!): Event!
   events(after: String, before: String, chatId: HashId!, first: Int, last: Int): PaginatedEvent!
   friends(after: String, before: String, filter: String, first: Int, last: Int): PaginatedFriend!
@@ -338,6 +364,28 @@ interface Request {
   recipient: User!
   recipientId: Float!
   state: RequestState!
+}
+
+type RequestAcceptedAlert implements Alert & RequestResponseAlert {
+  createdAt: DateTime!
+  createdBy: User!
+  createdById: HashId!
+  id: HashId!
+  isCreator: Boolean!
+  recipients: [User!]!
+  request: Request!
+  requestId: HashId!
+}
+
+type RequestDeclinedAlert implements Alert & RequestResponseAlert {
+  createdAt: DateTime!
+  createdBy: User!
+  createdById: HashId!
+  id: HashId!
+  isCreator: Boolean!
+  recipients: [User!]!
+  request: Request!
+  requestId: HashId!
 }
 
 interface RequestResponseAlert implements Alert {

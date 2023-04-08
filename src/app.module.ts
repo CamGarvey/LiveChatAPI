@@ -24,6 +24,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { GqlAuthGuard } from './auth/gql-auth.guard';
 import { RedisOptions } from 'ioredis';
 import { FriendModule } from './user/friend/friend.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -57,6 +58,7 @@ import { FriendModule } from './user/friend/friend.module';
       plugins: [ApolloServerPluginLandingPageLocalDefault()],
     }),
     UserModule,
+    ChatModule,
     RequestModule,
     RequestModule,
     AlertModule,

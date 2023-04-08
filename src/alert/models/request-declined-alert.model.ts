@@ -3,9 +3,10 @@ import { AlertType } from '@prisma/client';
 import Request from 'src/request/models/interfaces/request.interface';
 import User from 'src/user/models/interfaces/user.interface';
 import RequestResponseAlert from './interfaces/request-response-alert.interface';
+import Alert from './interfaces/alert.interface';
 
 @ObjectType({
-  implements: () => [RequestResponseAlert],
+  implements: () => [RequestResponseAlert, Alert],
 })
 export default class RequestDeclinedAlert implements RequestResponseAlert {
   requestId: number;
