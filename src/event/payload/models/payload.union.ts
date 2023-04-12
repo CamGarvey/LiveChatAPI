@@ -35,6 +35,7 @@ export const PayloadUnion = createUnionType({
   types: () =>
     [
       Message,
+      ChatNameUpdate,
       ChatDescriptionUpdate,
       ChatMembersAddedUpdate,
       ChatMembersRemovedUpdate,

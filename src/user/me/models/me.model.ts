@@ -7,9 +7,6 @@ import { PaginatedUser } from 'src/user/resolvers/user.resolver';
   implements: () => [User],
 })
 export default class Me implements User {
-  @Field(() => [Chat])
-  chats: Chat[];
-
   id: number;
   username: string;
   name: string;

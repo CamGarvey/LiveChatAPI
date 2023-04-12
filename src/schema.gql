@@ -241,7 +241,6 @@ type GroupChat implements Chat {
 scalar HashId
 
 type Me implements User {
-  chats: [Chat!]!
   createdAt: DateTime!
   friends(after: String, before: String, filter: String, first: Int, last: Int): PaginatedUser!
   id: HashId!
@@ -329,11 +328,12 @@ type PaginatedUser {
   totalCount: Float!
 }
 
-union PayloadUnion = ChatDescriptionUpdate | ChatMembersAddedUpdate | ChatMembersRemovedUpdate | Message
+union PayloadUnion = ChatDescriptionUpdate | ChatMembersAddedUpdate | ChatMembersRemovedUpdate | ChatNameUpdate | Message
 
 type Query {
   alerts: [Alert!]!
   chat(chatId: HashId!): Chat!
+  chats: [Chat!]!
   event(eventId: HashId!): Event!
   events(after: String, before: String, chatId: HashId!, first: Int, last: Int): PaginatedEvent!
   friends(after: String, before: String, filter: String, first: Int, last: Int): PaginatedFriend!
@@ -367,39 +367,6 @@ interface Request {
   state: RequestState!
 }
 
-type RequestAcceptedAlert implements Alert & RequestResponseAlert {
-  createdAt: DateTime!
-  createdBy: User!
-  createdById: HashId!
-  id: HashId!
-  isCreator: Boolean!
-  recipients: [User!]!
-  request: Request!
-  requestId: HashId!
-}
-
-type RequestDeclinedAlert implements Alert & RequestResponseAlert {
-  createdAt: DateTime!
-  createdBy: User!
-  createdById: HashId!
-  id: HashId!
-  isCreator: Boolean!
-  recipients: [User!]!
-  request: Request!
-  requestId: HashId!
-}
-
-interface RequestResponseAlert implements Alert {
-  createdAt: DateTime!
-  createdBy: User!
-  createdById: HashId!
-  id: HashId!
-  isCreator: Boolean!
-  recipients: [User!]!
-  request: Request!
-  requestId: HashId!
-}
-
 enum RequestState {
   ACCEPTED
   CANCELLED
@@ -420,6 +387,7 @@ type Stranger implements User {
 
 type Subscription {
   alerts: ChatAlert!
+  chats: Chat!
   events: Event!
   requests: Request!
 }

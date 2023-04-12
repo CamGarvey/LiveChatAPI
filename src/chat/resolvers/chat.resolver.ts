@@ -6,6 +6,7 @@ import {
   Query,
   ResolveField,
   Resolver,
+  Subscription,
 } from '@nestjs/graphql';
 import { IAuthUser } from 'src/auth/interfaces/auth-user.interface';
 import { ChatService } from 'src/chat/chat.service';
@@ -16,10 +17,16 @@ import { HashIdScalar } from 'src/common/scalars/hash-id.scalar';
 import { UserService } from 'src/user/services/user.service';
 import DeletedChat from '../deleted-chat/models/deleted-chat.model';
 import Chat from '../models/interfaces/chat.interfaces';
+import { PubSubService } from 'src/pubsub/pubsub.service';
+import { SubscriptionPayload } from 'src/common/subscriptions/subscription-payload.model';
+import { IContext } from 'src/auth/interfaces/context.interface';
 
 @Resolver(() => Chat)
 export class ChatInterfaceResolver {
-  constructor(private readonly chatService: ChatService) {}
+  constructor(
+    private readonly chatService: ChatService,
+    private readonly pubsub: PubSubService,
+  ) {}
 
   @ResolveField()
   async createdBy(@Parent() parent: Chat) {
@@ -44,5 +51,15 @@ export class ChatInterfaceResolver {
     @CurrentUser() user: IAuthUser,
   ) {
     return this.chatService.deleteChat(chatId, user.id);
+  }
+
+  @Subscription(() => Chat, {
+    filter: (payload: SubscriptionPayload<Chat>, _, { user }: IContext) => {
+      return payload.recipients.includes(user.id);
+    },
+    resolve: (payload: SubscriptionPayload<Chat>) => payload.content,
+  })
+  async chats() {
+    return this.pubsub.asyncIterator('chat.*');
   }
 }

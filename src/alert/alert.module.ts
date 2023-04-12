@@ -6,14 +6,9 @@ import { UserModule } from 'src/user/user.module';
 import { AlertService } from './services/alert.service';
 import { AlertInterfaceResolver } from './resolvers/alert.resolver';
 import { ChatAlertModule } from './chat-alert/chat-alert.module';
-import { RequestResponseAlertResolver } from './resolvers/request-response-alert.resolver';
 
 @Module({
-  providers: [
-    AlertService,
-    AlertInterfaceResolver,
-    RequestResponseAlertResolver,
-  ],
+  providers: [AlertService, AlertInterfaceResolver],
   imports: [PrismaModule, UserModule, PubSubModule, ChatAlertModule],
   exports: [AlertService],
 })

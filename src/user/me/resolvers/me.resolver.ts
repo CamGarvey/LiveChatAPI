@@ -5,14 +5,15 @@ import Me from '../models/me.model';
 import { UserService } from '../../services/user.service';
 import Alert from 'src/alert/models/interfaces/alert.interface';
 import Request from 'src/request/models/interfaces/request.interface';
+import Chat from 'src/chat/models/interfaces/chat.interfaces';
 
 @Resolver(() => Me)
 export class MeResolver {
   constructor(private readonly userService: UserService) {}
 
-  @ResolveField()
+  @Query(() => [Chat])
   async chats(@CurrentUser() user: IAuthUser) {
-    return this.userService.getUserChats(user.id);
+    return await this.userService.getUserChats(user.id);
   }
 
   @Query(() => [Request])

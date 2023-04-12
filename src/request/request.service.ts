@@ -31,7 +31,6 @@ export class RequestService {
       );
     }
 
-    // Publish alert
     this.pubsub.publish<SubscriptionPayload<Request>>(
       SubscriptionTriggers.RequestAccepted,
       {
@@ -44,7 +43,6 @@ export class RequestService {
   }
 
   async declineRequest(requestId: number): Promise<Request> {
-    // Decline request
     const request = await this.prisma.request.update({
       data: {
         state: 'DECLINED',
@@ -54,9 +52,8 @@ export class RequestService {
       },
     });
 
-    // Publish alert to the creator
     this.pubsub.publish<SubscriptionPayload<Request>>(
-      SubscriptionTriggers.RequestCancelled,
+      SubscriptionTriggers.RequestDeclined,
       {
         recipients: [request.createdById],
         content: request,
@@ -76,7 +73,6 @@ export class RequestService {
       },
     });
 
-    // Publish deleted request
     this.pubsub.publish<SubscriptionPayload<Request>>(
       SubscriptionTriggers.RequestCancelled,
       {
