@@ -5,8 +5,8 @@ import {
   Parent,
   ResolveField,
   Resolver,
+  registerEnumType,
 } from '@nestjs/graphql';
-import { Role } from '@prisma/client';
 import { IAuthUser } from 'src/auth/interfaces/auth-user.interface';
 import { ChatGuard } from 'src/common/guards/chat.guard';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
@@ -21,6 +21,7 @@ import { GroupChatService } from '../services/group-chat.service';
 import { HashIdScalar } from 'src/common/scalars/hash-id.scalar';
 import ChatMembersAddedUpdate from 'src/event/payload/chat-update/chat-member-alteration/models/chat-members-added-update.model';
 import ChatMembersRemovedUpdate from 'src/event/payload/chat-update/chat-member-alteration/models/chat-members-removed-update.model';
+import { Role } from '@prisma/client';
 
 @Resolver(() => GroupChat)
 export class GroupChatResolver {
@@ -93,4 +94,25 @@ export class GroupChatResolver {
   ) {
     return this.groupChatService.removeMembers(chatId, userIds, user.id);
   }
+
+  @Mutation(() => ChatMembersRemovedUpdate)
+  @UseGuards(ChatGuard)
+  @Roles(Role.ADMIN, Role.OWNER)
+  async changeMemberRoles(
+    @Args('chatId', { type: () => HashIdScalar }) chatId: number,
+    @Args('userIds', { type: () => [HashIdScalar] }) userIds: number[],
+    @Args('role') role: Role,
+    @CurrentUser() user: IAuthUser,
+  ) {
+    return this.groupChatService.changeMemberRoles(
+      chatId,
+      userIds,
+      role,
+      user.id,
+    );
+  }
 }
+
+registerEnumType(Role, {
+  name: 'Role',
+});

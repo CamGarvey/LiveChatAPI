@@ -8,6 +8,6 @@ export class ChatUpdateInterfaceResolver {
 
   @ResolveField()
   event(@Parent() parent: ChatUpdate) {
-    return this.chatUpdateService.getChatUpdate(parent.eventId);
+    return this.chatUpdateService.getChatUpdate(parent.eventId).event();
   }
 }

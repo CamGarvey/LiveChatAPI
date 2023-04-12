@@ -14,8 +14,6 @@ import ChatMembersRoleUpdate from '../chat-update/chat-member-alteration/models/
 export const PayloadUnion = createUnionType({
   name: 'PayloadUnion',
   resolveType: (source: PrismaMessage | PrismaChatUpdate) => {
-    console.log(source);
-
     if ('type' in source) {
       switch (source.type) {
         case 'NAME_UPDATED':

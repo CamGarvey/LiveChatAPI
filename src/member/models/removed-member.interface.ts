@@ -3,7 +3,7 @@ import Chat from 'src/chat/models/interfaces/chat.interfaces';
 import { HashIdScalar } from 'src/common/scalars/hash-id.scalar';
 import User from 'src/user/models/interfaces/user.interface';
 import Member from './interfaces/member.interface';
-import { MemberRole } from './member-role.enum';
+import { Role } from '@prisma/client';
 
 @ObjectType({
   implements: () => [Member],
@@ -16,7 +16,7 @@ export default class RemovedMember implements Member {
   removedById: number;
 
   id: number;
-  role: MemberRole;
+  role: Role;
   user: User;
   userId: number;
   chat: Chat;

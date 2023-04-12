@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Alert, Chat, ChatUpdate, Event } from '@prisma/client';
+import { Alert, Chat, ChatUpdate, Event, Role } from '@prisma/client';
 import { GraphQLError } from 'graphql';
 import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-triggers.enum';
 import { SubscriptionPayload } from 'src/common/subscriptions/subscription-payload.model';
@@ -478,6 +478,130 @@ export class GroupChatService {
       SubscriptionTriggers.ChatMemberAccessRevokedAlert,
       {
         recipients: userIds,
+        content: alert,
+      },
+    );
+
+    return event.chatUpdate;
+  }
+
+  async changeMemberRoles(
+    chatId: number,
+    userIds: number[],
+    role: Role,
+    changedById: number,
+  ): Promise<ChatUpdate> {
+    // Remove duplicates
+    const userIdSet: Set<number> = new Set(userIds);
+    userIdSet.delete(changedById);
+
+    if (userIdSet.size === 0) {
+      throw new GraphQLError('Member list must not be empty');
+    }
+
+    const chat = await this.prisma.chat.update({
+      data: {
+        members: {
+          updateMany: {
+            data: {
+              role,
+            },
+            where: {
+              userId: {
+                in: [...userIdSet],
+              },
+            },
+          },
+        },
+      },
+      select: {
+        members: {
+          select: {
+            userId: true,
+          },
+        },
+      },
+      where: {
+        id: chatId,
+      },
+    });
+
+    // Create new chat event
+    const event = await this.prisma.event.create({
+      data: {
+        type: 'CHAT_UPDATE',
+        chat: {
+          connect: {
+            id: chatId,
+          },
+        },
+        createdBy: {
+          connect: {
+            id: changedById,
+          },
+        },
+        chatUpdate: {
+          create: {
+            type: 'ROLE_CHANGED',
+            newRole: role,
+            members: userIdSet
+              ? {
+                  connect: [...userIdSet].map((userId) => ({
+                    userId_chatId: {
+                      chatId,
+                      userId,
+                    },
+                  })),
+                }
+              : undefined,
+          },
+        },
+      },
+      include: {
+        chatUpdate: true,
+      },
+    });
+
+    const recipients = chat.members
+      .map((x) => x.userId)
+      .filter((x) => x !== changedById);
+
+    // Publish new chat event
+    await this.pubsub.publish<SubscriptionPayload<Event>>(
+      SubscriptionTriggers.EventCreated,
+      {
+        recipients,
+        content: event,
+      },
+    );
+
+    // Create new alert for those affected
+    const alert = await this.prisma.alert.create({
+      data: {
+        type: 'CHAT_ROLE_CHANGED',
+        chat: {
+          connect: {
+            id: chatId,
+          },
+        },
+        createdBy: {
+          connect: {
+            id: changedById,
+          },
+        },
+        recipients: userIdSet
+          ? {
+              connect: [...userIdSet].map((id) => ({ id })),
+            }
+          : undefined,
+      },
+    });
+
+    // Publish new chat alert
+    await this.pubsub.publish<SubscriptionPayload<Alert>>(
+      SubscriptionTriggers.ChatAdminAccessRevokedAlert,
+      {
+        recipients,
         content: alert,
       },
     );

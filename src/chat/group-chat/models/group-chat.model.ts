@@ -1,6 +1,6 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
+import { Role } from '@prisma/client';
 import Chat from 'src/chat/models/interfaces/chat.interfaces';
-import { MemberRole } from 'src/member/models/member-role.enum';
 import { PaginatedMember } from 'src/member/models/paginated-member.model';
 import User from 'src/user/models/interfaces/user.interface';
 
@@ -8,8 +8,8 @@ import User from 'src/user/models/interfaces/user.interface';
   implements: () => Chat,
 })
 export default class GroupChat implements Chat {
-  @Field(() => MemberRole)
-  role: MemberRole;
+  @Field(() => Role)
+  role: Role;
 
   @Field()
   name: string;
@@ -29,3 +29,7 @@ export default class GroupChat implements Chat {
   createdAt: Date;
   updatedAt: Date;
 }
+
+registerEnumType(Role, {
+  name: 'Role',
+});

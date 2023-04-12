@@ -1,7 +1,6 @@
-import { Field, InputType } from '@nestjs/graphql';
+import { Field, InputType, registerEnumType } from '@nestjs/graphql';
 import { Role } from '@prisma/client';
 import { HashIdScalar } from 'src/common/scalars/hash-id.scalar';
-import { MemberRole } from '../member-role.enum';
 
 @InputType()
 export class ChangeRoleInput {
@@ -11,8 +10,12 @@ export class ChangeRoleInput {
   @Field(() => [HashIdScalar])
   userIds: number[];
 
-  @Field(() => MemberRole, {
+  @Field(() => Role, {
     description: 'New role for members',
   })
   role: Role;
 }
+
+registerEnumType(Role, {
+  name: 'Role',
+});

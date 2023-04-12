@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { AuthGuard } from '@nestjs/passport';
+import { log } from 'console';
 
 @Injectable()
 export class GqlAuthGuard extends AuthGuard('jwt') {
@@ -14,7 +15,6 @@ export class GqlAuthGuard extends AuthGuard('jwt') {
     if (ctx.req.connectionParams) {
       const headers = ctx.req.connectionParams || {};
       headers['authorization'] = headers.Authorization;
-      delete headers.Authorization;
       return { headers };
     }
 
