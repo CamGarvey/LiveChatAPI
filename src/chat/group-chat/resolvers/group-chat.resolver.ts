@@ -101,7 +101,7 @@ export class GroupChatResolver {
   async changeMemberRoles(
     @Args('chatId', { type: () => HashIdScalar }) chatId: number,
     @Args('userIds', { type: () => [HashIdScalar] }) userIds: number[],
-    @Args('role') role: Role,
+    @Args('role', { type: () => Role }) role: Role,
     @CurrentUser() user: IAuthUser,
   ) {
     return this.groupChatService.changeMemberRoles(

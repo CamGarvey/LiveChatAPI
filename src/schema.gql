@@ -277,7 +277,7 @@ type Mutation {
   acknowledgeAlert(alertId: HashId!): Alert!
   addMembers(chatId: HashId!, userIds: [HashId!]!): ChatMembersAddedUpdate!
   cancelRequest(requestId: HashId!): Request!
-  changeMemberRoles(chatId: HashId!, role: String!, userIds: [HashId!]!): ChatMembersRemovedUpdate!
+  changeMemberRoles(chatId: HashId!, role: Role!, userIds: [HashId!]!): ChatMembersRemovedUpdate!
   createDirectMessageChat(receipentUserId: HashId!): DirectMessageChat!
   createGroupChat(createGroupChatData: CreateGroupChatInput!): GroupChat!
   createMessage(chatId: HashId!, content: String!): Message!
