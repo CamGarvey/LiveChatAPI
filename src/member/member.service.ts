@@ -3,14 +3,10 @@ import {
   findManyCursorConnection,
 } from '@devoxa/prisma-relay-cursor-connection';
 import { Injectable } from '@nestjs/common';
-import { Alert, ChatUpdate, Event, Member, Prisma } from '@prisma/client';
-import { GraphQLError } from 'graphql';
+import { Member, Prisma } from '@prisma/client';
 import { PaginationArgs } from 'src/common/models/pagination';
-import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-triggers.enum';
-import { SubscriptionPayload } from 'src/common/subscriptions/subscription-payload.model';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PubSubService } from 'src/pubsub/pubsub.service';
-import { ChangeRoleInput } from './models/inputs/change-role.input';
 
 @Injectable()
 export class MemberService {

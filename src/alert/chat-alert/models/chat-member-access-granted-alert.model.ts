@@ -1,6 +1,6 @@
 import { ObjectType } from '@nestjs/graphql';
 import Alert from 'src/alert/models/interfaces/alert.interface';
-import Chat from 'src/chat/models/interfaces/chat.interfaces';
+import Chat from 'src/chat/chat.interface';
 import User from 'src/user/models/interfaces/user.interface';
 import ChatAccessAlert from './interfaces/chat-access-alert.interface';
 import ChatAlert from './interfaces/chat-alert.interface';

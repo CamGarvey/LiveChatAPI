@@ -5,7 +5,7 @@ import Me from '../models/me.model';
 import { UserService } from '../../services/user.service';
 import Alert from 'src/alert/models/interfaces/alert.interface';
 import Request from 'src/request/models/interfaces/request.interface';
-import Chat from 'src/chat/models/interfaces/chat.interfaces';
+import Chat from 'src/chat/chat.interface';
 
 @Resolver(() => Me)
 export class MeResolver {

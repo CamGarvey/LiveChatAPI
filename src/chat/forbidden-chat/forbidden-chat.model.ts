@@ -1,14 +1,12 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { ObjectType } from '@nestjs/graphql';
+import Chat from '../chat.interface';
 import User from 'src/user/models/interfaces/user.interface';
-import Chat from '../../models/interfaces/chat.interfaces';
 
 @ObjectType({
   implements: () => Chat,
+  description: 'A chat you do not have access to',
 })
-export default class DeletedChat implements Chat {
-  @Field(() => Date)
-  deletedAt: Date;
-
+export class ForbiddenChat implements Chat {
   id: number;
   createdBy: User;
   createdById: number;

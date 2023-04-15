@@ -1,6 +1,6 @@
 import { InterfaceType } from '@nestjs/graphql';
 import { Alert as PrimsaAlert } from '@prisma/client';
-import Chat from 'src/chat/models/interfaces/chat.interfaces';
+import Chat from 'src/chat/chat.interface';
 import User from 'src/user/models/interfaces/user.interface';
 import Alert from '../../../models/interfaces/alert.interface';
 import ChatAlert from './chat-alert.interface';

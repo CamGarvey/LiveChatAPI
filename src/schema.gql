@@ -140,6 +140,7 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+"""A deleted chat"""
 type DeletedChat implements Chat {
   createdAt: DateTime!
   createdBy: User!
@@ -186,6 +187,16 @@ interface Event {
 type EventEdge {
   cursor: String!
   node: Event!
+}
+
+"""A chat you do not have access to"""
+type ForbiddenChat implements Chat {
+  createdAt: DateTime!
+  createdBy: User!
+  createdById: HashId!
+  id: HashId!
+  isCreator: Boolean!
+  updatedAt: DateTime!
 }
 
 type Friend implements User {

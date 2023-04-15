@@ -9,14 +9,11 @@ import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-trig
 import { SubscriptionPayload } from 'src/common/subscriptions/subscription-payload.model';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PubSubService } from 'src/pubsub/pubsub.service';
-import { FriendCacheService } from 'src/user/friend/resolvers/friend-cache.service';
-
 @Injectable()
 export class FriendService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly pubsub: PubSubService,
-    private readonly friendCacheService: FriendCacheService,
   ) {}
 
   async createFriend(userId: number, createdById: number): Promise<User> {
@@ -37,8 +34,6 @@ export class FriendService {
         },
       },
     });
-
-    await this.friendCacheService.addFriendship(userId, createdById);
 
     return user;
   }
@@ -61,8 +56,6 @@ export class FriendService {
         },
       },
     });
-
-    await this.friendCacheService.removeFriendship(userId, deletedById);
 
     // Create alert for deleted friend
     const alert = await this.prisma.alert.create({
@@ -87,33 +80,6 @@ export class FriendService {
     );
 
     return deletedFriend;
-  }
-
-  async getAllFriendIds(userId: number): Promise<Set<number>> {
-    const cached = await this.friendCacheService.getFriends(userId);
-
-    if (cached) {
-      return cached;
-    }
-
-    const friends = await this.prisma.user.findMany({
-      select: {
-        id: true,
-      },
-      where: {
-        friends: {
-          some: {
-            id: userId,
-          },
-        },
-      },
-    });
-
-    const friendIds: Set<number> = new Set(friends.map(({ id }) => id));
-
-    await this.friendCacheService.setFriends(userId, friendIds);
-
-    return friendIds;
   }
 
   async getFriends(

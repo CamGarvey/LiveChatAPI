@@ -1,15 +1,17 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ChatAlertResolver } from './chat-alert.resolver';
+import { ChatAlertInterfaceResolver } from './chat-alert.resolver';
 
-describe('ChatAlertResolver', () => {
-  let resolver: ChatAlertResolver;
+describe('ChatAlertInterfaceResolver', () => {
+  let resolver: ChatAlertInterfaceResolver;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [ChatAlertResolver],
+      providers: [ChatAlertInterfaceResolver],
     }).compile();
 
-    resolver = module.get<ChatAlertResolver>(ChatAlertResolver);
+    resolver = module.get<ChatAlertInterfaceResolver>(
+      ChatAlertInterfaceResolver,
+    );
   });
 
   it('should be defined', () => {

@@ -1,9 +1,9 @@
-import { CanActivate, Injectable, ExecutionContext } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { ForbiddenException } from '@nestjs/common/exceptions/forbidden.exception';
 import { Reflector } from '@nestjs/core';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { Role } from '@prisma/client';
-import { log } from 'console';
+import { IAuthUser } from 'src/auth/interfaces/auth-user.interface';
 import { HashService } from 'src/hash/hash.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 
@@ -26,16 +26,9 @@ export class ChatGuard implements CanActivate {
 
     const chatId = +this.hashService.decode(encodeChatId);
 
-    const userId = ctx.req.user.id;
+    const user: IAuthUser = ctx.req.user;
 
-    const chat = await this.prisma.chat.findUniqueOrThrow({
-      where: { id: chatId },
-      include: { members: true },
-    });
-
-    const member = chat.members.find((m) => m.userId === userId);
-
-    if (!member) {
+    if (!user.chatIds.has(chatId)) {
       throw new ForbiddenException(
         'You are not authorized to perform this operation',
       );
@@ -47,6 +40,18 @@ export class ChatGuard implements CanActivate {
       // If not roles are specified then canActivate
       return true;
     }
+
+    const member = await this.prisma.member.findUniqueOrThrow({
+      select: {
+        role: true,
+      },
+      where: {
+        userId_chatId: {
+          chatId,
+          userId: user.id,
+        },
+      },
+    });
 
     return roles.includes(member.role);
   }

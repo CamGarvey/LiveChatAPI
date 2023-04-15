@@ -14,7 +14,7 @@ import { PaginationArgs } from 'src/common/models/pagination';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import ChatDescriptionUpdate from 'src/event/payload/chat-update/models/chat-description-update.model';
 import { MemberService } from 'src/member/member.service';
-import GroupChat from '../models/group-chat.model';
+import GroupChat from '../group-chat.model';
 import ChatNameUpdate from 'src/event/payload/chat-update/models/chat-name-update.model';
 import { CreateGroupChatInput } from 'src/chat/models/inputs/create-group-chat.input';
 import { GroupChatService } from '../services/group-chat.service';
@@ -44,7 +44,12 @@ export class GroupChatResolver {
     { name, description, userIds }: CreateGroupChatInput,
     @CurrentUser() user: IAuthUser,
   ) {
-    return this.groupChatService.create(name, description, userIds, user.id);
+    return this.groupChatService.createGroupChat(
+      name,
+      description,
+      userIds,
+      user.id,
+    );
   }
 
   @Mutation(() => ChatNameUpdate)

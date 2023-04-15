@@ -76,7 +76,7 @@ export class EventInterfaceResolver {
     resolve: (payload: SubscriptionPayload<Event>) => payload.content,
   })
   async eventSubscription() {
-    return this.pubsub.asyncIterator('event.*', { pattern: true });
+    return this.pubsub.asyncIterator<Event>('event.*', { pattern: true });
   }
 }
 

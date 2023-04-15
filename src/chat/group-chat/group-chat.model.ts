@@ -1,6 +1,6 @@
 import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { Role } from '@prisma/client';
-import Chat from 'src/chat/models/interfaces/chat.interfaces';
+import Chat from 'src/chat/chat.interface';
 import { PaginatedMember } from 'src/member/models/paginated-member.model';
 import User from 'src/user/models/interfaces/user.interface';
 

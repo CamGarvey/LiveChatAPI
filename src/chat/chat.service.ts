@@ -54,17 +54,26 @@ export class ChatService {
       },
     });
 
-    // Publish the deleted chat alert to every member
-    // except from the user who deleted it (deletedById)
-    await this.pubsub.publish<SubscriptionPayload<Alert>>(
-      SubscriptionTriggers.ChatDeletedAlert,
-      {
-        recipients: chat.members
-          .map((x) => x.userId)
-          .filter((x) => x !== deletedById),
-        content: alert,
-      },
-    );
+    const recipients = chat.members.map((x) => x.userId);
+
+    const publish: Promise<void>[] = [
+      this.pubsub.publish<SubscriptionPayload<Alert>>(
+        SubscriptionTriggers.ChatDeletedAlert,
+        {
+          recipients,
+          content: alert,
+        },
+      ),
+      this.pubsub.publish<SubscriptionPayload<Chat>>(
+        SubscriptionTriggers.ChatAccessRevoked,
+        {
+          recipients,
+          content: chat,
+        },
+      ),
+    ];
+
+    await Promise.all(publish);
 
     return chat;
   }

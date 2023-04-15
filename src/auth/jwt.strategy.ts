@@ -1,9 +1,4 @@
-import {
-  CACHE_MANAGER,
-  Inject,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, ExtractJwt } from 'passport-jwt';
@@ -13,8 +8,7 @@ import authConfig from 'src/config/auth.config';
 import { HashService } from 'src/hash/hash.service';
 import { IAuthUser } from './interfaces/auth-user.interface';
 import { IChatJwtPayload } from './interfaces/chat-jwt-payload.interface';
-import { UserService } from 'src/user/services/user.service';
-import { FriendService } from 'src/user/friend/services/friend.service';
+import { AuthService } from './auth.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -24,7 +18,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     private readonly hashService: HashService,
     @Inject(authConfig.KEY)
     configuration: ConfigType<typeof authConfig>,
-    private readonly friendService: FriendService,
+    private readonly authService: AuthService,
   ) {
     super({
       secretOrKeyProvider: passportJwtSecret({
@@ -44,7 +38,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   async validate(payload: IChatJwtPayload): Promise<IAuthUser> {
     if (!this.hasRequireScope(payload)) {
       throw new UnauthorizedException(
-        'JWT does not possess the required scope (`openid profile email`).',
+        `JWT does not possess the required scope (${this.requiredScopes}).`,
       );
     }
 
@@ -52,9 +46,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       payload['http://localhost:4000/user_id'],
     );
 
-    const friendIds = await this.friendService.getAllFriendIds(userId);
-
-    return { id: userId, friendIds };
+    return await this.authService.getAuthUser(userId);
   }
 
   hasRequireScope(payload: IChatJwtPayload) {

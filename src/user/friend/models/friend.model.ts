@@ -1,5 +1,5 @@
 import { ObjectType } from '@nestjs/graphql';
-import Chat from 'src/chat/models/interfaces/chat.interfaces';
+import Chat from 'src/chat/chat.interface';
 import User from '../../models/interfaces/user.interface';
 import { PaginatedUser } from '../../resolvers/user.resolver';
 

@@ -1,5 +1,7 @@
 export enum SubscriptionTriggers {
   ChatCreated = 'chat.created',
+  ChatAccessGranted = 'chat.access.granted',
+  ChatAccessRevoked = 'chat.access.revoked',
 
   // In chat events
   EventCreated = 'event.created',

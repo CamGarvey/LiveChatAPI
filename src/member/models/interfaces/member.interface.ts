@@ -1,5 +1,5 @@
 import { Field, InterfaceType, registerEnumType } from '@nestjs/graphql';
-import Chat from 'src/chat/models/interfaces/chat.interfaces';
+import Chat from 'src/chat/chat.interface';
 import { HashIdScalar } from 'src/common/scalars/hash-id.scalar';
 import User from 'src/user/models/interfaces/user.interface';
 import { Member as PrismaMember, Role } from '@prisma/client';

@@ -3,7 +3,7 @@ import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-trig
 import { SubscriptionPayload } from 'src/common/subscriptions/subscription-payload.model';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PubSubService } from 'src/pubsub/pubsub.service';
-import { Alert } from '@prisma/client';
+import { Alert, Chat } from '@prisma/client';
 
 @Injectable()
 export class DirectMessageChatService {
@@ -12,7 +12,7 @@ export class DirectMessageChatService {
     private readonly pubsub: PubSubService,
   ) {}
 
-  async create(userId: number, createdById: number) {
+  async createDirectMessage(userId: number, createdById: number) {
     const existingChat = await this.prisma.chat.findFirst({
       where: {
         type: 'DIRECT_MESSAGE',
@@ -73,13 +73,24 @@ export class DirectMessageChatService {
       },
     });
 
-    await this.pubsub.publish<SubscriptionPayload<Alert>>(
-      SubscriptionTriggers.ChatMemberAccessGrantedAlert,
-      {
-        recipients: [userId],
-        content: alert,
-      },
-    );
+    const publish: Promise<void>[] = [
+      this.pubsub.publish<SubscriptionPayload<Alert>>(
+        SubscriptionTriggers.ChatMemberAccessGrantedAlert,
+        {
+          recipients: [userId],
+          content: alert,
+        },
+      ),
+      this.pubsub.publish<SubscriptionPayload<Chat>>(
+        SubscriptionTriggers.ChatAccessGranted,
+        {
+          recipients: [userId],
+          content: chat,
+        },
+      ),
+    ];
+
+    await Promise.all(publish);
 
     return chat;
   }

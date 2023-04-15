@@ -5,7 +5,7 @@ import {
   ResolveField,
   Resolver,
 } from '@nestjs/graphql';
-import { DirectMessageChat } from '../models/direct-messge-chat.model';
+import { DirectMessageChat } from '../direct-messge-chat.model';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { IAuthUser } from 'src/auth/interfaces/auth-user.interface';
 import { MemberService } from 'src/member/member.service';
@@ -36,6 +36,9 @@ export class DirectMessageChatResolver {
     receipentUserId: number,
     @CurrentUser() user: IAuthUser,
   ) {
-    return this.directMessageChatService.create(receipentUserId, user.id);
+    return this.directMessageChatService.createDirectMessage(
+      receipentUserId,
+      user.id,
+    );
   }
 }

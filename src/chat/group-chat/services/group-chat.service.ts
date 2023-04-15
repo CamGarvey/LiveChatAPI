@@ -13,7 +13,7 @@ export class GroupChatService {
     private readonly pubsub: PubSubService,
   ) {}
 
-  async create(
+  async createGroupChat(
     name: string,
     description: string,
     userIds: number[],
@@ -67,13 +67,26 @@ export class GroupChatService {
       },
     });
 
-    await this.pubsub.publish<SubscriptionPayload<Alert>>(
-      SubscriptionTriggers.ChatMemberAccessGrantedAlert,
-      {
-        recipients,
-        content: alert,
-      },
-    );
+    const publish: Promise<void>[] = [
+      // Publish alert
+      this.pubsub.publish<SubscriptionPayload<Alert>>(
+        SubscriptionTriggers.ChatMemberAccessGrantedAlert,
+        {
+          recipients,
+          content: alert,
+        },
+      ),
+      // Publish chat
+      this.pubsub.publish<SubscriptionPayload<Chat>>(
+        SubscriptionTriggers.ChatAccessGranted,
+        {
+          recipients,
+          content: chat,
+        },
+      ),
+    ];
+
+    await Promise.all(publish);
 
     return chat;
   }
@@ -147,7 +160,7 @@ export class GroupChatService {
       .map((x) => x.userId)
       .filter((x) => x !== updatedById);
 
-    // Publish new chat event
+    // Publish event
     await this.pubsub.publish<SubscriptionPayload<Event>>(
       SubscriptionTriggers.EventCreated,
       {
@@ -229,7 +242,7 @@ export class GroupChatService {
       .map((x) => x.userId)
       .filter((x) => x !== updatedById);
 
-    // Publish new chat event
+    // Publish event
     await this.pubsub.publish<SubscriptionPayload<Event>>(
       SubscriptionTriggers.EventCreated,
       {
@@ -332,15 +345,6 @@ export class GroupChatService {
       .map((x) => x.id)
       .filter((x) => x !== addedById);
 
-    // Publish new chat event
-    await this.pubsub.publish<SubscriptionPayload<Event>>(
-      SubscriptionTriggers.EventCreated,
-      {
-        recipients,
-        content: event,
-      },
-    );
-
     const alert = await this.prisma.alert.create({
       data: {
         type: 'CHAT_ACCESS_GRANTED',
@@ -362,14 +366,34 @@ export class GroupChatService {
       },
     });
 
-    // Publish new chat alert
-    await this.pubsub.publish<SubscriptionPayload<Alert>>(
-      SubscriptionTriggers.ChatMemberAccessGrantedAlert,
-      {
-        recipients,
-        content: alert,
-      },
-    );
+    const publish: Promise<void>[] = [
+      // Publish alert
+      this.pubsub.publish<SubscriptionPayload<Alert>>(
+        SubscriptionTriggers.ChatMemberAccessGrantedAlert,
+        {
+          recipients,
+          content: alert,
+        },
+      ),
+      // Publish event
+      this.pubsub.publish<SubscriptionPayload<Event>>(
+        SubscriptionTriggers.EventCreated,
+        {
+          recipients,
+          content: event,
+        },
+      ),
+      // Publish chat
+      this.pubsub.publish<SubscriptionPayload<Event>>(
+        SubscriptionTriggers.ChatAccessGranted,
+        {
+          recipients,
+          content: event,
+        },
+      ),
+    ];
+
+    await Promise.all(publish);
 
     return event.chatUpdate;
   }
@@ -441,17 +465,6 @@ export class GroupChatService {
       },
     });
 
-    // Publish new chat event
-    await this.pubsub.publish<SubscriptionPayload<Event>>(
-      SubscriptionTriggers.EventCreated,
-      {
-        recipients: chat.members
-          .map((x) => x.userId)
-          .filter((x) => x !== removedById),
-        content: event,
-      },
-    );
-
     const alert = await this.prisma.alert.create({
       data: {
         type: 'CHAT_ACCESS_REVOKED',
@@ -473,14 +486,35 @@ export class GroupChatService {
       },
     });
 
-    // Publish new chat alert
-    await this.pubsub.publish<SubscriptionPayload<Alert>>(
-      SubscriptionTriggers.ChatMemberAccessRevokedAlert,
-      {
-        recipients: userIds,
-        content: alert,
-      },
-    );
+    const publish: Promise<void>[] = [
+      // Publish alert
+      this.pubsub.publish<SubscriptionPayload<Alert>>(
+        SubscriptionTriggers.ChatMemberAccessRevokedAlert,
+        {
+          recipients: userIds,
+          content: alert,
+        },
+      ),
+      // Publish event
+      this.pubsub.publish<SubscriptionPayload<Event>>(
+        SubscriptionTriggers.EventCreated,
+        {
+          recipients: chat.members
+            .map((x) => x.userId)
+            .filter((x) => x !== removedById),
+          content: event,
+        },
+      ),
+      this.pubsub.publish<SubscriptionPayload<Chat>>(
+        SubscriptionTriggers.ChatAccessRevoked,
+        {
+          recipients: userIds,
+          content: chat,
+        },
+      ),
+    ];
+
+    await Promise.all(publish);
 
     return event.chatUpdate;
   }
@@ -566,15 +600,6 @@ export class GroupChatService {
       .map((x) => x.userId)
       .filter((x) => x !== changedById);
 
-    // Publish new chat event
-    await this.pubsub.publish<SubscriptionPayload<Event>>(
-      SubscriptionTriggers.EventCreated,
-      {
-        recipients,
-        content: event,
-      },
-    );
-
     // Create new alert for those affected
     const alert = await this.prisma.alert.create({
       data: {
@@ -597,14 +622,26 @@ export class GroupChatService {
       },
     });
 
-    // Publish new chat alert
-    await this.pubsub.publish<SubscriptionPayload<Alert>>(
-      SubscriptionTriggers.ChatAdminAccessRevokedAlert,
-      {
-        recipients,
-        content: alert,
-      },
-    );
+    const publish: Promise<void>[] = [
+      // Publish alert
+      this.pubsub.publish<SubscriptionPayload<Alert>>(
+        SubscriptionTriggers.ChatAdminAccessRevokedAlert,
+        {
+          recipients,
+          content: alert,
+        },
+      ),
+      // Publish event
+      this.pubsub.publish<SubscriptionPayload<Event>>(
+        SubscriptionTriggers.EventCreated,
+        {
+          recipients,
+          content: event,
+        },
+      ),
+    ];
+
+    await Promise.all(publish);
 
     return event.chatUpdate;
   }
