@@ -5,13 +5,16 @@ import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-trig
 import { SubscriptionPayload } from 'src/common/subscriptions/subscription-payload.model';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PubSubService } from 'src/pubsub/pubsub.service';
+import { ChatService } from 'src/chat/chat.service';
 
 @Injectable()
-export class GroupChatService {
+export class GroupChatService extends ChatService {
   constructor(
-    private readonly prisma: PrismaService,
-    private readonly pubsub: PubSubService,
-  ) {}
+    protected readonly prisma: PrismaService,
+    protected readonly pubsub: PubSubService,
+  ) {
+    super(prisma, pubsub);
+  }
 
   async createGroupChat(
     name: string,

@@ -31,6 +31,16 @@ export class GroupChatResolver {
   ) {}
 
   @ResolveField()
+  async role(@Parent() parent: GroupChat, @CurrentUser() user: IAuthUser) {
+    const members = await this.groupChatService.getChat(parent.id).members({
+      where: {
+        userId: user.id,
+      },
+    });
+    return members[0].role;
+  }
+
+  @ResolveField()
   async members(
     @Parent() parent: GroupChat,
     @Args() paginationArgs: PaginationArgs,

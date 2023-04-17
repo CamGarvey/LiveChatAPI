@@ -8,8 +8,8 @@ import { PubSubService } from 'src/pubsub/pubsub.service';
 @Injectable()
 export class ChatService {
   constructor(
-    private readonly prisma: PrismaService,
-    private readonly pubsub: PubSubService,
+    protected readonly prisma: PrismaService,
+    protected readonly pubsub: PubSubService,
   ) {}
 
   getChat(chatId: number): Prisma.Prisma__ChatClient<Chat> {
