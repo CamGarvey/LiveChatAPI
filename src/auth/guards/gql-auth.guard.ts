@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { AuthGuard } from '@nestjs/passport';
+import { Observable } from 'rxjs';
 
 @Injectable()
 export class GqlAuthGuard extends AuthGuard('jwt') {
@@ -35,5 +36,15 @@ export class GqlAuthGuard extends AuthGuard('jwt') {
     gqlContext.getContext().user = user;
 
     return user;
+  }
+
+  canActivate(
+    context: ExecutionContext,
+  ): boolean | Promise<boolean> | Observable<boolean> {
+    if (context.getType() !== ('graphql' as any)) {
+      // Activate any non graphql requests
+      return true;
+    }
+    return super.canActivate(context);
   }
 }

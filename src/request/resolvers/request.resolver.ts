@@ -17,6 +17,7 @@ import { RequestService } from '../request.service';
 import { HashIdScalar } from 'src/common/scalars/hash-id.scalar';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { IAuthUser } from 'src/auth/interfaces/auth-user.interface';
+import { log } from 'console';
 
 @Resolver(() => Request)
 export class RequestInterfaceResolver {
@@ -67,6 +68,9 @@ export class RequestInterfaceResolver {
   @Subscription(() => Request, {
     filter(payload: SubscriptionPayload<Request>, _, { user }: IContext) {
       return payload.recipients.includes(user.id);
+    },
+    resolve(payload: SubscriptionPayload<Request>) {
+      return payload.content;
     },
   })
   async requests() {
