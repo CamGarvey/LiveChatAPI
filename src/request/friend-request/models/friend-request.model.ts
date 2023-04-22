@@ -1,8 +1,7 @@
 import { ObjectType } from '@nestjs/graphql';
 import User from 'src/user/models/interfaces/user.interface';
-import Request, {
-  RequestState,
-} from '../../models/interfaces/request.interface';
+import Request from '../../models/interfaces/request.interface';
+import { RequestState } from '@prisma/client';
 
 @ObjectType({
   implements: () => Request,

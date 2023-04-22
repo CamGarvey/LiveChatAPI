@@ -1,5 +1,12 @@
 import { UseGuards } from '@nestjs/common';
-import { Args, Mutation, Resolver, Subscription } from '@nestjs/graphql';
+import {
+  Args,
+  Mutation,
+  Parent,
+  ResolveField,
+  Resolver,
+  Subscription,
+} from '@nestjs/graphql';
 import { IContext } from 'src/auth/interfaces/context.interface';
 import { SubscriptionPayload } from 'src/common/subscriptions/subscription-payload.model';
 import { PubSubService } from 'src/pubsub/pubsub.service';
@@ -8,6 +15,8 @@ import { RequestSenderGuard } from '../guards/request-sender/request-sender.guar
 import Request from '../models/interfaces/request.interface';
 import { RequestService } from '../request.service';
 import { HashIdScalar } from 'src/common/scalars/hash-id.scalar';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
+import { IAuthUser } from 'src/auth/interfaces/auth-user.interface';
 
 @Resolver(() => Request)
 export class RequestInterfaceResolver {
@@ -16,12 +25,27 @@ export class RequestInterfaceResolver {
     private readonly pubsub: PubSubService,
   ) {}
 
+  @ResolveField()
+  async createdBy(@Parent() parent: Request) {
+    return await this.requestService.getRequest(parent.id).createdBy();
+  }
+
+  @ResolveField()
+  async isCreator(@Parent() parent: Request, @CurrentUser() user: IAuthUser) {
+    return parent.createdById === user.id;
+  }
+
+  @ResolveField()
+  async recipient(@Parent() parent: Request) {
+    return await this.requestService.getRequest(parent.id).recipient();
+  }
+
   @Mutation(() => Request)
   @UseGuards(RequestReceiverGuard)
   async acceptRequest(
     @Args('requestId', { type: () => HashIdScalar }) requestId: number,
   ) {
-    return this.requestService.acceptRequest(requestId);
+    return await this.requestService.acceptRequest(requestId);
   }
 
   @Mutation(() => Request)
@@ -29,7 +53,7 @@ export class RequestInterfaceResolver {
   async declineRequest(
     @Args('requestId', { type: () => HashIdScalar }) requestId: number,
   ) {
-    return this.requestService.declineRequest(requestId);
+    return await this.requestService.declineRequest(requestId);
   }
 
   @Mutation(() => Request)
@@ -37,7 +61,7 @@ export class RequestInterfaceResolver {
   async cancelRequest(
     @Args('requestId', { type: () => HashIdScalar }) requestId: number,
   ) {
-    return this.requestService.cancelRequest(requestId);
+    return await this.requestService.cancelRequest(requestId);
   }
 
   @Subscription(() => Request, {

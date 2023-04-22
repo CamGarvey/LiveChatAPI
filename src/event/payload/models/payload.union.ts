@@ -1,31 +1,32 @@
 import { createUnionType } from '@nestjs/graphql';
 
 import Message from '../message/models/message.model';
-import ChatMembersAddedUpdate from '../chat-update/chat-member-alteration/models/chat-members-added-update.model';
-import ChatMembersRemovedUpdate from '../chat-update/chat-member-alteration/models/chat-members-removed-update.model';
-import ChatDescriptionUpdate from '../chat-update/models/chat-description-update.model';
+import ChatDescriptionUpdate from '../chat-update/models/description-changed-update.model';
 import {
   Message as PrismaMessage,
   ChatUpdate as PrismaChatUpdate,
 } from '@prisma/client';
-import ChatNameUpdate from '../chat-update/models/chat-name-update.model';
-import ChatMembersRoleUpdate from '../chat-update/chat-member-alteration/models/chat-members-role-update.model';
+import NameChangedUpdate from '../chat-update/models/name-changed-update.model';
+import MembersRemovedUpdate from '../chat-update/member-alteration/models/members-removed-update.model';
+import RoleChangedUpdate from '../chat-update/member-alteration/models/role-changed-update.model';
+import MembersAddedUpdate from '../chat-update/member-alteration/models/members-added-update.model';
+import DescriptionChangedUpdate from '../chat-update/models/description-changed-update.model';
 
 export const PayloadUnion = createUnionType({
   name: 'PayloadUnion',
   resolveType: (source: PrismaMessage | PrismaChatUpdate) => {
     if ('type' in source) {
       switch (source.type) {
-        case 'NAME_UPDATED':
-          return ChatNameUpdate;
-        case 'DESCRIPTION_UPDATED':
-          return ChatDescriptionUpdate;
+        case 'NAME_CHANGED':
+          return NameChangedUpdate;
+        case 'DESCRIPTION_CHANGED':
+          return DescriptionChangedUpdate;
         case 'MEMBERS_ADDED':
-          return ChatMembersAddedUpdate;
+          return MembersAddedUpdate;
         case 'MEMBERS_REMOVED':
-          return ChatMembersRemovedUpdate;
+          return MembersRemovedUpdate;
         case 'ROLE_CHANGED':
-          return ChatMembersRoleUpdate;
+          return RoleChangedUpdate;
       }
     }
     return Message;
@@ -33,9 +34,9 @@ export const PayloadUnion = createUnionType({
   types: () =>
     [
       Message,
-      ChatNameUpdate,
+      NameChangedUpdate,
       ChatDescriptionUpdate,
-      ChatMembersAddedUpdate,
-      ChatMembersRemovedUpdate,
+      MembersAddedUpdate,
+      MembersRemovedUpdate,
     ] as const,
 });

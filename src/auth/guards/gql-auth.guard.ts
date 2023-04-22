@@ -20,7 +20,12 @@ export class GqlAuthGuard extends AuthGuard('jwt') {
     return ctx.req;
   }
 
-  handleRequest(err: any, user: any, _: any, context: ExecutionContext) {
+  handleRequest<IAuthUser>(
+    err: any,
+    user: IAuthUser,
+    _: any,
+    context: ExecutionContext,
+  ) {
     if (err || !user) {
       throw err || new UnauthorizedException();
     }

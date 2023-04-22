@@ -21,7 +21,7 @@ import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin
 import { CommonModule } from './common/common.module';
 import { HashModule } from './hash/hash.module';
 import { APP_GUARD } from '@nestjs/core';
-import { GqlAuthGuard } from './auth/gql-auth.guard';
+import { GqlAuthGuard } from './auth/guards/gql-auth.guard';
 import { RedisOptions } from 'ioredis';
 import { FriendModule } from './user/friend/friend.module';
 import { ChatModule } from './chat/chat.module';

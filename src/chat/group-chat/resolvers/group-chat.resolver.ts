@@ -12,16 +12,17 @@ import { ChatGuard } from 'src/common/guards/chat.guard';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { PaginationArgs } from 'src/common/models/pagination';
 import { Roles } from 'src/common/decorators/roles.decorator';
-import ChatDescriptionUpdate from 'src/event/payload/chat-update/models/chat-description-update.model';
+import ChatDescriptionUpdate from 'src/event/payload/chat-update/models/description-changed-update.model';
 import { MemberService } from 'src/member/member.service';
 import GroupChat from '../group-chat.model';
-import ChatNameUpdate from 'src/event/payload/chat-update/models/chat-name-update.model';
+import NameChangedUpdate from 'src/event/payload/chat-update/models/name-changed-update.model';
 import { CreateGroupChatInput } from 'src/chat/models/inputs/create-group-chat.input';
 import { GroupChatService } from '../services/group-chat.service';
 import { HashIdScalar } from 'src/common/scalars/hash-id.scalar';
-import ChatMembersAddedUpdate from 'src/event/payload/chat-update/chat-member-alteration/models/chat-members-added-update.model';
-import ChatMembersRemovedUpdate from 'src/event/payload/chat-update/chat-member-alteration/models/chat-members-removed-update.model';
 import { Role } from '@prisma/client';
+import MembersAddedUpdate from 'src/event/payload/chat-update/member-alteration/models/members-added-update.model';
+import MembersRemovedUpdate from 'src/event/payload/chat-update/member-alteration/models/members-removed-update.model';
+import RoleChangedUpdate from 'src/event/payload/chat-update/member-alteration/models/role-changed-update.model';
 
 @Resolver(() => GroupChat)
 export class GroupChatResolver {
@@ -54,7 +55,7 @@ export class GroupChatResolver {
     { name, description, userIds }: CreateGroupChatInput,
     @CurrentUser() user: IAuthUser,
   ) {
-    return this.groupChatService.createGroupChat(
+    return await this.groupChatService.createGroupChat(
       name,
       description,
       userIds,
@@ -62,7 +63,7 @@ export class GroupChatResolver {
     );
   }
 
-  @Mutation(() => ChatNameUpdate)
+  @Mutation(() => NameChangedUpdate)
   @UseGuards(ChatGuard)
   @Roles(Role.ADMIN, Role.OWNER)
   async updateGroupChatName(
@@ -70,7 +71,7 @@ export class GroupChatResolver {
     @Args('name') name: string,
     @CurrentUser() user: IAuthUser,
   ) {
-    return this.groupChatService.updateName(chatId, name, user.id);
+    return await this.groupChatService.updateName(chatId, name, user.id);
   }
 
   @Mutation(() => ChatDescriptionUpdate)
@@ -81,14 +82,14 @@ export class GroupChatResolver {
     @Args('description') description: string,
     @CurrentUser() user: IAuthUser,
   ) {
-    return this.groupChatService.updateDescription(
+    return await this.groupChatService.updateDescription(
       chatId,
       description,
       user.id,
     );
   }
 
-  @Mutation(() => ChatMembersAddedUpdate)
+  @Mutation(() => MembersAddedUpdate)
   @UseGuards(ChatGuard)
   @Roles(Role.ADMIN, Role.OWNER)
   async addMembers(
@@ -96,10 +97,10 @@ export class GroupChatResolver {
     @Args('userIds', { type: () => [HashIdScalar] }) userIds: number[],
     @CurrentUser() user: IAuthUser,
   ) {
-    return this.groupChatService.addMembers(chatId, userIds, user.id);
+    return await this.groupChatService.addMembers(chatId, userIds, user.id);
   }
 
-  @Mutation(() => ChatMembersRemovedUpdate)
+  @Mutation(() => MembersRemovedUpdate)
   @UseGuards(ChatGuard)
   @Roles(Role.ADMIN, Role.OWNER)
   async removeMembers(
@@ -107,10 +108,10 @@ export class GroupChatResolver {
     @Args('userIds', { type: () => [HashIdScalar] }) userIds: number[],
     @CurrentUser() user: IAuthUser,
   ) {
-    return this.groupChatService.removeMembers(chatId, userIds, user.id);
+    return await this.groupChatService.removeMembers(chatId, userIds, user.id);
   }
 
-  @Mutation(() => ChatMembersRemovedUpdate)
+  @Mutation(() => RoleChangedUpdate)
   @UseGuards(ChatGuard)
   @Roles(Role.ADMIN, Role.OWNER)
   async changeMemberRoles(
@@ -119,7 +120,7 @@ export class GroupChatResolver {
     @Args('role', { type: () => Role }) role: Role,
     @CurrentUser() user: IAuthUser,
   ) {
-    return this.groupChatService.changeMemberRoles(
+    return await this.groupChatService.changeMemberRoles(
       chatId,
       userIds,
       role,

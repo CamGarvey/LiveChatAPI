@@ -1,14 +1,13 @@
 import { Parent, ResolveField, Resolver } from '@nestjs/graphql';
-import ChatMemberAlteration from '../models/interface/chat-member-alteration.interface';
-import { EventService } from 'src/event/event.service';
+import MemberAlteration from '../models/interface/member-alteration.interface';
 import { ChatUpdateService } from '../../services/chat-update.service';
 
-@Resolver(() => ChatMemberAlteration)
-export class ChatMemberAlterationResolver {
+@Resolver(() => MemberAlteration)
+export class MemberAlterationResolver {
   constructor(private readonly chatUpdateService: ChatUpdateService) {}
 
   @ResolveField()
-  async members(@Parent() parent: ChatMemberAlteration) {
+  async members(@Parent() parent: MemberAlteration) {
     return await this.chatUpdateService.getChatUpdate(parent.eventId).members();
   }
 }

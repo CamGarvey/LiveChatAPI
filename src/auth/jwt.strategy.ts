@@ -8,7 +8,7 @@ import authConfig from 'src/config/auth.config';
 import { HashService } from 'src/hash/hash.service';
 import { IAuthUser } from './interfaces/auth-user.interface';
 import { IChatJwtPayload } from './interfaces/chat-jwt-payload.interface';
-import { AuthService } from './auth.service';
+import { AuthService } from './services/auth.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {

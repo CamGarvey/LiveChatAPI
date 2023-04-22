@@ -5,7 +5,7 @@ import ChatUpdate from './interface/chat-update.interface';
 @ObjectType({
   implements: () => ChatUpdate,
 })
-export default class ChatDescriptionUpdate implements ChatUpdate {
+export default class DescriptionChangedUpdate implements ChatUpdate {
   @Field()
   descriptionBefore: string;
 

@@ -53,13 +53,6 @@ type ChatDeletedAlert implements Alert {
   recipients: [User!]!
 }
 
-type ChatDescriptionUpdate implements ChatUpdate {
-  descriptionAfter: String!
-  descriptionBefore: String!
-  event: Event!
-  eventId: Float!
-}
-
 type ChatMember implements Member {
   addedBy: User!
   addedById: HashId!
@@ -80,31 +73,6 @@ type ChatMemberAccessGrantedAlert implements Alert & ChatAccessAlert & ChatAlert
   id: HashId!
   isCreator: Boolean!
   recipients: [User!]!
-}
-
-interface ChatMemberAlteration implements ChatUpdate {
-  event: Event!
-  eventId: Float!
-  members: [Member!]!
-}
-
-type ChatMembersAddedUpdate implements ChatMemberAlteration & ChatUpdate {
-  event: Event!
-  eventId: Float!
-  members: [Member!]!
-}
-
-type ChatMembersRemovedUpdate implements ChatMemberAlteration & ChatUpdate {
-  event: Event!
-  eventId: Float!
-  members: [Member!]!
-}
-
-type ChatNameUpdate implements ChatUpdate {
-  event: Event!
-  eventId: Float!
-  nameAfter: String!
-  nameBefore: String!
 }
 
 interface ChatUpdate {
@@ -161,6 +129,13 @@ type DeletedEvent implements Event {
   id: HashId!
   isCreator: Boolean!
   updatedAt: DateTime!
+}
+
+type DescriptionChangedUpdate implements ChatUpdate {
+  descriptionAfter: String!
+  descriptionBefore: String!
+  event: Event!
+  eventId: Float!
 }
 
 type DirectMessageChat implements Chat {
@@ -271,9 +246,27 @@ interface Member {
   userId: HashId!
 }
 
+interface MemberAlteration implements ChatUpdate {
+  event: Event!
+  eventId: Float!
+  members: [Member!]!
+}
+
 type MemberEdge {
   cursor: String!
   node: Member!
+}
+
+type MembersAddedUpdate implements ChatUpdate & MemberAlteration {
+  event: Event!
+  eventId: Float!
+  members: [Member!]!
+}
+
+type MembersRemovedUpdate implements ChatUpdate & MemberAlteration {
+  event: Event!
+  eventId: Float!
+  members: [Member!]!
 }
 
 type Message {
@@ -286,9 +279,9 @@ type Message {
 type Mutation {
   acceptRequest(requestId: HashId!): Request!
   acknowledgeAlert(alertId: HashId!): Alert!
-  addMembers(chatId: HashId!, userIds: [HashId!]!): ChatMembersAddedUpdate!
+  addMembers(chatId: HashId!, userIds: [HashId!]!): MembersAddedUpdate!
   cancelRequest(requestId: HashId!): Request!
-  changeMemberRoles(chatId: HashId!, role: Role!, userIds: [HashId!]!): ChatMembersRemovedUpdate!
+  changeMemberRoles(chatId: HashId!, role: Role!, userIds: [HashId!]!): RoleChangedUpdate!
   createDirectMessageChat(receipentUserId: HashId!): DirectMessageChat!
   createGroupChat(createGroupChatData: CreateGroupChatInput!): GroupChat!
   createMessage(chatId: HashId!, content: String!): Message!
@@ -296,11 +289,18 @@ type Mutation {
   deleteEvent(eventId: HashId!): DeletedEvent!
   deleteFriend(userId: HashId!): Stranger!
   deletedChat(chatId: HashId!): DeletedChat!
-  removeMembers(chatId: HashId!, userIds: [HashId!]!): ChatMembersRemovedUpdate!
+  removeMembers(chatId: HashId!, userIds: [HashId!]!): MembersRemovedUpdate!
   sendFriendRequest(userId: HashId!): FriendRequest!
-  updateGroupChatDescription(chatId: HashId!, description: String!): ChatDescriptionUpdate!
-  updateGroupChatName(chatId: HashId!, name: String!): ChatNameUpdate!
+  updateGroupChatDescription(chatId: HashId!, description: String!): DescriptionChangedUpdate!
+  updateGroupChatName(chatId: HashId!, name: String!): NameChangedUpdate!
   updateMessage(content: String!, eventId: HashId!): Message!
+}
+
+type NameChangedUpdate implements ChatUpdate {
+  event: Event!
+  eventId: Float!
+  nameAfter: String!
+  nameBefore: String!
 }
 
 type PageInfo {
@@ -334,7 +334,7 @@ type PaginatedUser {
   totalCount: Float!
 }
 
-union PayloadUnion = ChatDescriptionUpdate | ChatMembersAddedUpdate | ChatMembersRemovedUpdate | ChatNameUpdate | Message
+union PayloadUnion = DescriptionChangedUpdate | MembersAddedUpdate | MembersRemovedUpdate | Message | NameChangedUpdate
 
 type Query {
   alerts: [Alert!]!
@@ -384,6 +384,13 @@ enum Role {
   ADMIN
   BASIC
   OWNER
+}
+
+type RoleChangedUpdate implements ChatUpdate & MemberAlteration {
+  event: Event!
+  eventId: Float!
+  members: [Member!]!
+  role: Role!
 }
 
 type Stranger implements User {

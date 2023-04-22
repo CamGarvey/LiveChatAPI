@@ -1,15 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ChatMemberAlterationResolver } from './chat-member-alteration.resolver';
+import { MemberAlterationResolver } from './chat-member-alteration.resolver';
 
 describe('ChatMemberAlterationResolver', () => {
-  let resolver: ChatMemberAlterationResolver;
+  let resolver: MemberAlterationResolver;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [ChatMemberAlterationResolver],
+      providers: [MemberAlterationResolver],
     }).compile();
 
-    resolver = module.get<ChatMemberAlterationResolver>(ChatMemberAlterationResolver);
+    resolver = module.get<MemberAlterationResolver>(MemberAlterationResolver);
   });
 
   it('should be defined', () => {

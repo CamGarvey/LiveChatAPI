@@ -1,8 +1,12 @@
 import { Field, InterfaceType, registerEnumType } from '@nestjs/graphql';
 import { HashIdScalar } from 'src/common/scalars/hash-id.scalar';
 import User from '../../../user/models/interfaces/user.interface';
+import { RequestState } from '@prisma/client';
+import { FriendRequest } from 'src/request/friend-request/models/friend-request.model';
 
-@InterfaceType()
+@InterfaceType({
+  resolveType: () => FriendRequest,
+})
 export default class Request {
   @Field(() => HashIdScalar)
   id: number;
@@ -27,13 +31,6 @@ export default class Request {
 
   @Field(() => Date)
   createdAt: Date;
-}
-
-export enum RequestState {
-  ACCEPTED,
-  CANCELLED,
-  DECLINED,
-  SENT,
 }
 
 registerEnumType(RequestState, {

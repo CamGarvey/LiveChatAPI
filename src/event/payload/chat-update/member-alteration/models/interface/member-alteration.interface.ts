@@ -2,9 +2,9 @@ import { Field, InterfaceType } from '@nestjs/graphql';
 import { ChatUpdate as PrismaChatUpdate } from '@prisma/client';
 import Event from 'src/event/models/interfaces/event.interface';
 import Member from 'src/member/models/interfaces/member.interface';
-import ChatMembersAddedUpdate from '../chat-members-added-update.model';
-import ChatMembersRemovedUpdate from '../chat-members-removed-update.model';
-import ChatMembersRoleUpdate from '../chat-members-role-update.model';
+import MembersAddedUpdate from '../members-added-update.model';
+import MembersRemovedUpdate from '../members-removed-update.model';
+import RoleChangedUpdate from '../role-changed-update.model';
 import ChatUpdate from '../../../models/interface/chat-update.interface';
 
 @InterfaceType({
@@ -12,17 +12,17 @@ import ChatUpdate from '../../../models/interface/chat-update.interface';
   resolveType: (source: PrismaChatUpdate) => {
     switch (source.type) {
       case 'MEMBERS_ADDED':
-        return ChatMembersAddedUpdate;
+        return MembersAddedUpdate;
       case 'MEMBERS_REMOVED':
-        return ChatMembersRemovedUpdate;
+        return MembersRemovedUpdate;
       case 'ROLE_CHANGED':
-        return ChatMembersRoleUpdate;
+        return RoleChangedUpdate;
       default:
         throw new Error('ChatType not supported');
     }
   },
 })
-export default class ChatMemberAlteration implements ChatUpdate {
+export default class MemberAlteration implements ChatUpdate {
   @Field(() => [Member])
   members: Member[];
 

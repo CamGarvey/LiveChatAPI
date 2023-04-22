@@ -1,14 +1,14 @@
 import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
 import Event from 'src/event/models/interfaces/event.interface';
-import ChatMemberAlteration from './interface/chat-member-alteration.interface';
+import MemberAlteration from './interface/member-alteration.interface';
 import Member from 'src/member/models/interfaces/member.interface';
 import ChatUpdate from '../../models/interface/chat-update.interface';
 import { Role } from '@prisma/client';
 
 @ObjectType({
-  implements: () => [ChatUpdate, ChatMemberAlteration],
+  implements: () => [ChatUpdate, MemberAlteration],
 })
-export default class ChatMembersRoleUpdate implements ChatMemberAlteration {
+export default class RoleChangedUpdate implements MemberAlteration {
   @Field(() => Role)
   role: Role;
 

@@ -148,7 +148,7 @@ export class GroupChatService extends ChatService {
         },
         chatUpdate: {
           create: {
-            type: 'NAME_UPDATED',
+            type: 'NAME_CHANGED',
             nameBefore: chatBeforeUpdate.name,
             nameAfter: chatAfterUpdate.name,
           },
@@ -230,7 +230,7 @@ export class GroupChatService extends ChatService {
         },
         chatUpdate: {
           create: {
-            type: 'DESCRIPTION_UPDATED',
+            type: 'DESCRIPTION_CHANGED',
             descriptionBefore: chatBeforeUpdate.description,
             descriptionAfter: chatAfterUpdate.description,
           },

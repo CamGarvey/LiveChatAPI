@@ -1,25 +1,25 @@
 import { Field, InterfaceType } from '@nestjs/graphql';
 import Event from '../../../../models/interfaces/event.interface';
 import { ChatUpdate as PrismaChatUpdate } from '@prisma/client';
-import ChatMembersAddedUpdate from '../../chat-member-alteration/models/chat-members-added-update.model';
-import ChatMembersRemovedUpdate from '../../chat-member-alteration/models/chat-members-removed-update.model';
-import ChatNameUpdate from '../chat-name-update.model';
-import ChatDescriptionUpdate from '../chat-description-update.model';
-import ChatMembersRoleUpdate from '../../chat-member-alteration/models/chat-members-role-update.model';
+import NameChangedUpdate from '../name-changed-update.model';
+import ChatDescriptionUpdate from '../description-changed-update.model';
+import MembersAddedUpdate from '../../member-alteration/models/members-added-update.model';
+import MembersRemovedUpdate from '../../member-alteration/models/members-removed-update.model';
+import RoleChangedUpdate from '../../member-alteration/models/role-changed-update.model';
 
 @InterfaceType({
   resolveType: (source: PrismaChatUpdate) => {
     switch (source.type) {
-      case 'NAME_UPDATED':
-        return ChatNameUpdate;
-      case 'DESCRIPTION_UPDATED':
+      case 'NAME_CHANGED':
+        return NameChangedUpdate;
+      case 'DESCRIPTION_CHANGED':
         return ChatDescriptionUpdate;
       case 'MEMBERS_ADDED':
-        return ChatMembersAddedUpdate;
+        return MembersAddedUpdate;
       case 'MEMBERS_REMOVED':
-        return ChatMembersRemovedUpdate;
+        return MembersRemovedUpdate;
       case 'ROLE_CHANGED':
-        return ChatMembersRoleUpdate;
+        return RoleChangedUpdate;
     }
   },
 })

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Alert, Request } from '@prisma/client';
+import { Alert, Prisma, Request } from '@prisma/client';
 import { SubscriptionPayload } from 'src/common/subscriptions/subscription-payload.model';
 import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-triggers.enum';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -13,6 +13,14 @@ export class RequestService {
     private readonly pubsub: PubSubService,
     private readonly friendService: FriendService,
   ) {}
+
+  getRequest(requestId: number): Prisma.Prisma__RequestClient<Request> {
+    return this.prisma.request.findUniqueOrThrow({
+      where: {
+        id: requestId,
+      },
+    });
+  }
 
   async acceptRequest(requestId: number): Promise<Request> {
     const request = await this.prisma.request.update({

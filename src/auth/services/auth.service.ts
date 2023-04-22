@@ -1,5 +1,5 @@
 import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
-import { IAuthUser } from './interfaces/auth-user.interface';
+import { IAuthUser } from '../interfaces/auth-user.interface';
 import { Cache } from 'cache-manager';
 import { PrismaService } from 'src/prisma/prisma.service';
 
