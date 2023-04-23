@@ -1,62 +1,56 @@
-## Description
+# Chat API
 
-### Database
+This is a Chat API written in Typescript, using NestJS and Graphql, with authentication provided by Auth0.
 
-Models
-The following models are included in the schema:
+## Dependencies
 
-- User: Represents a user of the social network. Includes fields for email, name, username, friends, liked messages, and more.
+The following dependencies are required for the project:
 
-- Request: Represents a notification that requires action, such as a friend request. Includes fields for the type of request, the recipient, and the creator.
-- Alert: Represents a notification that does not require action, such as a friend deletion. Includes fields for the type of alert, the recipients, and the creator.
-- Member: Represents a user's membership in a chat. Includes fields for the user, the chat, and the user's role in the chat.
-- Chat: Represents a chat between one or more users. Includes fields for the chat type, name, description, and more.
-- Event: Represents an event that occurs within a chat, such as a message or chat update. Includes fields for the event type, the chat, and the creator.
-- Message: Represents a message sent within a chat. Includes fields for the content and the users who have liked the message.
-- ChatUpdate: Represents an update to a chat's name or description. Includes fields for the type of update, the event, and the previous name or description.
+- Node.js and npm
+- Auth0 for authentication
+- Docker
+  - Prisma for database ORM using Postgres
+  - Redis for cache
 
 ## Installation
 
-```bash
-$ yarn install
+To install and set up the project on your local machine, follow these steps:
+
+- Run `yarn install` to install the required packages.
+- Run `yarn run docker` to spin up the database and redis containers using Docker.
+- Run `yarn run prisma:gen` to generate typings.
+- Run `yarn run prisma:seed` to populate the database with test data.
+- Run `yarn run prisma:push` to push the database schema to the database.
+- Run `yarn run start:dev` to start up the development server.
+
+## Usage
+
+To interact with the Chat API, go to http://localhost:4000/graphql which will take you to the Apollo sandbox.
+
+## Environment Variables
+
+Before running the project, make sure you have set the following environment variables:
+
+```
+DOMAIN=http://localhost:4000
+DATABASE_URL=postgresql://postgres:postgres@localhost:5438/postgres?schema=public
+REDIS_HOST=127.0.0.1
+REDIS_PORT=6379
+PORT=4000
+CORS_ORIGIN=http://localhost:3000
+AUTH0_AUDIENCE=https://dev--2cpvhzk.us.auth0.com/api/v2/
+AUTH0_JWKS_URI=https://dev--2cpvhzk.us.auth0.com/.well-known/jwks.json
+AUTH0_SIGNING_ALG=RS256
+AUTH0_ISSUER_BASE_URL=https://dev--2cpvhzk.us.auth0.com/
+AUTH0_HOOK_SECRET=
+HASH_SALT=
+HASH_MIN_LENGTH=11
+APOLLO_KEY=
+APOLLO_GRAPH_REF=graphchat@current
+APOLLO_SCHEMA_REPORTING=true
 ```
 
-## Running the app
+## Important Details
 
-```bash
-# development
-$ yarn run start
-
-# watch mode
-$ yarn run start:dev
-
-# production mode
-$ yarn run start:prod
-```
-
-## Test
-
-```bash
-# unit tests
-$ yarn run test
-
-# e2e tests
-$ yarn run test:e2e
-
-# test coverage
-$ yarn run test:cov
-```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+You will need to upload the Auth0 server-less functions into your Auth0 account or project.
+The database models are defined in the Prisma schema file. Please see the schema.prisma file for more information.
