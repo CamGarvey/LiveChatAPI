@@ -3,7 +3,7 @@
 # ------------------------------------------------------
 
 interface Alert {
-  createdAt: DateTime!
+  createdAt: Date!
   createdBy: User!
   createdById: HashId!
   id: HashId!
@@ -12,18 +12,18 @@ interface Alert {
 }
 
 interface Chat {
-  createdAt: DateTime!
+  createdAt: Date!
   createdBy: User!
   createdById: HashId!
   id: HashId!
   isCreator: Boolean!
-  updatedAt: DateTime!
+  updatedAt: Date!
 }
 
 interface ChatAccessAlert implements Alert & ChatAlert {
   chat: Chat!
   chatId: HashId!
-  createdAt: DateTime!
+  createdAt: Date!
   createdBy: User!
   createdById: HashId!
   id: HashId!
@@ -34,7 +34,7 @@ interface ChatAccessAlert implements Alert & ChatAlert {
 interface ChatAlert implements Alert {
   chat: Chat!
   chatId: HashId!
-  createdAt: DateTime!
+  createdAt: Date!
   createdBy: User!
   createdById: HashId!
   id: HashId!
@@ -45,7 +45,7 @@ interface ChatAlert implements Alert {
 type ChatDeletedAlert implements Alert {
   chat: User!
   chatId: HashId!
-  createdAt: DateTime!
+  createdAt: Date!
   createdBy: User!
   createdById: HashId!
   id: HashId!
@@ -67,7 +67,7 @@ type ChatMember implements Member {
 type ChatMemberAccessGrantedAlert implements Alert & ChatAccessAlert & ChatAlert {
   chat: Chat!
   chatId: HashId!
-  createdAt: DateTime!
+  createdAt: Date!
   createdBy: User!
   createdById: HashId!
   id: HashId!
@@ -94,41 +94,39 @@ input CreateGroupChatInput {
 type CreatedEvent implements Event {
   chat: Chat!
   chatId: HashId!
-  createdAt: DateTime!
+  createdAt: Date!
   createdBy: User!
   createdById: HashId!
   id: HashId!
   isCreator: Boolean!
   payload: PayloadUnion!
-  updatedAt: DateTime!
+  updatedAt: Date!
 }
 
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
+"""Date custom scalar type"""
+scalar Date
 
 """A deleted chat"""
 type DeletedChat implements Chat {
-  createdAt: DateTime!
+  createdAt: Date!
   createdBy: User!
   createdById: HashId!
-  deletedAt: DateTime!
+  deletedAt: Date!
   id: HashId!
   isCreator: Boolean!
-  updatedAt: DateTime!
+  updatedAt: Date!
 }
 
 type DeletedEvent implements Event {
   chat: Chat!
   chatId: HashId!
-  createdAt: DateTime!
+  createdAt: Date!
   createdBy: User!
   createdById: HashId!
-  deletedAt: DateTime!
+  deletedAt: Date!
   id: HashId!
   isCreator: Boolean!
-  updatedAt: DateTime!
+  updatedAt: Date!
 }
 
 type DescriptionChangedUpdate implements ChatUpdate {
@@ -139,24 +137,24 @@ type DescriptionChangedUpdate implements ChatUpdate {
 }
 
 type DirectMessageChat implements Chat {
-  createdAt: DateTime!
+  createdAt: Date!
   createdBy: User!
   createdById: HashId!
   id: HashId!
   isCreator: Boolean!
   receipent: Member!
-  updatedAt: DateTime!
+  updatedAt: Date!
 }
 
 interface Event {
   chat: Chat!
   chatId: HashId!
-  createdAt: DateTime!
+  createdAt: Date!
   createdBy: User!
   createdById: HashId!
   id: HashId!
   isCreator: Boolean!
-  updatedAt: DateTime!
+  updatedAt: Date!
 }
 
 type EventEdge {
@@ -166,25 +164,25 @@ type EventEdge {
 
 """A chat you do not have access to"""
 type ForbiddenChat implements Chat {
-  createdAt: DateTime!
+  createdAt: Date!
   createdBy: User!
   createdById: HashId!
   id: HashId!
   isCreator: Boolean!
-  updatedAt: DateTime!
+  updatedAt: Date!
 }
 
 type Friend implements User {
-  createdAt: DateTime!
+  createdAt: Date!
   friends(after: String, before: String, filter: String, first: Int, last: Int): PaginatedUser!
   id: HashId!
   name: String
-  updatedAt: DateTime!
+  updatedAt: Date!
   username: String!
 }
 
 type FriendDeletedAlert implements Alert {
-  createdAt: DateTime!
+  createdAt: Date!
   createdBy: User!
   createdById: HashId!
   id: HashId!
@@ -200,7 +198,7 @@ type FriendEdge {
 }
 
 type FriendRequest implements Request {
-  createdAt: DateTime!
+  createdAt: Date!
   createdBy: User!
   createdById: HashId!
   id: HashId!
@@ -211,7 +209,7 @@ type FriendRequest implements Request {
 }
 
 type GroupChat implements Chat {
-  createdAt: DateTime!
+  createdAt: Date!
   createdBy: User!
   createdById: HashId!
   description: String
@@ -220,18 +218,18 @@ type GroupChat implements Chat {
   members(after: String, before: String, first: Int, last: Int): PaginatedMember!
   name: String!
   role: Role!
-  updatedAt: DateTime!
+  updatedAt: Date!
 }
 
 """Hash Id custom scalar type"""
 scalar HashId
 
 type Me implements User {
-  createdAt: DateTime!
+  createdAt: Date!
   friends(after: String, before: String, filter: String, first: Int, last: Int): PaginatedUser!
   id: HashId!
   name: String
-  updatedAt: DateTime!
+  updatedAt: Date!
   username: String!
 }
 
@@ -363,7 +361,7 @@ type RemovedMember implements Member {
 }
 
 interface Request {
-  createdAt: DateTime!
+  createdAt: Date!
   createdBy: User!
   createdById: HashId!
   id: HashId!
@@ -394,13 +392,13 @@ type RoleChangedUpdate implements ChatUpdate & MemberAlteration {
 }
 
 type Stranger implements User {
-  createdAt: DateTime!
+  createdAt: Date!
   friendRequest: FriendRequest
   friends(after: String, before: String, filter: String, first: Int, last: Int): PaginatedUser!
   id: HashId!
   mutualFriends(after: String, before: String, filter: String, first: Int, last: Int): [Friend!]!
   name: String
-  updatedAt: DateTime!
+  updatedAt: Date!
   username: String!
 }
 
@@ -412,11 +410,11 @@ type Subscription {
 }
 
 interface User {
-  createdAt: DateTime!
+  createdAt: Date!
   friends(after: String, before: String, filter: String, first: Int, last: Int): PaginatedUser!
   id: HashId!
   name: String
-  updatedAt: DateTime!
+  updatedAt: Date!
   username: String!
 }
 

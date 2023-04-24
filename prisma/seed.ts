@@ -1,6 +1,11 @@
 import { PrismaClient, User } from '@prisma/client';
 import users from './data';
 
+/**
+ * This file is used to populate the database with test data for development
+ * run `yarn prisma:seed`
+ */
+
 const loadUsers = async (prisma: PrismaClient) => {
   await prisma.user.createMany({
     data: users,
@@ -10,8 +15,8 @@ const loadUsers = async (prisma: PrismaClient) => {
 
   const masterUser = await prisma.user.create({
     data: {
-      email: 'cam.garvey11@gmail.com',
-      name: 'Cameron g',
+      email: 'test.test@test.com',
+      name: 'CamGarvey',
       username: 'Camgaroo',
       friends: {
         connect: otherUsers.map(({ id }) => ({ id })),

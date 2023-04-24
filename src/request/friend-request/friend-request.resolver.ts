@@ -1,9 +1,9 @@
 import { Args, Mutation, Resolver } from '@nestjs/graphql';
 import { IAuthUser } from 'src/auth/interfaces/auth-user.interface';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
-import { FriendRequest } from '../models/friend-request.model';
 import { HashIdScalar } from 'src/common/scalars/hash-id.scalar';
-import { FriendRequestService } from '../services/friend-request.service';
+import { FriendRequestService } from './services/friend-request.service';
+import { FriendRequest } from './models/friend-request.model';
 
 @Resolver(() => FriendRequest)
 export class FriendRequestResolver {

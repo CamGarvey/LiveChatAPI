@@ -17,11 +17,11 @@ The following dependencies are required for the project:
 To install and set up the project on your local machine, follow these steps:
 
 - Run `yarn install` to install the required packages.
-- Run `yarn run docker` to spin up the database and redis containers using Docker.
-- Run `yarn run prisma:gen` to generate typings.
-- Run `yarn run prisma:seed` to populate the database with test data.
-- Run `yarn run prisma:push` to push the database schema to the database.
-- Run `yarn run start:dev` to start up the development server.
+- Run `yarn docker` to spin up the database and redis containers using Docker.
+- Run `yarn prisma:gen` to generate typings.
+- Run `yarn prisma:seed` to populate the database with test data.
+- Run `yarn prisma:push` to push the database schema to the database.
+- Run `yarn start:dev` to start up the development server.
 
 ## Usage
 

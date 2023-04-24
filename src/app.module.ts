@@ -21,7 +21,7 @@ import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin
 import { CommonModule } from './common/common.module';
 import { HashModule } from './hash/hash.module';
 import { APP_GUARD } from '@nestjs/core';
-import { GqlAuthGuard } from './auth/guards/gql-auth.guard';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RedisOptions } from 'ioredis';
 import { FriendModule } from './user/friend/friend.module';
 import { ChatModule } from './chat/chat.module';
@@ -56,6 +56,8 @@ import { ChatModule } from './chat/chat.module';
       sortSchema: true,
       playground: false,
       plugins: [ApolloServerPluginLandingPageLocalDefault()],
+      context: ({ req, connection }) =>
+        connection ? { req: connection.context } : { req },
     }),
     UserModule,
     ChatModule,
@@ -72,7 +74,7 @@ import { ChatModule } from './chat/chat.module';
     JwtStrategy,
     {
       provide: APP_GUARD,
-      useClass: GqlAuthGuard,
+      useClass: JwtAuthGuard,
     },
   ],
 })

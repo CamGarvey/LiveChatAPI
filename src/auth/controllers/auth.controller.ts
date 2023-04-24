@@ -12,6 +12,7 @@ import { ConfigType } from '@nestjs/config';
 import { Request, Response } from 'express';
 import authConfig from 'src/config/auth.config';
 import { AuthService } from '../services/auth.service';
+import { Public } from '../decorators/public.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -21,6 +22,7 @@ export class AuthController {
     private authService: AuthService,
   ) {}
 
+  @Public()
   @Post('create-user-hook')
   @HttpCode(HttpStatus.CREATED)
   async createUserHook(@Req() request: Request, @Res() res: Response) {
