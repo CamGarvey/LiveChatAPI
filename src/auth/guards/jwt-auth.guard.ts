@@ -41,11 +41,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       throw err || new UnauthorizedException();
     }
 
-    if (context.getType<GqlContextType>() === 'graphql') {
-      // Put user on gql context
-      const gqlContext = GqlExecutionContext.create(context);
-      gqlContext.getContext().user = user;
-    }
+    this.putUserOnContext(context, user);
 
     return user;
   }
@@ -72,5 +68,18 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     }
 
     return ctx.req;
+  }
+
+  private putUserOnContext<T>(context: ExecutionContext, user: T) {
+    switch (context.getType<GqlContextType>()) {
+      case 'graphql':
+        const gqlContext = GqlExecutionContext.create(context);
+        gqlContext.getContext().user = user;
+        break;
+      case 'http':
+        const request = context.switchToHttp().getRequest();
+        request.user = user;
+        break;
+    }
   }
 }

@@ -1,6 +1,5 @@
 import {
   Controller,
-  Get,
   HttpCode,
   HttpStatus,
   Inject,
@@ -11,8 +10,8 @@ import {
 import { ConfigType } from '@nestjs/config';
 import { Request, Response } from 'express';
 import authConfig from 'src/config/auth.config';
-import { AuthService } from '../services/auth.service';
 import { Public } from '../decorators/public.decorator';
+import { AuthService } from '../services/auth.service';
 
 @Controller('auth')
 export class AuthController {

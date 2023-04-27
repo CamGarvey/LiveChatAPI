@@ -64,6 +64,14 @@ export class RequestInterfaceResolver {
     return await this.requestService.cancelRequest(requestId);
   }
 
+  @Mutation(() => Request)
+  @UseGuards(RequestSenderGuard)
+  async deleteRequest(
+    @Args('requestId', { type: () => HashIdScalar }) requestId: number,
+  ) {
+    return await this.requestService.deletedRequest(requestId);
+  }
+
   @Subscription(() => Request, {
     filter(payload: SubscriptionPayload<Request>, _, { user }: IContext) {
       return payload.recipients.includes(user.id);

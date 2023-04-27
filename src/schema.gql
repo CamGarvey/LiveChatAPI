@@ -286,6 +286,7 @@ type Mutation {
   declineRequest(requestId: HashId!): Request!
   deleteEvent(eventId: HashId!): DeletedEvent!
   deleteFriend(userId: HashId!): Stranger!
+  deleteRequest(requestId: HashId!): Request!
   deletedChat(chatId: HashId!): DeletedChat!
   removeMembers(chatId: HashId!, userIds: [HashId!]!): MembersRemovedUpdate!
   sendFriendRequest(userId: HashId!): FriendRequest!

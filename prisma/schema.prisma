@@ -45,7 +45,6 @@ model Request {
   createdBy   User         @relation("SentRequests", fields: [createdById], references: [id])
   createdById Int
   createdAt   DateTime     @unique @default(now())
-  alert       Alert?
 
   @@unique([recipientId, createdById, type])
 }
@@ -72,12 +71,9 @@ model Alert {
   createdAt   DateTime  @unique @default(now())
   chat        Chat?     @relation(fields: [chatId], references: [id])
   chatId      Int?
-  request     Request?  @relation(references: [id], fields: [requestId], onDelete: Cascade)
-  requestId   Int?      @unique
 
   @@index([createdById])
   @@index([chatId])
-  @@index([requestId])
   @@index([type])
 }
 

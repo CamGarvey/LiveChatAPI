@@ -32,6 +32,16 @@ export class FriendRequestService {
       },
       update: {
         state: 'SENT',
+        recipient: {
+          connect: {
+            id: userId,
+          },
+        },
+        createdBy: {
+          connect: {
+            id: createdById,
+          },
+        },
         createdAt: new Date().toISOString(),
       },
       where: {
