@@ -303,10 +303,10 @@ type NameChangedUpdate implements ChatUpdate {
 }
 
 type PageInfo {
-  endCursor: String!
+  endCursor: String
   hasNextPage: Boolean!
   hasPreviousPage: Boolean!
-  startCursor: String!
+  startCursor: String
 }
 
 type PaginatedEvent {

@@ -21,6 +21,7 @@ import { EventService } from '../event.service';
 import DeletedEvent from '../models/deleted-event.model';
 import Event from '../models/interfaces/event.interface';
 import { HashIdScalar } from 'src/common/scalars/hash-id.scalar';
+import { IContext } from 'src/auth/interfaces/context.interface';
 
 @Resolver(() => Event)
 export class EventInterfaceResolver {
@@ -71,8 +72,9 @@ export class EventInterfaceResolver {
 
   @Subscription(() => Event, {
     name: 'events',
-    filter: (payload: SubscriptionPayload<Event>, _, user: IAuthUser) =>
-      payload.recipients.includes(user.id),
+    filter: (payload: SubscriptionPayload<Event>, _, context: IContext) => {
+      return payload.recipients.includes(context.user.id);
+    },
     resolve: (payload: SubscriptionPayload<Event>) => payload.content,
   })
   async eventSubscription() {

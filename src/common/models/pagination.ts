@@ -21,7 +21,7 @@ export interface IPaginatedType<T> {
 
 @ObjectType()
 class PageInfo implements IPageInfo {
-  @Field((type) => String)
+  @Field((type) => String, { nullable: true })
   endCursor: string;
 
   @Field((type) => Boolean)
@@ -30,7 +30,7 @@ class PageInfo implements IPageInfo {
   @Field((type) => Boolean)
   hasPreviousPage: boolean;
 
-  @Field((type) => String)
+  @Field((type) => String, { nullable: true })
   startCursor: string;
 }
 

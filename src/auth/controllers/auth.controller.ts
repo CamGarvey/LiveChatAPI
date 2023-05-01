@@ -27,6 +27,11 @@ export class AuthController {
   async createUserHook(@Req() request: Request, @Res() res: Response) {
     const { secret, name, username, email } = request.body;
 
+    console.log({
+      request: request.body,
+      secret: this.configuration.hookSecret,
+    });
+
     if (secret !== this.configuration.hookSecret) {
       return res.status(HttpStatus.FORBIDDEN).send();
     }
