@@ -1,5 +1,6 @@
 # Graphql Live Chat API
 
+(WORK IN PROGRESS)
 This is a Live Chat API written in Typescript, using NestJS and Graphql, with authentication provided by Auth0.
 
 ## Dependencies
