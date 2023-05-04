@@ -1,6 +1,6 @@
 import { ApolloDriverConfig } from '@nestjs/apollo';
 import { ApolloDriver } from '@nestjs/apollo/dist/drivers';
-import { CacheModule, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { UserModule } from './user/user.module';
 import { ConfigModule, ConfigService, ConfigType } from '@nestjs/config';
@@ -25,6 +25,7 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RedisOptions } from 'ioredis';
 import { FriendModule } from './user/friend/friend.module';
 import { ChatModule } from './chat/chat.module';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
