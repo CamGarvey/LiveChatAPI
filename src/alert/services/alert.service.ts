@@ -1,12 +1,19 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, LoggerService } from '@nestjs/common';
 import { Alert, Prisma } from '@prisma/client';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class AlertService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject(WINSTON_MODULE_NEST_PROVIDER)
+    private readonly logger: LoggerService,
+  ) {}
 
   getAlert(alertId: number): Prisma.Prisma__AlertClient<Alert> {
+    this.logger.debug('Getting alert', { alertId });
+
     return this.prisma.alert.findUniqueOrThrow({
       where: { id: alertId },
     });
@@ -16,6 +23,8 @@ export class AlertService {
     alertId: number,
     acknowledgedById: number,
   ): Promise<Alert> {
+    this.logger.debug('Acknowledging alert', { alertId, acknowledgedById });
+
     const alert = await this.prisma.alert.update({
       data: {
         recipients: {

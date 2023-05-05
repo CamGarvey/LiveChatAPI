@@ -2,21 +2,26 @@ import {
   Connection,
   findManyCursorConnection,
 } from '@devoxa/prisma-relay-cursor-connection';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, LoggerService } from '@nestjs/common';
 import { Alert, Prisma, User } from '@prisma/client';
 import { FilterPaginationArgs } from 'src/common/models/pagination';
 import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-triggers.enum';
 import { SubscriptionPayload } from 'src/common/subscriptions/subscription-payload.model';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PubSubService } from 'src/pubsub/pubsub.service';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 @Injectable()
 export class FriendService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly pubsub: PubSubService,
+    @Inject(WINSTON_MODULE_NEST_PROVIDER)
+    private readonly logger: LoggerService,
   ) {}
 
   async createFriend(userId: number, createdById: number): Promise<User> {
+    this.logger.debug('Creating friend', { userId, createdById });
+
     const user = await this.prisma.user.update({
       where: {
         id: createdById,
@@ -39,6 +44,8 @@ export class FriendService {
   }
 
   async deleteFriend(userId: number, deletedById: number): Promise<User> {
+    this.logger.debug('Deleting friend', { userId, deletedById });
+
     const deletedFriend = await this.prisma.user.update({
       where: {
         id: userId,
@@ -86,6 +93,8 @@ export class FriendService {
     userId: number,
     filterPaginationArgs: FilterPaginationArgs,
   ): Promise<Connection<User>> {
+    this.logger.debug('Getting friends', { userId, filterPaginationArgs });
+
     const where = this.getUserWhereValidator(filterPaginationArgs.filter);
 
     return findManyCursorConnection<
@@ -134,6 +143,12 @@ export class FriendService {
     otherUserId: number,
     filterPaginationArgs: FilterPaginationArgs,
   ): Promise<Connection<User>> {
+    this.logger.debug('Getting mutual friends', {
+      userId,
+      otherUserId,
+      filterPaginationArgs,
+    });
+
     const userWhere = this.getUserWhereValidator(filterPaginationArgs.filter);
     // Find all users where friends with both
     const where: Prisma.UserWhereInput = {

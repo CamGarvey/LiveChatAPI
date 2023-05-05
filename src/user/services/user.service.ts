@@ -2,20 +2,24 @@ import {
   Connection,
   findManyCursorConnection,
 } from '@devoxa/prisma-relay-cursor-connection';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, LoggerService } from '@nestjs/common';
 import { Chat, Prisma, User } from '@prisma/client';
 import { FilterPaginationArgs } from 'src/common/models/pagination';
 import { PubSubService } from 'src/pubsub/pubsub.service';
 import { PrismaService } from '../../prisma/prisma.service';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 @Injectable()
 export class UserService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly pubsub: PubSubService,
+    @Inject(WINSTON_MODULE_NEST_PROVIDER)
+    private readonly logger: LoggerService,
   ) {}
 
   getUser(userId: number): Prisma.Prisma__UserClient<User> {
+    this.logger.debug('Getting user', { userId });
+
     return this.prisma.user.findUniqueOrThrow({
       where: {
         id: userId,
@@ -24,6 +28,8 @@ export class UserService {
   }
 
   async getUserChats(userId: number): Promise<Chat[]> {
+    this.logger.debug('Getting user chats', { userId });
+
     const user = await this.prisma.user.findUniqueOrThrow({
       select: {
         memberOfChats: {
@@ -43,6 +49,8 @@ export class UserService {
   async getUsers(
     filterPaginationArgs: FilterPaginationArgs,
   ): Promise<Connection<User>> {
+    this.logger.debug('Getting users', { filterPaginationArgs });
+
     const where = this.getUserWhereValidator(filterPaginationArgs.filter);
 
     return findManyCursorConnection<

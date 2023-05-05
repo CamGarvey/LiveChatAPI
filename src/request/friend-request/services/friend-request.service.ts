@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, LoggerService } from '@nestjs/common';
 import { Request } from '@prisma/client';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { SubscriptionPayload } from 'src/common/subscriptions/subscription-payload.model';
 import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-triggers.enum';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -10,12 +11,15 @@ export class FriendRequestService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly pubsub: PubSubService,
+    @Inject(WINSTON_MODULE_NEST_PROVIDER)
+    private readonly logger: LoggerService,
   ) {}
 
   async sendFriendRequest(
     userId: number,
     createdById: number,
   ): Promise<Request> {
+    this.logger.debug('Sending friend request', { userId, createdById });
     const request = await this.prisma.request.upsert({
       create: {
         type: 'FRIEND_REQUEST',

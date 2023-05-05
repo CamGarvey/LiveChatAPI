@@ -26,7 +26,22 @@ import { RedisOptions } from 'ioredis';
 import { FriendModule } from './user/friend/friend.module';
 import { ChatModule } from './chat/chat.module';
 import { CacheModule } from '@nestjs/cache-manager';
+import {
+  utilities as nestWinstonModuleUtilities,
+  WinstonModule,
+} from 'nest-winston';
+import * as winston from 'winston';
+import { format } from 'util';
 
+const combineMessageAndSplat = () => {
+  return {
+    transform: (info, opts) => {
+      //combine message and args if any
+      info.message = format(info.message, ...(info[Symbol.for('splat')] || []));
+      return info;
+    },
+  };
+};
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -47,6 +62,25 @@ import { CacheModule } from '@nestjs/cache-manager';
       }),
       inject: [ConfigService],
       isGlobal: true,
+    }),
+    WinstonModule.forRoot({
+      level: 'debug',
+      format: winston.format.combine(
+        combineMessageAndSplat(),
+        winston.format.simple(),
+      ),
+      transports: [
+        new winston.transports.Console({
+          format: winston.format.combine(
+            winston.format.timestamp(),
+            winston.format.ms(),
+            nestWinstonModuleUtilities.format.nestLike('MyApp', {
+              colors: true,
+              prettyPrint: true,
+            }),
+          ),
+        }),
+      ],
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
