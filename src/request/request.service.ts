@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
-import { Alert, Prisma, Request } from '@prisma/client';
+import { Inject, Injectable, LoggerService } from '@nestjs/common';
+import { Prisma, Request } from '@prisma/client';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { SubscriptionPayload } from 'src/common/subscriptions/subscription-payload.model';
 import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-triggers.enum';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -12,6 +13,8 @@ export class RequestService {
     private readonly prisma: PrismaService,
     private readonly pubsub: PubSubService,
     private readonly friendService: FriendService,
+    @Inject(WINSTON_MODULE_NEST_PROVIDER)
+    private readonly logger: LoggerService,
   ) {}
 
   /**
@@ -20,6 +23,8 @@ export class RequestService {
    * @returns request
    */
   getRequest(requestId: number): Prisma.Prisma__RequestClient<Request> {
+    this.logger.debug('Getting request', { requestId });
+
     return this.prisma.request.findUniqueOrThrow({
       where: {
         id: requestId,
@@ -34,6 +39,8 @@ export class RequestService {
    * @returns accepted request
    */
   async acceptRequest(requestId: number): Promise<Request> {
+    this.logger.debug('Accepting request', { requestId });
+
     const request = await this.prisma.request.update({
       data: {
         state: 'ACCEPTED',
@@ -68,6 +75,8 @@ export class RequestService {
    * @returns declined request
    */
   async declineRequest(requestId: number): Promise<Request> {
+    this.logger.debug('Declining request', { requestId });
+
     const request = await this.prisma.request.update({
       data: {
         state: 'DECLINED',
@@ -95,6 +104,8 @@ export class RequestService {
    * @returns cancelled request
    */
   async cancelRequest(requestId: number): Promise<Request> {
+    this.logger.debug('Cancelling request', { requestId });
+
     const request = await this.prisma.request.update({
       data: {
         state: 'CANCELLED',
@@ -121,6 +132,8 @@ export class RequestService {
    * @returns deleted request
    */
   async deletedRequest(requestId: number): Promise<Request> {
+    this.logger.debug('Deleting request', { requestId });
+
     return await this.prisma.request.delete({
       where: {
         id: requestId,

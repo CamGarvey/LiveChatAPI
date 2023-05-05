@@ -1,9 +1,11 @@
-import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
-import { IAuthUser } from '../interfaces/auth-user.interface';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Inject, Injectable, LoggerService } from '@nestjs/common';
 import { Cache } from 'cache-manager';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { INewUserData } from '../interfaces/new-user-data.interface';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { HashService } from 'src/hash/hash.service';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { IAuthUser } from '../interfaces/auth-user.interface';
+import { INewUserData } from '../interfaces/new-user-data.interface';
 
 @Injectable()
 export class AuthService {
@@ -11,6 +13,8 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly hashService: HashService,
     @Inject(CACHE_MANAGER) private cache: Cache,
+    @Inject(WINSTON_MODULE_NEST_PROVIDER)
+    private readonly logger: LoggerService,
   ) {}
 
   async isUsernameTaken(username: string): Promise<boolean> {
@@ -23,6 +27,8 @@ export class AuthService {
   }
 
   async createUser(data: INewUserData): Promise<string> {
+    this.logger.debug('Creating new user', data);
+
     const { id } = await this.prisma.user.create({
       select: {
         id: true,

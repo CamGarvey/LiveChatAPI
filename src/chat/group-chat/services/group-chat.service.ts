@@ -1,19 +1,30 @@
-import { Injectable } from '@nestjs/common';
-import { Alert, Chat, ChatUpdate, Event, Role } from '@prisma/client';
+import { Inject, Injectable, LoggerService } from '@nestjs/common';
+import {
+  Alert,
+  Chat,
+  ChatUpdate,
+  Event,
+  Prisma,
+  PrismaClient,
+  Role,
+} from '@prisma/client';
 import { GraphQLError } from 'graphql';
 import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-triggers.enum';
 import { SubscriptionPayload } from 'src/common/subscriptions/subscription-payload.model';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PubSubService } from 'src/pubsub/pubsub.service';
 import { ChatService } from 'src/chat/chat.service';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 @Injectable()
 export class GroupChatService extends ChatService {
   constructor(
     protected readonly prisma: PrismaService,
     protected readonly pubsub: PubSubService,
+    @Inject(WINSTON_MODULE_NEST_PROVIDER)
+    protected readonly logger: LoggerService,
   ) {
-    super(prisma, pubsub);
+    super(prisma, pubsub, logger);
   }
 
   async createGroupChat(
@@ -22,6 +33,12 @@ export class GroupChatService extends ChatService {
     userIds: number[],
     createdById: number,
   ): Promise<Chat> {
+    this.logger.debug('Creating group chat', {
+      name,
+      description,
+      userIds,
+      createdById,
+    });
     // Remove duplicates and add creator
     const userIdSet: Set<number> = new Set(userIds);
     userIdSet.add(createdById);
@@ -99,6 +116,11 @@ export class GroupChatService extends ChatService {
     name: string,
     updatedById: number,
   ): Promise<ChatUpdate> {
+    this.logger.debug('Updating group chat name', {
+      chatId,
+      name,
+      updatedById,
+    });
     const chatBeforeUpdate = await this.prisma.chat.findUniqueOrThrow({
       where: {
         id: chatId,
@@ -180,6 +202,11 @@ export class GroupChatService extends ChatService {
     description: string,
     updatedById: number,
   ): Promise<ChatUpdate> {
+    this.logger.debug('Updating group chat description', {
+      chatId,
+      description,
+      updatedById,
+    });
     const chatBeforeUpdate = await this.prisma.chat.findUniqueOrThrow({
       where: {
         id: chatId,

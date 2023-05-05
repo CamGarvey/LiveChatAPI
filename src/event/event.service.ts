@@ -2,22 +2,27 @@ import {
   Connection,
   findManyCursorConnection,
 } from '@devoxa/prisma-relay-cursor-connection';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, LoggerService } from '@nestjs/common';
 import { Event, Prisma } from '@prisma/client';
 import { PaginationArgs } from 'src/common/models/pagination';
 import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-triggers.enum';
 import { SubscriptionPayload } from 'src/common/subscriptions/subscription-payload.model';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PubSubService } from 'src/pubsub/pubsub.service';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 @Injectable()
 export class EventService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly pubsub: PubSubService,
+    @Inject(WINSTON_MODULE_NEST_PROVIDER)
+    private readonly logger: LoggerService,
   ) {}
 
   getEvent(eventId: number): Prisma.Prisma__EventClient<Event> {
+    this.logger.debug('Getting event', { eventId });
+
     return this.prisma.event.findUniqueOrThrow({
       where: {
         id: eventId,
@@ -29,6 +34,8 @@ export class EventService {
     chatId: number,
     paginationArgs: PaginationArgs,
   ): Promise<Connection<Event>> {
+    this.logger.debug('Getting events', { chatId, paginationArgs });
+
     return findManyCursorConnection<
       Event,
       Pick<Prisma.UserWhereUniqueInput, 'id'>
@@ -63,6 +70,8 @@ export class EventService {
   }
 
   async deleteEvent(eventId: number, deletedById: number): Promise<Event> {
+    this.logger.debug('Deleting event', { eventId, deletedById });
+
     const event = await this.prisma.event.update({
       data: {
         deletedAt: new Date(),

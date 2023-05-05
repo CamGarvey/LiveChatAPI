@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, LoggerService } from '@nestjs/common';
 import { Alert, Chat, Prisma } from '@prisma/client';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { SubscriptionPayload } from 'src/common/subscriptions/subscription-payload.model';
 import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-triggers.enum';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -10,9 +11,12 @@ export class ChatService {
   constructor(
     protected readonly prisma: PrismaService,
     protected readonly pubsub: PubSubService,
+    @Inject(WINSTON_MODULE_NEST_PROVIDER)
+    protected readonly logger: LoggerService,
   ) {}
 
   getChat(chatId: number): Prisma.Prisma__ChatClient<Chat> {
+    this.logger.debug('Getting chat', { chatId });
     return this.prisma.chat.findUniqueOrThrow({
       where: {
         id: chatId,
@@ -21,6 +25,8 @@ export class ChatService {
   }
 
   async deleteChat(chatId: number, deletedById: number) {
+    this.logger.debug('Deleting chat', { chatId, deletedById });
+
     const chat = await this.prisma.chat.update({
       where: {
         id: chatId,
