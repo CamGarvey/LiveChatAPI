@@ -1,8 +1,9 @@
 import { Field, InputType } from '@nestjs/graphql';
 import { HashIdScalar } from 'src/common/scalars/hash-id.scalar';
+import { ICreateGroupChat } from '../interfaces/create-group-chat.interface';
 
 @InputType()
-export class CreateGroupChatInput {
+export class CreateGroupChatInput implements ICreateGroupChat {
   @Field({
     description: 'Name of the group chat',
   })

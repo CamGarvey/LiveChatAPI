@@ -1,20 +1,13 @@
 import { Inject, Injectable, LoggerService } from '@nestjs/common';
-import {
-  Alert,
-  Chat,
-  ChatUpdate,
-  Event,
-  Prisma,
-  PrismaClient,
-  Role,
-} from '@prisma/client';
+import { Alert, Chat, ChatUpdate, Event, Role } from '@prisma/client';
 import { GraphQLError } from 'graphql';
-import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-triggers.enum';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import { ChatService } from 'src/chat/chat.service';
 import { SubscriptionPayload } from 'src/common/subscriptions/subscription-payload.model';
+import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-triggers.enum';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PubSubService } from 'src/pubsub/pubsub.service';
-import { ChatService } from 'src/chat/chat.service';
-import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import { ICreateGroupChat } from '../models/interfaces/create-group-chat.interface';
 
 @Injectable()
 export class GroupChatService extends ChatService {
@@ -28,17 +21,12 @@ export class GroupChatService extends ChatService {
   }
 
   async createGroupChat(
-    name: string,
-    description: string,
-    userIds: number[],
+    data: ICreateGroupChat,
     createdById: number,
   ): Promise<Chat> {
-    this.logger.debug('Creating group chat', {
-      name,
-      description,
-      userIds,
-      createdById,
-    });
+    this.logger.debug('Creating group chat', { createdById, ...data });
+
+    const { name, description, userIds } = data;
     // Remove duplicates and add creator
     const userIdSet: Set<number> = new Set(userIds);
     userIdSet.add(createdById);

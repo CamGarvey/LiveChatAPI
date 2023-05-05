@@ -16,7 +16,7 @@ import ChatDescriptionUpdate from 'src/event/payload/chat-update/models/descript
 import { MemberService } from 'src/member/member.service';
 import GroupChat from '../group-chat.model';
 import NameChangedUpdate from 'src/event/payload/chat-update/models/name-changed-update.model';
-import { CreateGroupChatInput } from 'src/chat/models/inputs/create-group-chat.input';
+import { CreateGroupChatInput } from 'src/chat/group-chat/models/inputs/create-group-chat.input';
 import { GroupChatService } from '../services/group-chat.service';
 import { HashIdScalar } from 'src/common/scalars/hash-id.scalar';
 import { Role } from '@prisma/client';
@@ -56,9 +56,11 @@ export class GroupChatResolver {
     @CurrentUser() user: IAuthUser,
   ) {
     return await this.groupChatService.createGroupChat(
-      name,
-      description,
-      userIds,
+      {
+        name,
+        description,
+        userIds,
+      },
       user.id,
     );
   }
