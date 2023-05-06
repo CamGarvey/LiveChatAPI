@@ -13,6 +13,7 @@ export class PubSubService extends RedisPubSub {
     const redisOptions: RedisOptions = {
       host: configuration.host,
       port: configuration.port,
+      password: configuration.password,
       retryStrategy: (times: any) => {
         // reconnect after
         return Math.min(times * 50, 2000);
