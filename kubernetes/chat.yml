@@ -31,8 +31,14 @@ spec:
           ports:
             - containerPort: 4000
           env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: dotenv
+                  key: POSTGRES_PASSWORD
+                  optional: false
             - name: DATABASE_URL
-              value: postgresql://postgres:postgresSuperUserPsw@postgres:5432/postgres?schema=public
+              value: postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/postgres?schema=public
             - name: REDIS_HOST
               value: redis
             - name: REDIS_PORT
@@ -65,4 +71,3 @@ spec:
               value: graphchat@current
             - name: APOLLO_SCHEMA_REPORTING
               value: 'true'
-

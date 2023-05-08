@@ -4,11 +4,9 @@ metadata:
   name: backup-pvc
   namespace: default
 spec:
-  storageClassName: "standard"
+  storageClassName: 'standard'
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: 20Mi
-
-

@@ -7,19 +7,18 @@ import { Member, Prisma } from '@prisma/client';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { PaginationArgs } from 'src/common/models/pagination';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { PubSubService } from 'src/pubsub/pubsub.service';
 
 @Injectable()
 export class MemberService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly pubsub: PubSubService,
     @Inject(WINSTON_MODULE_NEST_PROVIDER)
     private readonly logger: LoggerService,
   ) {}
 
   getMember(memberId: number): Prisma.Prisma__MemberClient<Member> {
     this.logger.debug('Getting member', { memberId });
+
     return this.prisma.member.findUniqueOrThrow({
       where: {
         id: memberId,
@@ -32,6 +31,7 @@ export class MemberService {
     paginationArgs: PaginationArgs,
   ): Promise<Connection<Member>> {
     this.logger.debug('Getting members', { chatId, paginationArgs });
+
     return await findManyCursorConnection<
       Member,
       Pick<Prisma.MemberWhereUniqueInput, 'id'>
