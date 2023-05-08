@@ -42,6 +42,7 @@ const combineMessageAndSplat = () => {
     },
   };
 };
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -59,6 +60,8 @@ const combineMessageAndSplat = () => {
       useFactory: async (configuration: ConfigType<typeof redisConfig>) => ({
         host: configuration.host,
         port: configuration.port,
+        password: configuration.password,
+        no_ready_check: true,
       }),
       inject: [ConfigService],
       isGlobal: true,
