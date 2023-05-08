@@ -26,13 +26,13 @@ spec:
     spec:
       containers:
         - name: app
-          image: chat-api2.2
+          image: chat-api2.5
           imagePullPolicy: Never
           ports:
             - containerPort: 4000
           env:
             - name: DATABASE_URL
-              value: postgresql://postgres:superUserPassword@mypostgres:5432/postgres?schema=public
+              value: postgresql://postgres:postgresSuperUserPsw@postgres:5432/postgres?schema=public
             - name: REDIS_HOST
               value: redis
             - name: REDIS_PORT
@@ -65,4 +65,4 @@ spec:
               value: graphchat@current
             - name: APOLLO_SCHEMA_REPORTING
               value: 'true'
-          # imagePullPolicy: Always
+
