@@ -1,0 +1,140 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chat
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chat
+  template:
+    metadata:
+      labels:
+        app: chat
+    spec:
+      containers:
+        - name: app
+          image: chat-api:latest
+          imagePullPolicy: Never
+          resources:
+            requests:
+              cpu: 250m
+              memory: 250Mi
+            limits:
+              cpu: 250m
+              memory: 250Mi
+          ports:
+            - containerPort: 4000
+          env:
+            - name: HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: chat-configmap
+                  key: host
+                  optional: true
+
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: chat-configmap
+                  key: port
+                  optional: true
+
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: dotenv
+                  key: POSTGRES_PASSWORD
+                  optional: false
+
+            - name: DATABASE_URL
+              value: 'postgresql://postgres:$(POSTGRES_PASSWORD)@postgres:5432/postgres?schema=public'
+
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: dotenv
+                  key: REDIS_PASS
+                  optional: false
+
+            - name: REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: chat-configmap
+                  key: redis-host
+                  optional: false
+
+            - name: REDIS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: chat-configmap
+                  key: redis-port
+                  optional: false
+
+            - name: CORS_ORIGIN
+              valueFrom:
+                configMapKeyRef:
+                  name: chat-configmap
+                  key: cors-origin
+                  optional: false
+
+            - name: AUTH0_AUDIENCE
+              valueFrom:
+                configMapKeyRef:
+                  name: chat-configmap
+                  key: auth0-audience
+                  optional: false
+
+            - name: AUTH0_JWKS_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: chat-configmap
+                  key: auth0-jwks-uri
+                  optional: false
+
+            - name: AUTH0_SIGNING_ALG
+              valueFrom:
+                configMapKeyRef:
+                  name: chat-configmap
+                  key: auth0-signing-alg
+                  optional: false
+
+            - name: AUTH0_ISSUER_BASE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: chat-configmap
+                  key: auth0-issuer-base-url
+                  optional: false
+
+            - name: AUTH0_HOOK_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: dotenv
+                  key: AUTH0_HOOK_SECRET
+                  optional: false
+
+            - name: HASH_SALT
+              valueFrom:
+                secretKeyRef:
+                  name: dotenv
+                  key: HASH_SALT
+                  optional: false
+
+            - name: HASH_MIN_LENGTH
+              valueFrom:
+                configMapKeyRef:
+                  name: chat-configmap
+                  key: hash-min-length
+                  optional: false
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chat
+spec:
+  selector:
+    app: chat
+  ports:
+    - port: 4000
+      targetPort: 4000
+  type: LoadBalancer

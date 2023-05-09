@@ -16,17 +16,16 @@ spec:
       initContainers:
         - name: config
           image: redis:7.0.10-alpine
-          command: ['sh', '-c']
+          command: ["sh", "-c"]
           args:
             - |
-              REDIS_PASSWORD=test
               nodes=redis-0.redis,redis-1.redis,redis-2.redis
               loop=$(echo $nodes | sed -e "s/,/\n/g")
 
               for i in $loop
               do
                   echo "finding master at $i"
-                  MASTER=$(redis-cli --no-auth-warning --raw -h $i -a $REDIS_PASSWORD info replication | awk '{print $1}' | grep master_host: | cut -d ":" -f2)
+                  MASTER=$(redis-cli --no-auth-warning --raw -h $i -a $REDIS_PASS info replication | awk '{print $1}' | grep master_host: | cut -d ":" -f2)
                   if [ "$MASTER" = "" ]; then
                       echo "no master found"
                       MASTER=
@@ -43,17 +42,38 @@ spec:
               sentinel down-after-milliseconds mymaster 5000
               sentinel failover-timeout mymaster 60000
               sentinel parallel-syncs mymaster 1
-              sentinel auth-pass mymaster $REDIS_PASSWORD
+              sentinel auth-pass mymaster $REDIS_PASS
               " > /etc/redis/sentinel.conf
               cat /etc/redis/sentinel.conf
           volumeMounts:
             - name: redis-config
               mountPath: /etc/redis/
+          env:
+            - name: REDIS_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: dotenv
+                  key: REDIS_PASS
+                  optional: false
+
+            - name: REDIS_MASTER_AUTH
+              valueFrom:
+                secretKeyRef:
+                  name: dotenv
+                  key: REDIS_MASTER_AUTH
+                  optional: false
       containers:
         - name: sentinel
           image: redis:7.0.10-alpine
-          command: ['redis-sentinel']
-          args: ['/etc/redis/sentinel.conf']
+          command: ["redis-sentinel"]
+          args:
+            [
+              "/etc/redis/sentinel.conf",
+              "--requirepass",
+              $(REDIS_PASS),
+              "--masterauth",
+              $(REDIS_MASTER_AUTH),
+            ]
           ports:
             - containerPort: 5000
               name: sentinel
@@ -62,6 +82,20 @@ spec:
               mountPath: /etc/redis/
             - name: data
               mountPath: /data
+          env:
+            - name: REDIS_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: dotenv
+                  key: REDIS_PASS
+                  optional: false
+
+            - name: REDIS_MASTER_AUTH
+              valueFrom:
+                secretKeyRef:
+                  name: dotenv
+                  key: REDIS_MASTER_AUTH
+                  optional: false
       volumes:
         - name: redis-config
           emptyDir: {}
@@ -69,8 +103,8 @@ spec:
     - metadata:
         name: data
       spec:
-        accessModes: ['ReadWriteOnce']
-        storageClassName: 'standard'
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: "standard"
         resources:
           requests:
             storage: 64Mi

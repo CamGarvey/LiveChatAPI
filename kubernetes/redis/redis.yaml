@@ -47,7 +47,14 @@ spec:
         - name: redis
           image: redis:7.0.10-alpine
           command: ['redis-server']
-          args: ['/etc/redis/redis.conf']
+          args:
+            [
+              '/etc/redis/redis.conf',
+              '--requirepass',
+              $(REDIS_PASS),
+              '--masterauth',
+              $(REDIS_MASTER_AUTH),
+            ]
           ports:
             - containerPort: 6379
               name: redis
@@ -56,6 +63,20 @@ spec:
               mountPath: /data
             - name: redis-config
               mountPath: /etc/redis/
+          env:
+            - name: REDIS_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: dotenv
+                  key: REDIS_PASS
+                  optional: false
+
+            - name: REDIS_MASTER_AUTH
+              valueFrom:
+                secretKeyRef:
+                  name: dotenv
+                  key: REDIS_MASTER_AUTH
+                  optional: false
       volumes:
         - name: redis-config
           emptyDir: {}

@@ -21,10 +21,10 @@ RUN yarn run prisma:gen
 
 FROM base AS prod
 
-COPY --from=prod-build /app/node_modules /app/node_modules
-COPY --from=build  /app/prisma /app/prisma
-COPY --from=build /app/dist /app/dist
+COPY --from=prod-build /app/node_modules ./node_modules
+COPY --from=build  /app/prisma ./prisma
+COPY --from=build /app/dist ./dist
 
 EXPOSE 5432 6379
 
-CMD [ "node", "dist/src/main.js" ]
+CMD [  "yarn", "run", "start:migrate:prod" ]

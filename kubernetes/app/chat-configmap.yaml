@@ -1,0 +1,16 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: chat-configmap
+  namespace: default
+data:
+  host: '0.0.0.0'
+  port: '4000'
+  redis-host: 'redis'
+  redis-port: '6379'
+  cors-origin: 'http://localhost:3000'
+  auth0-audience: 'https://dev--2cpvhzk.us.auth0.com/api/v2/'
+  auth0-jwks-uri: 'https://dev--2cpvhzk.us.auth0.com/.well-known/jwks.json'
+  auth0-signing-alg: 'RS256'
+  auth0-issuer-base-url: 'https://dev--2cpvhzk.us.auth0.com/'
+  hash-min-length: '11'
