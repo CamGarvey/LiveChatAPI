@@ -53,7 +53,7 @@ spec:
               '--requirepass',
               $(REDIS_PASS),
               '--masterauth',
-              $(REDIS_MASTER_AUTH),
+              $(REDIS_PASS),
             ]
           ports:
             - containerPort: 6379
@@ -69,13 +69,6 @@ spec:
                 secretKeyRef:
                   name: dotenv
                   key: REDIS_PASS
-                  optional: false
-
-            - name: REDIS_MASTER_AUTH
-              valueFrom:
-                secretKeyRef:
-                  name: dotenv
-                  key: REDIS_MASTER_AUTH
                   optional: false
       volumes:
         - name: redis-config

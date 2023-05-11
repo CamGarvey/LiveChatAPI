@@ -53,9 +53,7 @@ export class MessageService {
     this.pubsub.publish<SubscriptionPayload<Event>>(
       SubscriptionTriggers.EventCreated,
       {
-        recipients: event.chat.members
-          .map((x) => x.id)
-          .filter((x) => x !== createdById),
+        recipients: event.chat.members.map((x) => x.id),
         content: event,
       },
     );

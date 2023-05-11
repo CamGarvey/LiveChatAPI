@@ -1,5 +1,5 @@
 export interface IAuthUser {
   id: number;
-  friendIds: Set<number>;
-  chatIds: Set<number>;
+  getFriends: () => Promise<Set<number>>;
+  getChats: () => Promise<Set<number>>;
 }

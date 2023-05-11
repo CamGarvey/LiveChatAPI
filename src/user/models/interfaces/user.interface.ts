@@ -7,11 +7,12 @@ import Stranger from '../../stranger/models/stranger.model';
 import { PaginatedUser } from 'src/user/resolvers/user.resolver';
 
 @InterfaceType({
-  resolveType: (value: User, { user }: IContext) => {
+  resolveType: async (value: User, { user }: IContext) => {
     if (value.id == user.id) {
       return Me;
     }
-    if (user.friendIds.has(value.id)) {
+    const friends = await user.getFriends();
+    if (friends.has(value.id)) {
       return Friend;
     }
     return Stranger;

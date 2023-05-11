@@ -77,7 +77,9 @@ export class EventInterfaceResolver {
     },
     resolve: (payload: SubscriptionPayload<Event>) => payload.content,
   })
-  async eventSubscription() {
+  async eventSubscription(
+    @Args('chatId', { type: () => HashIdScalar }) _: number,
+  ) {
     return this.pubsub.asyncIterator<Event>('event.*', { pattern: true });
   }
 }

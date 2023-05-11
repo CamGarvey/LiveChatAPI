@@ -173,14 +173,24 @@ export class GroupChatService extends ChatService {
       .map((x) => x.userId)
       .filter((x) => x !== updatedById);
 
-    // Publish event
-    await this.pubsub.publish<SubscriptionPayload<Event>>(
-      SubscriptionTriggers.EventCreated,
-      {
-        recipients,
-        content: event,
-      },
-    );
+    const publish: Promise<void>[] = [
+      this.pubsub.publish<SubscriptionPayload<Chat>>(
+        SubscriptionTriggers.ChatUpdated,
+        {
+          recipients,
+          content: chatAfterUpdate,
+        },
+      ),
+      this.pubsub.publish<SubscriptionPayload<Event>>(
+        SubscriptionTriggers.EventCreated,
+        {
+          recipients,
+          content: event,
+        },
+      ),
+    ];
+
+    await Promise.all(publish);
 
     return event.chatUpdate;
   }
@@ -217,8 +227,7 @@ export class GroupChatService extends ChatService {
       data: {
         description,
       },
-      select: {
-        description: true,
+      include: {
         members: {
           select: {
             userId: true,
@@ -260,14 +269,24 @@ export class GroupChatService extends ChatService {
       .map((x) => x.userId)
       .filter((x) => x !== updatedById);
 
-    // Publish event
-    await this.pubsub.publish<SubscriptionPayload<Event>>(
-      SubscriptionTriggers.EventCreated,
-      {
-        recipients,
-        content: event,
-      },
-    );
+    const publish: Promise<void>[] = [
+      this.pubsub.publish<SubscriptionPayload<Chat>>(
+        SubscriptionTriggers.ChatUpdated,
+        {
+          recipients,
+          content: chatAfterUpdate,
+        },
+      ),
+      this.pubsub.publish<SubscriptionPayload<Event>>(
+        SubscriptionTriggers.EventCreated,
+        {
+          recipients,
+          content: event,
+        },
+      ),
+    ];
+
+    await Promise.all(publish);
 
     return event.chatUpdate;
   }
@@ -297,7 +316,7 @@ export class GroupChatService extends ChatService {
             // Skipping duplicates as they will be updated below
             skipDuplicates: true,
           },
-          // "Undeleting" members that have been deleted
+          // "Unremoving" members that have been removed
           updateMany: {
             data: {
               removedAt: null,

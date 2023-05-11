@@ -406,7 +406,7 @@ type Stranger implements User {
 type Subscription {
   alerts: ChatAlert!
   chats: Chat!
-  events: Event!
+  events(chatId: HashId!): Event!
   requests: Request!
 }
 

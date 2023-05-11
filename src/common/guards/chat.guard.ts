@@ -28,7 +28,19 @@ export class ChatGuard implements CanActivate {
 
     const user: IAuthUser = ctx.req.user;
 
-    if (!user.chatIds.has(chatId)) {
+    const member = await this.prisma.member.findUnique({
+      select: {
+        role: true,
+      },
+      where: {
+        userId_chatId: {
+          chatId,
+          userId: user.id,
+        },
+      },
+    });
+
+    if (!member) {
       throw new ForbiddenException(
         'You are not authorized to perform this operation',
       );
@@ -40,18 +52,6 @@ export class ChatGuard implements CanActivate {
       // If not roles are specified then canActivate
       return true;
     }
-
-    const member = await this.prisma.member.findUniqueOrThrow({
-      select: {
-        role: true,
-      },
-      where: {
-        userId_chatId: {
-          chatId,
-          userId: user.id,
-        },
-      },
-    });
 
     return roles.includes(member.role);
   }

@@ -9,12 +9,12 @@ import { IContext } from 'src/auth/interfaces/context.interface';
 import { ForbiddenChat } from './forbidden-chat/forbidden-chat.model';
 
 @InterfaceType({
-  resolveType: (value: PrismaChat, { user }: IContext) => {
+  resolveType: async (value: PrismaChat, { user }: IContext) => {
     if (value.deletedAt) {
       return DeletedChat;
     }
-
-    if (user.chatIds.has(value.id)) {
+    const chats = await user.getChats();
+    if (chats.has(value.id)) {
       switch (value.type) {
         case 'GROUP':
           return GroupChat;

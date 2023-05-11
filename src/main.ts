@@ -12,11 +12,13 @@ async function bootstrap() {
   });
   app.useGlobalPipes(new ValidationPipe());
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
+
   const configService = app.get<ConfigService>(ConfigService);
   await app.listen(
     configService.get<number>('app.port'),
     configService.get<string>('app.host'),
   );
+
   console.log(`Application is running on: ${await app.getUrl()}`);
   console.log(`GraphQL Playground: ${await app.getUrl()}/graphql`);
 }
