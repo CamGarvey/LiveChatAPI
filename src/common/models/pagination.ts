@@ -35,7 +35,7 @@ class PageInfo implements IPageInfo {
 }
 
 export function Paginated<T>(classRef: Type<T>): Type<IPaginatedType<T>> {
-  @ObjectType(`${classRef.name}Edge`)
+  @ObjectType(`${classRef?.name}Edge`)
   abstract class EdgeType {
     @Field((type) => String)
     cursor: string;

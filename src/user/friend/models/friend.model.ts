@@ -1,7 +1,7 @@
 import { ObjectType } from '@nestjs/graphql';
 import Chat from 'src/chat/chat.interface';
 import User from '../../models/interfaces/user.interface';
-import { PaginatedUser } from '../../resolvers/user.resolver';
+import { PaginatedUser } from 'src/user/models/paginated-user.model';
 
 @ObjectType({
   implements: () => [User],

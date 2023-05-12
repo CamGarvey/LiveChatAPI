@@ -576,6 +576,11 @@
   resolved "https://registry.yarnpkg.com/@eslint/js/-/js-8.39.0.tgz#58b536bcc843f4cd1e02a7e6171da5c040f4d44b"
   integrity sha512-kf9RB0Fg7NZfap83B3QOqOGg9QmD9yBudqQXzzOtn3i4y7ZUXe5ONeW34Gwi+TxhH4mvj72R1Zc300KUMa9Bng==
 
+"@golevelup/ts-jest@^0.3.7":
+  version "0.3.7"
+  resolved "https://registry.yarnpkg.com/@golevelup/ts-jest/-/ts-jest-0.3.7.tgz#6c66bd5cdea96d1052ac41a2d6c227c4a9509903"
+  integrity sha512-eoRfl9trBEt7BrQ6t3GHY/ZOcDOMBIOgqghd9qkIWMpcqQgWbU5Yf5UeHA6wwnLYpOMIJoKqazJ0cUDM79yr+g==
+
 "@graphql-tools/merge@8.4.0":
   version "8.4.0"
   resolved "https://registry.yarnpkg.com/@graphql-tools/merge/-/merge-8.4.0.tgz#47fbe5c4b6764276dc35bd19c4e7d3c46d3dc0fc"
@@ -4340,10 +4345,10 @@ neo-async@^2.6.2:
   resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.2.tgz#b4aafb93e3aeb2d8174ca53cf163ab7d7308305f"
   integrity sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==
 
-nest-winston@^1.9.1:
-  version "1.9.1"
-  resolved "https://registry.yarnpkg.com/nest-winston/-/nest-winston-1.9.1.tgz#2968a9553ca60728be93e47ccb659a8946e97481"
-  integrity sha512-L3fjIfas+7ZziKsCQiTYvTVw0Hpv3oN4TDnbLLYLIQgKLNpzQyf/2yZv1/buDPMrGJKrNPwiHLoifjGHon34+A==
+nest-winston@^1.9.2:
+  version "1.9.2"
+  resolved "https://registry.yarnpkg.com/nest-winston/-/nest-winston-1.9.2.tgz#b6726b9cfc40c2e5f0833079dd1b1fbe95fd7ff8"
+  integrity sha512-vOgQRFzmQ9+pMZfue2JdhtxDho3OYJZSSUgcL5jCpsxxCJu1QuGtZWo3S+mUCFvu7AN1hVgHugGk60STP5nSCQ==
   dependencies:
     fast-safe-stringify "^2.1.1"
 

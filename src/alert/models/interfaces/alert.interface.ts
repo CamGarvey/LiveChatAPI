@@ -1,4 +1,4 @@
-import { Field, ID, InterfaceType } from '@nestjs/graphql';
+import { Field, InterfaceType } from '@nestjs/graphql';
 import { Alert as PrimsaAlert } from '@prisma/client';
 import ChatMemberAccessGrantedAlert from 'src/alert/chat-alert/models/chat-member-access-granted-alert.model';
 import ChatMemberAccessRevokedAlert from 'src/alert/chat-alert/models/chat-member-access-revoked-alert.model';

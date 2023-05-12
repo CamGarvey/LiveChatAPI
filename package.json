@@ -53,7 +53,7 @@
     "ioredis": "^5.3.1",
     "jsonwebtoken": "^9.0.0",
     "jwks-rsa": "^3.0.1",
-    "nest-winston": "^1.9.1",
+    "nest-winston": "^1.9.2",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.1",
     "reflect-metadata": "^0.1.13",
@@ -61,6 +61,7 @@
     "winston": "^3.8.2"
   },
   "devDependencies": {
+    "@golevelup/ts-jest": "^0.3.7",
     "@nestjs/cli": "^9.3.0",
     "@nestjs/schematics": "^9.0.0",
     "@nestjs/testing": "^9.0.0",
@@ -93,6 +94,9 @@
       "json",
       "ts"
     ],
+    "moduleNameMapper": {
+      "^src/(.*)$": "<rootDir>/$1"
+    },
     "rootDir": "src",
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {

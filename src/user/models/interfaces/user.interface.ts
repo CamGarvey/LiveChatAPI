@@ -4,7 +4,7 @@ import Friend from '../../friend/models/friend.model';
 import { IContext } from 'src/auth/interfaces/context.interface';
 import Me from 'src/user/me/models/me.model';
 import Stranger from '../../stranger/models/stranger.model';
-import { PaginatedUser } from 'src/user/resolvers/user.resolver';
+import { PaginatedUser } from '../paginated-user.model';
 
 @InterfaceType({
   resolveType: async (value: User, { user }: IContext) => {

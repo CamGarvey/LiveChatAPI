@@ -1,15 +1,9 @@
-import {
-  Resolver,
-  Args,
-  Query,
-  ObjectType,
-  ResolveField,
-  Parent,
-} from '@nestjs/graphql';
-import { FilterPaginationArgs, Paginated } from 'src/common/models/pagination';
-import User from '../models/interfaces/user.interface';
-import { UserService } from '../services/user.service';
+import { Args, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import { FilterPaginationArgs } from 'src/common/models/pagination';
 import { FriendService } from '../friend/services/friend.service';
+import User from '../models/interfaces/user.interface';
+import { PaginatedUser } from '../models/paginated-user.model';
+import { UserService } from '../services/user.service';
 
 @Resolver(() => User)
 export class UserInterfaceResolver {
@@ -31,6 +25,3 @@ export class UserInterfaceResolver {
     return this.userServer.getUsers(filterPaginationArgs);
   }
 }
-
-@ObjectType()
-export class PaginatedUser extends Paginated(User) {}
