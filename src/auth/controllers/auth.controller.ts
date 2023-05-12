@@ -1,19 +1,19 @@
 import {
+  Body,
   Controller,
   HttpCode,
+  HttpException,
   HttpStatus,
   Inject,
   LoggerService,
   Post,
-  Req,
-  Res,
 } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
-import { Request, Response } from 'express';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import authConfig from 'src/config/auth.config';
 import { Public } from '../decorators/public.decorator';
 import { AuthService } from '../services/auth.service';
+import { CreateUserDto } from './dto';
 
 @Controller('auth')
 export class AuthController {
@@ -28,16 +28,16 @@ export class AuthController {
   @Public()
   @Post('create-user-hook')
   @HttpCode(HttpStatus.CREATED)
-  async createUserHook(@Req() request: Request, @Res() res: Response) {
-    const { secret, name, username, email } = request.body;
+  async createUserHook(@Body() body: CreateUserDto) {
+    const { secret, name, username, email } = body;
     this.logger.debug('Creating user', { name, username, email });
 
     if (secret !== this.configuration.hookSecret) {
-      return res.status(HttpStatus.FORBIDDEN).send();
+      throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
     }
 
     if (await this.authService.isUsernameTaken(username)) {
-      return res.status(HttpStatus.CONFLICT).send();
+      throw new HttpException('Username taken', HttpStatus.CONFLICT);
     }
 
     const ecodedId = await this.authService.createUser({
@@ -46,8 +46,8 @@ export class AuthController {
       email,
     });
 
-    res.status(HttpStatus.CREATED).send({
+    return {
       userId: ecodedId,
-    });
+    };
   }
 }

@@ -1,4 +1,4 @@
-import { Field, ID, InterfaceType } from '@nestjs/graphql';
+import { Field, InterfaceType } from '@nestjs/graphql';
 import { Event as PrismaEvent } from '@prisma/client';
 import Chat from 'src/chat/chat.interface';
 import { HashIdScalar } from 'src/common/scalars/hash-id.scalar';

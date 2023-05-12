@@ -23,7 +23,7 @@ export class AuthService {
         username,
       },
     });
-    return count !== 0;
+    return count > 0;
   }
 
   async createUser(data: INewUserData): Promise<string> {
@@ -47,49 +47,45 @@ export class AuthService {
   }
 
   private async getUserFriends(userId: number): Promise<Set<number>> {
-    const getFriends = () =>
-      this.prisma.user
-        .findUniqueOrThrow({
-          select: {
-            friends: {
-              select: {
-                id: true,
+    return await this.cache.wrap<Set<number>>(
+      `user.${userId}.friends`,
+      (): Promise<Set<number>> =>
+        this.prisma.user
+          .findUniqueOrThrow({
+            select: {
+              friends: {
+                select: {
+                  id: true,
+                },
               },
             },
-          },
-          where: {
-            id: userId,
-          },
-        })
-        .then((user) => new Set(user.friends.map((friend) => friend.id)));
-
-    return getFriends();
-    return this.cache.wrap<Set<number>>(`user.${userId}.friends`, getFriends);
+            where: {
+              id: userId,
+            },
+          })
+          .then((u) => new Set(u.friends.map((f) => f.id))),
+    );
   }
 
   private async getUserChats(userId: number): Promise<Set<number>> {
-    const getChats = () =>
-      this.prisma.user
-        .findUniqueOrThrow({
-          select: {
-            memberOfChats: {
-              select: {
-                chatId: true,
-              },
-              where: {
-                removedAt: null,
+    return await this.cache.wrap<Set<number>>(
+      `user.${userId}.chats`,
+      (): Promise<Set<number>> =>
+        this.prisma.member
+          .findMany({
+            select: {
+              chat: {
+                select: {
+                  id: true,
+                },
               },
             },
-          },
-          where: {
-            id: userId,
-          },
-        })
-        .then(
-          (user) => new Set(user.memberOfChats.map((member) => member.chatId)),
-        );
-
-    return getChats();
-    return this.cache.wrap<Set<number>>(`user.${userId}.chats`, getChats);
+            where: {
+              userId,
+              removedAt: null,
+            },
+          })
+          .then((m) => new Set(m.map((m) => m.chat.id))),
+    );
   }
 }

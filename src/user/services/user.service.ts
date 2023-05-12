@@ -4,10 +4,9 @@ import {
 } from '@devoxa/prisma-relay-cursor-connection';
 import { Inject, Injectable, LoggerService } from '@nestjs/common';
 import { Chat, Prisma, User } from '@prisma/client';
-import { FilterPaginationArgs } from 'src/common/models/pagination';
-import { PubSubService } from 'src/pubsub/pubsub.service';
-import { PrismaService } from '../../prisma/prisma.service';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import { FilterPaginationArgs } from 'src/common/models/pagination';
+import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
 export class UserService {
