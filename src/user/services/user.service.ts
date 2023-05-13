@@ -5,15 +5,16 @@ import {
 import { Inject, Injectable, LoggerService } from '@nestjs/common';
 import { Chat, Prisma, User } from '@prisma/client';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { FilterPaginationArgs } from 'src/common/models/pagination';
 import { PrismaService } from '../../prisma/prisma.service';
+import { PaginationService } from 'src/prisma/pagination.service';
+import { FilterPaginationArgs } from 'src/prisma/models/pagination';
 
 @Injectable()
 export class UserService {
   constructor(
     private readonly prisma: PrismaService,
     @Inject(WINSTON_MODULE_NEST_PROVIDER)
-    private readonly logger: LoggerService,
+    private readonly logger: LoggerService, // private readonly paginationService: PaginationService,
   ) {}
 
   getUser(userId: number): Prisma.Prisma__UserClient<User> {

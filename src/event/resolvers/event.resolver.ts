@@ -2,7 +2,6 @@ import { UseGuards } from '@nestjs/common';
 import {
   Args,
   Mutation,
-  ObjectType,
   Parent,
   Query,
   ResolveField,
@@ -10,18 +9,19 @@ import {
   Subscription,
 } from '@nestjs/graphql';
 import { IAuthUser } from 'src/auth/interfaces/auth-user.interface';
-import { ChatGuard } from 'src/common/guards/chat.guard';
+import { IContext } from 'src/auth/interfaces/context.interface';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
-import { EventGuard } from 'src/common/guards/event.guard';
-import { Paginated, PaginationArgs } from 'src/common/models/pagination';
 import { Roles } from 'src/common/decorators/roles.decorator';
+import { ChatGuard } from 'src/common/guards/chat.guard';
+import { EventGuard } from 'src/common/guards/event.guard';
+import { HashIdScalar } from 'src/common/scalars/hash-id.scalar';
 import { SubscriptionPayload } from 'src/common/subscriptions/subscription-payload.model';
+import { PaginationArgs } from 'src/prisma/models/pagination';
 import { PubSubService } from 'src/pubsub/pubsub.service';
 import { EventService } from '../event.service';
 import DeletedEvent from '../models/deleted-event.model';
 import Event from '../models/interfaces/event.interface';
-import { HashIdScalar } from 'src/common/scalars/hash-id.scalar';
-import { IContext } from 'src/auth/interfaces/context.interface';
+import { PaginatedEvent } from '../models/paginated-event.model';
 
 @Resolver(() => Event)
 export class EventInterfaceResolver {
@@ -85,6 +85,3 @@ export class EventInterfaceResolver {
     });
   }
 }
-
-@ObjectType()
-export class PaginatedEvent extends Paginated(Event) {}

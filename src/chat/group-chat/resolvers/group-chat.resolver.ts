@@ -10,7 +10,6 @@ import {
 import { IAuthUser } from 'src/auth/interfaces/auth-user.interface';
 import { ChatGuard } from 'src/common/guards/chat.guard';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
-import { PaginationArgs } from 'src/common/models/pagination';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import ChatDescriptionUpdate from 'src/event/payload/chat-update/models/description-changed-update.model';
 import { MemberService } from 'src/member/member.service';
@@ -23,6 +22,7 @@ import { Role } from '@prisma/client';
 import MembersAddedUpdate from 'src/event/payload/chat-update/member-alteration/models/members-added-update.model';
 import MembersRemovedUpdate from 'src/event/payload/chat-update/member-alteration/models/members-removed-update.model';
 import RoleChangedUpdate from 'src/event/payload/chat-update/member-alteration/models/role-changed-update.model';
+import { PaginationArgs } from 'src/prisma/models/pagination';
 
 @Resolver(() => GroupChat)
 export class GroupChatResolver {

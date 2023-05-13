@@ -1,11 +1,11 @@
 import { UseGuards } from '@nestjs/common';
 import { Resolver, Args, Query, ResolveField, Parent } from '@nestjs/graphql';
 import { ChatGuard } from 'src/common/guards/chat.guard';
-import { PaginationArgs } from 'src/common/models/pagination';
 import { MemberService } from '../member.service';
 import Member from '../models/interfaces/member.interface';
 import { PaginatedMember } from '../models/paginated-member.model';
 import { HashIdScalar } from 'src/common/scalars/hash-id.scalar';
+import { PaginationArgs } from 'src/prisma/models/pagination';
 
 @Resolver(() => Member)
 export class MemberInterfaceResolver {

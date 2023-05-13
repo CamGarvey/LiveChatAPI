@@ -4,12 +4,12 @@ import {
 } from '@devoxa/prisma-relay-cursor-connection';
 import { Inject, Injectable, LoggerService } from '@nestjs/common';
 import { Event, Prisma } from '@prisma/client';
-import { PaginationArgs } from 'src/common/models/pagination';
 import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-triggers.enum';
 import { SubscriptionPayload } from 'src/common/subscriptions/subscription-payload.model';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PubSubService } from 'src/pubsub/pubsub.service';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import { PaginationArgs } from 'src/prisma/models/pagination';
 
 @Injectable()
 export class EventService {

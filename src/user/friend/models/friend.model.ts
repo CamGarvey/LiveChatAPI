@@ -1,7 +1,7 @@
 import { ObjectType } from '@nestjs/graphql';
 import Chat from 'src/chat/chat.interface';
 import User from '../../models/interfaces/user.interface';
-import { PaginatedUser } from 'src/user/models/paginated-user.model';
+import { PaginatedFriend } from './paginated-friend.model';
 
 @ObjectType({
   implements: () => [User],
@@ -13,5 +13,5 @@ export default class Friend implements User {
   createdAt: Date;
   updatedAt: Date;
   chats: Chat[];
-  friends: PaginatedUser;
+  friends: PaginatedFriend;
 }

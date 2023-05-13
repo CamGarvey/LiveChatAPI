@@ -5,7 +5,7 @@ import {
 import { Inject, Injectable, LoggerService } from '@nestjs/common';
 import { Member, Prisma } from '@prisma/client';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { PaginationArgs } from 'src/common/models/pagination';
+import { PaginationArgs } from 'src/prisma/models/pagination';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()

@@ -104,8 +104,8 @@ const combineMessageAndSplat = () => {
     EventModule,
     MemberModule,
     AuthModule,
-    CommonModule,
     HashModule,
+    CommonModule,
     FriendModule,
   ],
   providers: [

@@ -2,7 +2,7 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import { FriendRequest } from 'src/request/friend-request/models/friend-request.model';
 import User from '../../models/interfaces/user.interface';
 import Friend from '../../friend/models/friend.model';
-import { PaginatedUser } from 'src/user/models/paginated-user.model';
+import { PaginatedUser } from 'src/user/resolvers/user.resolver';
 
 @ObjectType({
   implements: () => [User],

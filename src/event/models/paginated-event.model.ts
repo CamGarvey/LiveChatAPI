@@ -1,6 +1,6 @@
 import { ObjectType } from '@nestjs/graphql';
-import Member from './interfaces/member.interface';
 import { Paginated } from 'src/prisma/models/pagination';
+import Event from './interfaces/event.interface';
 
 @ObjectType()
-export class PaginatedMember extends Paginated(Member) {}
+export class PaginatedEvent extends Paginated(Event) {}
