@@ -6,28 +6,38 @@ import {
 } from '@devoxa/prisma-relay-cursor-connection';
 import { Injectable } from '@nestjs/common';
 
-type Cursor = { id: number };
+export type Cursor = { id: number };
+
+type PaginationArgs<T> = {
+  findMany: (args: PrismaFindManyArguments<Cursor>) => Promise<(T & Cursor)[]>;
+  aggregate: () => Promise<number>;
+  args?: ConnectionArguments;
+};
 
 @Injectable()
 export class PaginationService {
-  async findMany<T>(
-    findMany: (
-      args: PrismaFindManyArguments<Cursor>,
-    ) => Promise<(T & Cursor)[]>,
-    aggregate: () => Promise<number>,
-    args?: ConnectionArguments,
-  ): Promise<Connection<T>> {
+  async Paginate<T>({
+    findMany,
+    aggregate,
+    args,
+  }: PaginationArgs<T>): Promise<Connection<T>> {
     return findManyCursorConnection<T & Cursor, Cursor>(
       findMany,
       aggregate,
       args,
       {
         getCursor: (record) => ({ id: record.id }),
-        encodeCursor: (cursor) =>
-          Buffer.from(JSON.stringify(cursor)).toString('base64'),
-        decodeCursor: (cursor) =>
-          JSON.parse(Buffer.from(cursor, 'base64').toString('ascii')),
+        encodeCursor: this.encodeCursor,
+        decodeCursor: this.decodeCursor,
       },
     );
+  }
+
+  private encodeCursor(cursor: Cursor): string {
+    return Buffer.from(JSON.stringify(cursor)).toString('base64');
+  }
+
+  private decodeCursor(encodedCursor: string): Cursor {
+    return JSON.parse(Buffer.from(encodedCursor, 'base64').toString('ascii'));
   }
 }

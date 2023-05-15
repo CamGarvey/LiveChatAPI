@@ -10,11 +10,14 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { PubSubService } from 'src/pubsub/pubsub.service';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { FilterPaginationArgs } from 'src/prisma/models/pagination';
+import { PaginationService } from 'src/prisma/pagination.service';
+
 @Injectable()
 export class FriendService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly pubsub: PubSubService,
+    private readonly paginationService: PaginationService,
     @Inject(WINSTON_MODULE_NEST_PROVIDER)
     private readonly logger: LoggerService,
   ) {}
@@ -23,9 +26,6 @@ export class FriendService {
     this.logger.debug('Creating friend', { userId, createdById });
 
     const user = await this.prisma.user.update({
-      where: {
-        id: createdById,
-      },
       data: {
         friends: {
           connect: {
@@ -37,6 +37,9 @@ export class FriendService {
             id: userId,
           },
         },
+      },
+      where: {
+        id: createdById,
       },
     });
 
@@ -47,9 +50,6 @@ export class FriendService {
     this.logger.debug('Deleting friend', { userId, deletedById });
 
     const deletedFriend = await this.prisma.user.update({
-      where: {
-        id: userId,
-      },
       data: {
         friends: {
           disconnect: {
@@ -62,6 +62,9 @@ export class FriendService {
           },
         },
       },
+      where: {
+        id: userId,
+      },
     });
 
     // Create alert for deleted friend
@@ -70,14 +73,14 @@ export class FriendService {
         type: 'FRIEND_DELETED',
         recipients: {
           connect: {
-            id: deletedFriend.id,
+            id: userId,
           },
         },
         createdById: deletedById,
       },
     });
 
-    // Publish notification to deleted friend
+    // Publish alert to deleted friend
     this.pubsub.publish<SubscriptionPayload<Alert>>(
       SubscriptionTriggers.FriendDeletedAlert,
       {
@@ -97,11 +100,8 @@ export class FriendService {
 
     const where = this.getUserWhereValidator(filterPaginationArgs.filter);
 
-    return findManyCursorConnection<
-      User,
-      Pick<Prisma.UserWhereUniqueInput, 'id'>
-    >(
-      (args) =>
+    return this.paginationService.Paginate({
+      findMany: (args) =>
         this.prisma.user
           .findUniqueOrThrow({
             where: {
@@ -112,7 +112,7 @@ export class FriendService {
             where,
             ...args,
           }),
-      () =>
+      aggregate: () =>
         this.prisma.user
           .findUniqueOrThrow({
             include: {
@@ -123,19 +123,13 @@ export class FriendService {
               },
             },
             where: {
+              ...where,
               id: userId,
             },
           })
           .then((result) => result._count.friends),
-      filterPaginationArgs,
-      {
-        getCursor: (record) => ({ id: record.id }),
-        encodeCursor: (cursor) =>
-          Buffer.from(JSON.stringify(cursor)).toString('base64'),
-        decodeCursor: (cursor) =>
-          JSON.parse(Buffer.from(cursor, 'base64').toString('ascii')),
-      },
-    );
+      args: filterPaginationArgs,
+    });
   }
 
   async getMutualFriends(
