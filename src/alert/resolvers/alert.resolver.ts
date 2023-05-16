@@ -8,14 +8,12 @@ import {
   Subscription,
 } from '@nestjs/graphql';
 import { AlertService } from 'src/alert/services/alert.service';
-import { IContext } from 'src/auth/interfaces/context.interface';
-import { SubscriptionPayload } from 'src/common/subscriptions/subscription-payload.model';
+import { IAuthUser } from 'src/auth/interfaces/auth-user.interface';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
+import { HashIdScalar } from 'src/common/scalars/hash-id.scalar';
 import { PubSubService } from 'src/pubsub/pubsub.service';
 import { UserService } from 'src/user/services/user.service';
 import Alert from '../models/interfaces/alert.interface';
-import { CurrentUser } from 'src/common/decorators/current-user.decorator';
-import { IAuthUser } from 'src/auth/interfaces/auth-user.interface';
-import { HashIdScalar } from 'src/common/scalars/hash-id.scalar';
 
 @Resolver(() => Alert)
 export class AlertInterfaceResolver {
@@ -50,12 +48,10 @@ export class AlertInterfaceResolver {
 
   @Subscription(() => Alert, {
     name: 'alerts',
-    filter(payload: SubscriptionPayload<Alert>, _, { user }: IContext) {
-      return payload.recipients.includes(user.id);
-    },
+    resolve: (payload) => payload,
   })
-  async alertSubscription() {
-    return this.pubsub.asyncIterator<Alert>('alert.*', {
+  async alertSubscription(@CurrentUser() user: IAuthUser) {
+    return this.pubsub.asyncIterator<Alert>(`user-alerts/${user.id}`, {
       pattern: true,
     });
   }

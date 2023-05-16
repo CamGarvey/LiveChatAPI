@@ -1,7 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { Event, Message, Prisma } from '@prisma/client';
-import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-triggers.enum';
-import { SubscriptionPayload } from 'src/common/subscriptions/subscription-payload.model';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PubSubService } from 'src/pubsub/pubsub.service';
 
@@ -50,54 +48,27 @@ export class MessageService {
       },
     });
 
-    this.pubsub.publish<SubscriptionPayload<Event>>(
-      SubscriptionTriggers.EventCreated,
-      {
-        recipients: event.chat.members.map((x) => x.id),
-        content: event,
-      },
-    );
+    await this.pubsub.publish<Event>(`chat-events/${chatId}`, event);
 
     return event.message;
   }
 
-  async updateMessage(
-    eventId: number,
-    content: string,
-    updatedById: number,
-  ): Promise<Message> {
+  async updateMessage(eventId: number, content: string): Promise<Message> {
     const message = await this.prisma.message.update({
       data: {
         content,
       },
       include: {
-        event: {
-          include: {
-            chat: {
-              select: {
-                members: {
-                  select: {
-                    id: true,
-                  },
-                },
-              },
-            },
-          },
-        },
+        event: true,
       },
       where: {
         eventId,
       },
     });
 
-    this.pubsub.publish<SubscriptionPayload<Event>>(
-      SubscriptionTriggers.EventUpdated,
-      {
-        recipients: message.event.chat.members
-          .map((x) => x.id)
-          .filter((x) => x !== updatedById),
-        content: message.event,
-      },
+    await this.pubsub.publish<Event>(
+      `chat-events/${message.event.chatId}`,
+      message.event,
     );
 
     return message;

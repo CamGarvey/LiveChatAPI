@@ -141,22 +141,18 @@ describe('UserService', () => {
         };
         const expectedWhereClause = {
           where: {
-            AND: [
+            OR: [
               {
-                OR: [
-                  {
-                    username: {
-                      contains: paginationArgs.filter,
-                      mode: 'insensitive',
-                    },
-                  },
-                  {
-                    name: {
-                      contains: paginationArgs.filter,
-                      mode: 'insensitive',
-                    },
-                  },
-                ],
+                username: {
+                  contains: paginationArgs.filter,
+                  mode: 'insensitive',
+                },
+              },
+              {
+                name: {
+                  contains: paginationArgs.filter,
+                  mode: 'insensitive',
+                },
               },
             ],
           },

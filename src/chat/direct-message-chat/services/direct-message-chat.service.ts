@@ -1,10 +1,8 @@
 import { Inject, Injectable, LoggerService } from '@nestjs/common';
-import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-triggers.enum';
-import { SubscriptionPayload } from 'src/common/subscriptions/subscription-payload.model';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { PubSubService } from 'src/pubsub/pubsub.service';
 import { Alert, Chat } from '@prisma/client';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { PubSubService } from 'src/pubsub/pubsub.service';
 
 @Injectable()
 export class DirectMessageChatService {
@@ -78,20 +76,8 @@ export class DirectMessageChatService {
     });
 
     const publish: Promise<void>[] = [
-      this.pubsub.publish<SubscriptionPayload<Alert>>(
-        SubscriptionTriggers.ChatMemberAccessGrantedAlert,
-        {
-          recipients: [userId],
-          content: alert,
-        },
-      ),
-      this.pubsub.publish<SubscriptionPayload<Chat>>(
-        SubscriptionTriggers.ChatAccessGranted,
-        {
-          recipients: [userId],
-          content: chat,
-        },
-      ),
+      this.pubsub.publish<Chat>(`user-chats/${userId}`, chat),
+      this.pubsub.publish<Alert>(`user-alerts/${userId}`, alert),
     ];
 
     await Promise.all(publish);

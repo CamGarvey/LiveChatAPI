@@ -53,7 +53,11 @@ export class UserService {
       const where = this.createUserWhereClause(filterPaginationArgs.filter);
 
       return this.paginationService.Paginate({
-        findMany: (args) => this.prisma.user.findMany({ ...args, where }),
+        findMany: (args) =>
+          this.prisma.user.findMany({
+            ...args,
+            where,
+          }),
         aggregate: () => this.prisma.user.count({ where }),
         args: filterPaginationArgs,
       });
@@ -68,22 +72,18 @@ export class UserService {
 
   private createUserWhereClause(filter: string) {
     return Prisma.validator<Prisma.UserWhereInput>()({
-      AND: [
+      OR: [
         {
-          OR: [
-            {
-              username: {
-                contains: filter,
-                mode: 'insensitive',
-              },
-            },
-            {
-              name: {
-                contains: filter,
-                mode: 'insensitive',
-              },
-            },
-          ],
+          username: {
+            contains: filter,
+            mode: 'insensitive',
+          },
+        },
+        {
+          name: {
+            contains: filter,
+            mode: 'insensitive',
+          },
         },
       ],
     });

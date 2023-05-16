@@ -1,8 +1,6 @@
 import { Inject, Injectable, LoggerService } from '@nestjs/common';
 import { Alert, Chat, Prisma } from '@prisma/client';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { SubscriptionPayload } from 'src/common/subscriptions/subscription-payload.model';
-import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-triggers.enum';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PubSubService } from 'src/pubsub/pubsub.service';
 
@@ -60,26 +58,19 @@ export class ChatService {
       },
     });
 
-    const recipients = chat.members.map((x) => x.userId);
+    const recipientId = chat.members.map((x) => x.userId);
 
-    const publish: Promise<void>[] = [
-      this.pubsub.publish<SubscriptionPayload<Alert>>(
-        SubscriptionTriggers.ChatDeletedAlert,
-        {
-          recipients,
-          content: alert,
-        },
+    await Promise.all(
+      recipientId.map((id) =>
+        this.pubsub.publish<Chat>(`user-chats/${id}`, chat),
       ),
-      this.pubsub.publish<SubscriptionPayload<Chat>>(
-        SubscriptionTriggers.ChatAccessRevoked,
-        {
-          recipients,
-          content: chat,
-        },
-      ),
-    ];
+    );
 
-    await Promise.all(publish);
+    await Promise.all(
+      recipientId.map((id) =>
+        this.pubsub.publish<Alert>(`user-alerts/${id}`, alert),
+      ),
+    );
 
     return chat;
   }

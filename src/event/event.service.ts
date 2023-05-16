@@ -4,12 +4,10 @@ import {
 } from '@devoxa/prisma-relay-cursor-connection';
 import { Inject, Injectable, LoggerService } from '@nestjs/common';
 import { Event, Prisma } from '@prisma/client';
-import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-triggers.enum';
-import { SubscriptionPayload } from 'src/common/subscriptions/subscription-payload.model';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { PubSubService } from 'src/pubsub/pubsub.service';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { PaginationArgs } from 'src/prisma/models/pagination';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { PubSubService } from 'src/pubsub/pubsub.service';
 
 @Injectable()
 export class EventService {
@@ -92,15 +90,7 @@ export class EventService {
       },
     });
 
-    this.pubsub.publish<SubscriptionPayload<Event>>(
-      SubscriptionTriggers.EventDeleted,
-      {
-        recipients: event.chat.members
-          .map((x) => x.id)
-          .filter((x) => x !== deletedById),
-        content: event,
-      },
-    );
+    await this.pubsub.publish<Event>(`chat-events/${event.chatId}`, event);
 
     return event;
   }

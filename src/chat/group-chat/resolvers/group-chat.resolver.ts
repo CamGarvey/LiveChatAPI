@@ -13,7 +13,7 @@ import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import ChatDescriptionUpdate from 'src/event/payload/chat-update/models/description-changed-update.model';
 import { MemberService } from 'src/member/member.service';
-import GroupChat from '../group-chat.model';
+import GroupChat from '../models/group-chat.model';
 import NameChangedUpdate from 'src/event/payload/chat-update/models/name-changed-update.model';
 import { CreateGroupChatInput } from 'src/chat/group-chat/models/inputs/create-group-chat.input';
 import { GroupChatService } from '../services/group-chat.service';

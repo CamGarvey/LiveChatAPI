@@ -8,7 +8,7 @@ import User from 'src/user/models/interfaces/user.interface';
 })
 export class DirectMessageChat implements Chat {
   @Field(() => Member)
-  receipent: Member;
+  recipient: Member;
 
   id: number;
   createdBy: User;

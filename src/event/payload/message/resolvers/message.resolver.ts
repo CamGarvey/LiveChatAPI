@@ -46,8 +46,7 @@ export class MessageResolver {
   async updateMessage(
     @Args('eventId', { type: () => HashIdScalar }) eventId: number,
     @Args('content') content: string,
-    @CurrentUser() user: IAuthUser,
   ) {
-    return await this.messageService.updateMessage(eventId, content, user.id);
+    return await this.messageService.updateMessage(eventId, content);
   }
 }

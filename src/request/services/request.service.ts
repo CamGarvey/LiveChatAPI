@@ -1,8 +1,6 @@
 import { Inject, Injectable, LoggerService } from '@nestjs/common';
 import { Prisma, Request } from '@prisma/client';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { SubscriptionPayload } from 'src/common/subscriptions/subscription-payload.model';
-import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-triggers.enum';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PubSubService } from 'src/pubsub/pubsub.service';
 import { FriendService } from 'src/user/friend/services/friend.service';
@@ -57,13 +55,9 @@ export class RequestService {
       );
     }
 
-    // this.pubsub.publish(``, request);
-    this.pubsub.publish<SubscriptionPayload<Request>>(
-      SubscriptionTriggers.RequestAccepted,
-      {
-        recipients: [request.createdById],
-        content: request,
-      },
+    await this.pubsub.publish<Request>(
+      `user-requests/${request.createdById}`,
+      request,
     );
 
     return request;
@@ -87,12 +81,9 @@ export class RequestService {
       },
     });
 
-    this.pubsub.publish<SubscriptionPayload<Request>>(
-      SubscriptionTriggers.RequestDeclined,
-      {
-        recipients: [request.createdById],
-        content: request,
-      },
+    await this.pubsub.publish<Request>(
+      `user-requests/${request.createdById}`,
+      request,
     );
 
     return request;
@@ -116,12 +107,9 @@ export class RequestService {
       },
     });
 
-    this.pubsub.publish<SubscriptionPayload<Request>>(
-      SubscriptionTriggers.RequestCancelled,
-      {
-        recipients: [request.recipientId],
-        content: request,
-      },
+    await this.pubsub.publish<Request>(
+      `user-requests/${request.recipientId}`,
+      request,
     );
 
     return request;

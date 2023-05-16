@@ -9,13 +9,11 @@ import {
   Subscription,
 } from '@nestjs/graphql';
 import { IAuthUser } from 'src/auth/interfaces/auth-user.interface';
-import { IContext } from 'src/auth/interfaces/context.interface';
 import { ChatService } from 'src/chat/chat.service';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { ChatGuard } from 'src/common/guards/chat.guard';
 import { HashIdScalar } from 'src/common/scalars/hash-id.scalar';
-import { SubscriptionPayload } from 'src/common/subscriptions/subscription-payload.model';
 import { PubSubService } from 'src/pubsub/pubsub.service';
 import Chat from '../chat.interface';
 import DeletedChat from '../deleted-chat/deleted-chat.model';
@@ -53,12 +51,11 @@ export class ChatInterfaceResolver {
   }
 
   @Subscription(() => Chat, {
-    filter: (payload: SubscriptionPayload<Chat>, _, { user }: IContext) => {
-      return payload.recipients.includes(user.id);
-    },
-    resolve: (payload: SubscriptionPayload<Chat>) => payload.content,
+    resolve: (payload) => payload,
   })
-  async chats() {
-    return this.pubsub.asyncIterator<Chat>('chat.*', { pattern: true });
+  async chats(@CurrentUser() user: IAuthUser) {
+    return this.pubsub.asyncIterator<Chat>(`user-chats/${user.id}`, {
+      pattern: true,
+    });
   }
 }

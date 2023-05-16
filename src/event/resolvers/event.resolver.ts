@@ -9,19 +9,18 @@ import {
   Subscription,
 } from '@nestjs/graphql';
 import { IAuthUser } from 'src/auth/interfaces/auth-user.interface';
-import { IContext } from 'src/auth/interfaces/context.interface';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { ChatGuard } from 'src/common/guards/chat.guard';
 import { EventGuard } from 'src/common/guards/event.guard';
 import { HashIdScalar } from 'src/common/scalars/hash-id.scalar';
-import { SubscriptionPayload } from 'src/common/subscriptions/subscription-payload.model';
 import { PaginationArgs } from 'src/prisma/models/pagination';
 import { PubSubService } from 'src/pubsub/pubsub.service';
 import { EventService } from '../event.service';
 import DeletedEvent from '../models/deleted-event.model';
 import Event from '../models/interfaces/event.interface';
 import { PaginatedEvent } from '../models/paginated-event.model';
+import { IContext } from 'src/auth/interfaces/context.interface';
 
 @Resolver(() => Event)
 export class EventInterfaceResolver {
@@ -72,15 +71,15 @@ export class EventInterfaceResolver {
 
   @Subscription(() => Event, {
     name: 'events',
-    filter: (payload: SubscriptionPayload<Event>, _, context: IContext) => {
-      return payload.recipients.includes(context.user.id);
+    resolve: (payload) => payload,
+    filter: (payload: Event, _, { user }: IContext) => {
+      return payload.createdById !== user.id;
     },
-    resolve: (payload: SubscriptionPayload<Event>) => payload.content,
   })
   async eventSubscription(
     @Args('chatId', { type: () => HashIdScalar }) chatId: number,
   ) {
-    return this.pubsub.asyncIterator<Event>(`chat.${chatId}.event.*`, {
+    return this.pubsub.asyncIterator<Event>(`chat-events/${chatId}`, {
       pattern: true,
     });
   }

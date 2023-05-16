@@ -142,7 +142,7 @@ type DirectMessageChat implements Chat {
   createdById: HashId!
   id: HashId!
   isCreator: Boolean!
-  receipent: Member!
+  recipient: Member!
   updatedAt: Date!
 }
 
@@ -280,7 +280,7 @@ type Mutation {
   addMembers(chatId: HashId!, userIds: [HashId!]!): MembersAddedUpdate!
   cancelRequest(requestId: HashId!): Request!
   changeMemberRoles(chatId: HashId!, role: Role!, userIds: [HashId!]!): RoleChangedUpdate!
-  createDirectMessageChat(receipentUserId: HashId!): DirectMessageChat!
+  createDirectMessageChat(recipientUserId: HashId!): DirectMessageChat!
   createGroupChat(createGroupChatData: CreateGroupChatInput!): GroupChat!
   createMessage(chatId: HashId!, content: String!): Message!
   declineRequest(requestId: HashId!): Request!
@@ -404,7 +404,7 @@ type Stranger implements User {
 }
 
 type Subscription {
-  alerts: ChatAlert!
+  alerts: Alert!
   chats: Chat!
   events(chatId: HashId!): Event!
   requests: Request!

@@ -1,12 +1,8 @@
-import { Parent, ResolveField, Resolver, Subscription } from '@nestjs/graphql';
-import { EventService } from '../event.service';
-import CreatedEvent from '../models/created-event.model';
+import { Parent, ResolveField, Resolver } from '@nestjs/graphql';
 import { GraphQLError } from 'graphql';
 import { PubSubService } from 'src/pubsub/pubsub.service';
-import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-triggers.enum';
-import { IContext } from 'src/auth/interfaces/context.interface';
-import { SubscriptionPayload } from 'src/common/subscriptions/subscription-payload.model';
-import { Event } from '@prisma/client';
+import { EventService } from '../event.service';
+import CreatedEvent from '../models/created-event.model';
 
 @Resolver(() => CreatedEvent)
 export class CreatedEventResolver {

@@ -4,13 +4,11 @@ import {
 } from '@devoxa/prisma-relay-cursor-connection';
 import { Inject, Injectable, LoggerService } from '@nestjs/common';
 import { Alert, Prisma, User } from '@prisma/client';
-import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-triggers.enum';
-import { SubscriptionPayload } from 'src/common/subscriptions/subscription-payload.model';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { PubSubService } from 'src/pubsub/pubsub.service';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { FilterPaginationArgs } from 'src/prisma/models/pagination';
 import { PaginationService } from 'src/prisma/pagination.service';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { PubSubService } from 'src/pubsub/pubsub.service';
 
 @Injectable()
 export class FriendService {
@@ -80,14 +78,7 @@ export class FriendService {
       },
     });
 
-    // Publish alert to deleted friend
-    this.pubsub.publish<SubscriptionPayload<Alert>>(
-      SubscriptionTriggers.FriendDeletedAlert,
-      {
-        recipients: [userId],
-        content: alert,
-      },
-    );
+    await this.pubsub.publish<Alert>(`user-alerts/${userId}`, alert);
 
     return deletedFriend;
   }
@@ -113,21 +104,16 @@ export class FriendService {
             ...args,
           }),
       aggregate: () =>
-        this.prisma.user
-          .findUniqueOrThrow({
-            include: {
-              _count: {
-                select: {
-                  friends: true,
-                },
+        this.prisma.user.count({
+          where: {
+            friends: {
+              some: {
+                id: userId,
               },
             },
-            where: {
-              ...where,
-              id: userId,
-            },
-          })
-          .then((result) => result._count.friends),
+            ...where,
+          },
+        }),
       args: filterPaginationArgs,
     });
   }
@@ -191,22 +177,18 @@ export class FriendService {
 
   private getUserWhereValidator(filter: string | null | undefined) {
     return Prisma.validator<Prisma.UserWhereInput>()({
-      AND: [
+      OR: [
         {
-          OR: [
-            {
-              username: {
-                contains: filter ?? undefined,
-                mode: 'insensitive',
-              },
-            },
-            {
-              name: {
-                contains: filter ?? undefined,
-                mode: 'insensitive',
-              },
-            },
-          ],
+          username: {
+            contains: filter ?? undefined,
+            mode: 'insensitive',
+          },
+        },
+        {
+          name: {
+            contains: filter ?? undefined,
+            mode: 'insensitive',
+          },
         },
       ],
     });
