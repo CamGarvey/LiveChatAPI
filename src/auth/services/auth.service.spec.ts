@@ -106,7 +106,6 @@ describe('AuthService', () => {
       prismaMock.user.create.mockResolvedValueOnce({
         id: 1,
       } as unknown as User);
-      const encodedId = await service.createUser(userData);
 
       expect(prismaMock.user.create).toBeCalledWith({
         select: {

@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { MeResolver } from './me.resolver';
-import { DeepMockProxy, mock, mockDeep } from 'jest-mock-extended';
-import { UserService } from 'src/user/services/user.service';
-import { IAuthUser } from 'src/auth/interfaces/auth-user.interface';
 import { Alert, Chat, Prisma, Request, User } from '@prisma/client';
+import { DeepMockProxy, mockDeep } from 'jest-mock-extended';
+import { IAuthUser } from 'src/auth/interfaces/auth-user.interface';
+import { UserService } from 'src/user/services/user.service';
+import { MeResolver } from './me.resolver';
 
 describe('MeResolver', () => {
   let resolver: MeResolver;

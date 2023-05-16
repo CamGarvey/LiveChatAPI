@@ -57,6 +57,7 @@ export class RequestService {
       );
     }
 
+    // this.pubsub.publish(``, request);
     this.pubsub.publish<SubscriptionPayload<Request>>(
       SubscriptionTriggers.RequestAccepted,
       {

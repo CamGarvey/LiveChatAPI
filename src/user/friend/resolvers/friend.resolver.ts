@@ -7,6 +7,7 @@ import { HashIdScalar } from 'src/common/scalars/hash-id.scalar';
 import { FilterPaginationArgs } from 'src/prisma/models/pagination';
 import { FriendService } from '../services/friend.service';
 import { PaginatedFriend } from '../models/paginated-friend.model';
+import { User } from '@prisma/client';
 
 @Resolver(() => Friend)
 export class FriendResolver {
@@ -24,7 +25,7 @@ export class FriendResolver {
   async deleteFriend(
     @Args('userId', { type: () => HashIdScalar }) userId: number,
     @CurrentUser() user: IAuthUser,
-  ) {
+  ): Promise<User> {
     return this.friendSerivce.deleteFriend(userId, user.id);
   }
 }
