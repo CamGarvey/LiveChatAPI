@@ -1,7 +1,7 @@
 import { LoggerService } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Prisma, Request } from '@prisma/client';
-import { DeepMockProxy, mock, mockDeep } from 'jest-mock-extended';
+import { DeepMockProxy, MockProxy, mock, mockDeep } from 'jest-mock-extended';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PubSubService } from 'src/pubsub/pubsub.service';
@@ -44,7 +44,7 @@ describe('RequestService', () => {
     friendServiceMock = module.get(FriendService);
   });
 
-  fdescribe('getRequest', () => {
+  describe('getRequest', () => {
     it('should get unique request using request id', () => {
       const requestId = 93;
       const requestMock = mockDeep<Prisma.Prisma__RequestClient<Request>>();
@@ -62,36 +62,51 @@ describe('RequestService', () => {
   });
 
   describe('acceptRequest', () => {
-    it('should create an ACCEPTED request with request id', async () => {
-      const requestId = 432;
+    let requestMock: MockProxy<Request>;
 
-      await service.acceptRequest(requestId);
+    beforeEach(() => {
+      requestMock = mock<Request>({
+        type: 'FRIEND_REQUEST',
+        id: 222,
+        createdById: 222,
+        recipientId: 222,
+      });
+      prismaMock.request.update.mockResolvedValue(requestMock);
+    });
+
+    it('should update the request state to ACCEPTED', async () => {
+      await service.acceptRequest(requestMock.id);
 
       expect(prismaMock.request.update).toBeCalledWith({
         data: {
           state: 'ACCEPTED',
         },
         where: {
-          id: requestId,
+          id: requestMock.id,
         },
       });
     });
 
-    it('should create friend if request type is FRIEND_REQUEST', async () => {
-      const requestMock = mock<Request>({
-        type: 'FRIEND_REQUEST',
-        id: 432,
-        createdById: 23,
-        recipientId: 54,
-      });
-      prismaMock.request.update.mockResolvedValueOnce(requestMock);
-
+    it('should create a friend if the request type is FRIEND_REQUEST', async () => {
       await service.acceptRequest(requestMock.id);
 
-      expect(friendServiceMock.createFriend).resolves.toHaveBeenCalledWith(
+      expect(friendServiceMock.createFriend).toHaveBeenCalledWith(
         requestMock.createdById,
         requestMock.recipientId,
       );
+    });
+
+    it('should publish the request back to the creator', async () => {
+      await service.acceptRequest(requestMock.id);
+
+      expect(pubsubMock.publish).toHaveBeenCalledWith(
+        `user-requests/${requestMock.createdById}`,
+        requestMock,
+      );
+    });
+
+    it('should return the accepted request', async () => {
+      expect(service.acceptRequest(requestMock.id)).resolves.toBe(requestMock);
     });
   });
 });

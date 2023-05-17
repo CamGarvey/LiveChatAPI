@@ -89,7 +89,35 @@ export class FriendService {
   ): Promise<Connection<User>> {
     this.logger.debug('Getting friends', { userId, filterPaginationArgs });
 
-    const where = this.getUserWhereValidator(filterPaginationArgs.filter);
+    if (filterPaginationArgs.filter) {
+      const where = this.getUserWhereValidator(filterPaginationArgs.filter);
+
+      return this.paginationService.Paginate({
+        findMany: (args) =>
+          this.prisma.user
+            .findUniqueOrThrow({
+              where: {
+                id: userId,
+              },
+            })
+            .friends({
+              where,
+              ...args,
+            }),
+        aggregate: () =>
+          this.prisma.user.count({
+            where: {
+              friends: {
+                some: {
+                  id: userId,
+                },
+              },
+              ...where,
+            },
+          }),
+        args: filterPaginationArgs,
+      });
+    }
 
     return this.paginationService.Paginate({
       findMany: (args) =>
@@ -100,20 +128,9 @@ export class FriendService {
             },
           })
           .friends({
-            where,
             ...args,
           }),
-      aggregate: () =>
-        this.prisma.user.count({
-          where: {
-            friends: {
-              some: {
-                id: userId,
-              },
-            },
-            ...where,
-          },
-        }),
+      aggregate: () => this.prisma.user.count(),
       args: filterPaginationArgs,
     });
   }
@@ -158,9 +175,7 @@ export class FriendService {
       (args) => {
         return this.prisma.user.findMany({
           ...args,
-          ...{
-            where,
-          },
+          where,
         });
       },
       () => this.prisma.user.count({ where }),

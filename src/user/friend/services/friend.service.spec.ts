@@ -1,13 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { FriendService } from './friend.service';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { DeepMockProxy, mockDeep } from 'jest-mock-extended';
+import { DeepMockProxy, MockProxy, mock, mockDeep } from 'jest-mock-extended';
 import { PubSubService } from 'src/pubsub/pubsub.service';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { LoggerService } from '@nestjs/common';
 import { PrismaDeepMockProxy } from 'test/common/proxy';
 import { Alert, Prisma, User } from '@prisma/client';
-import { SubscriptionTriggers } from 'src/common/subscriptions/subscription-triggers.enum';
 import { PaginationService } from 'src/prisma/pagination.service';
 import { FilterPaginationArgs } from 'src/prisma/models/pagination';
 import { PrismaFindManyArguments } from '@devoxa/prisma-relay-cursor-connection';
@@ -79,11 +78,24 @@ describe('FriendService', () => {
   });
 
   describe('deleteFriend', () => {
-    it('should disconnect user from friends amd friendsOf', async () => {
-      const userId = 1;
+    let friendMock: MockProxy<User>;
+    let alertMock: MockProxy<Alert>;
+
+    beforeEach(() => {
+      friendMock = mock<User>({
+        id: 1,
+      });
+      prismaMock.user.update.mockResolvedValue(friendMock);
+      alertMock = mock<Alert>({
+        id: 2,
+      });
+      prismaMock.alert.create.mockResolvedValue(alertMock);
+    });
+
+    it('should disconnect user from friends and friendsOf', async () => {
       const deletedById = 2;
 
-      await service.deleteFriend(userId, deletedById);
+      await service.deleteFriend(friendMock.id, deletedById);
 
       expect(prismaMock.user.update).toBeCalledWith({
         data: {
@@ -99,24 +111,22 @@ describe('FriendService', () => {
           },
         },
         where: {
-          id: userId,
+          id: friendMock.id,
         },
       });
     });
 
     it('should create a FRIEND_DELETED alert with deleted friend as recipient', async () => {
-      const userId = 1;
       const deletedById = 2;
-      prismaMock.user.update.mockResolvedValueOnce(mockDeep<User>());
 
-      await service.deleteFriend(userId, deletedById);
+      await service.deleteFriend(friendMock.id, deletedById);
 
       expect(prismaMock.alert.create).toBeCalledWith({
         data: {
           type: 'FRIEND_DELETED',
           recipients: {
             connect: {
-              id: userId,
+              id: friendMock.id,
             },
           },
           createdById: deletedById,
@@ -125,64 +135,63 @@ describe('FriendService', () => {
     });
 
     it('should publish alert to user', async () => {
-      const userId = 1;
-      const deletedById = 2;
-      const expectedAlert = mockDeep<Alert>();
-      prismaMock.user.update.mockResolvedValueOnce(mockDeep<User>());
-      prismaMock.alert.create.mockResolvedValueOnce(expectedAlert);
+      await service.deleteFriend(friendMock.id, 2);
 
-      await service.deleteFriend(userId, deletedById);
-
-      expect(pubsubMock.publish).toBeCalledWith(
-        SubscriptionTriggers.FriendDeletedAlert,
-        {
-          recipients: [userId],
-          content: expectedAlert,
-        },
-      );
+      expect(pubsubMock.publish).toBeCalledWith('user-alerts/1', alertMock);
     });
 
     it('should return deleted user', async () => {
-      const userId = 1;
-      const deletedById = 2;
-      const expectedDeletedUser = mockDeep<User>();
-      prismaMock.user.update.mockResolvedValueOnce(expectedDeletedUser);
-      prismaMock.alert.create.mockResolvedValueOnce(mockDeep<Alert>());
-
-      const deletedUser = await service.deleteFriend(userId, deletedById);
-
-      expect(deletedUser).toBe(expectedDeletedUser);
+      await expect(service.deleteFriend(friendMock.id, 2)).resolves.toBe(
+        friendMock,
+      );
     });
   });
 
   describe('getFriends', () => {
-    describe('with filter', () => {
-      it('should call PaginationService with correct findAny args', async () => {
-        const userId = 1;
-        const paginationArgs: FilterPaginationArgs = {
-          first: 1,
-          filter: 'finn',
-        };
-        const findManyArgs: PrismaFindManyArguments<User> = {
-          cursor: {
-            id: 1,
-            username: 'FinnTheHuman',
-            name: 'Finn',
-            createdAt: new Date(),
-            email: 'finn@human.com',
-            updatedAt: new Date(),
-          },
-          skip: 0,
-          take: 1,
-        };
-        const userClientMock = mockDeep<Prisma.Prisma__UserClient<User>>();
-        prismaMock.user.findUniqueOrThrow.mockReturnValueOnce(userClientMock);
+    const userId = 1;
+    let userClientMock: MockProxy<Prisma.Prisma__UserClient<User>>;
+    let findManyArgsMock: MockProxy<PrismaFindManyArguments<User>>;
+    let paginationArgs: MockProxy<FilterPaginationArgs>;
 
+    beforeEach(() => {
+      userClientMock = mock<Prisma.Prisma__UserClient<User>>();
+      findManyArgsMock = mock<PrismaFindManyArguments<User>>();
+
+      prismaMock.user.findUniqueOrThrow.mockReturnValue(userClientMock);
+    });
+
+    describe('with filter', () => {
+      let validator;
+
+      beforeEach(() => {
+        paginationArgs = mock<FilterPaginationArgs>({
+          filter: 'The',
+        });
+        validator = Prisma.validator<Prisma.UserWhereInput>()({
+          OR: [
+            {
+              username: {
+                contains: paginationArgs.filter,
+                mode: 'insensitive',
+              },
+            },
+            {
+              name: {
+                contains: paginationArgs.filter,
+                mode: 'insensitive',
+              },
+            },
+          ],
+        });
+        prismaMock.user.count.mockResolvedValue(2);
+      });
+
+      it('should call PaginationService with correct findAny args', async () => {
         await service.getFriends(userId, paginationArgs);
 
         const [{ findMany }] = paginationServiceMock.Paginate.mock.calls[0];
 
-        await findMany(findManyArgs);
+        await findMany(findManyArgsMock);
 
         expect(prismaMock.user.findUniqueOrThrow).toBeCalledWith({
           where: {
@@ -190,43 +199,12 @@ describe('FriendService', () => {
           },
         });
         expect(userClientMock.friends).toBeCalledWith({
-          ...findManyArgs,
-          where: {
-            AND: [
-              {
-                OR: [
-                  {
-                    username: {
-                      contains: 'finn',
-                      mode: 'insensitive',
-                    },
-                  },
-                  {
-                    name: {
-                      contains: 'finn',
-                      mode: 'insensitive',
-                    },
-                  },
-                ],
-              },
-            ],
-          },
+          ...findManyArgsMock,
+          where: validator,
         });
       });
 
       it('should call PaginationService with correct aggregate args', async () => {
-        const userId = 1;
-        const paginationArgs: FilterPaginationArgs = {
-          first: 1,
-          filter: 'finn',
-        };
-
-        prismaMock.user.findUniqueOrThrow.mockResolvedValueOnce({
-          _count: {
-            friends: 10,
-          },
-        } as unknown as User);
-
         await service.getFriends(userId, paginationArgs);
 
         const [{ aggregate, args }] =
@@ -235,45 +213,19 @@ describe('FriendService', () => {
         await aggregate();
 
         expect(args).toBe(paginationArgs);
-        expect(prismaMock.user.findUniqueOrThrow).toBeCalledWith({
-          include: {
-            _count: {
-              select: {
-                friends: true,
+        expect(prismaMock.user.count).toBeCalledWith({
+          where: {
+            friends: {
+              some: {
+                id: userId,
               },
             },
-          },
-          where: {
-            AND: [
-              {
-                OR: [
-                  {
-                    username: {
-                      contains: 'finn',
-                      mode: 'insensitive',
-                    },
-                  },
-                  {
-                    name: {
-                      contains: 'finn',
-                      mode: 'insensitive',
-                    },
-                  },
-                ],
-              },
-            ],
-            id: userId,
+            ...validator,
           },
         });
       });
 
       it('should call PaginationService with correct connection args', async () => {
-        const userId = 1;
-        const paginationArgs: FilterPaginationArgs = {
-          first: 1,
-          filter: 'finn',
-        };
-
         await service.getFriends(userId, paginationArgs);
 
         const [{ args }] = paginationServiceMock.Paginate.mock.calls[0];
@@ -283,32 +235,18 @@ describe('FriendService', () => {
     });
 
     describe('without filter', () => {
-      it('should call PaginationService with correct findAny args', async () => {
-        const userId = 1;
-        const paginationArgs: FilterPaginationArgs = {
-          first: 1,
-          filter: 'finn',
-        };
-        const findManyArgs: PrismaFindManyArguments<User> = {
-          cursor: {
-            id: 1,
-            username: 'FinnTheHuman',
-            name: 'Finn',
-            createdAt: new Date(),
-            email: 'finn@human.com',
-            updatedAt: new Date(),
-          },
-          skip: 0,
-          take: 1,
-        };
-        const userClientMock = mockDeep<Prisma.Prisma__UserClient<User>>();
-        prismaMock.user.findUniqueOrThrow.mockReturnValueOnce(userClientMock);
+      beforeEach(() => {
+        paginationArgs = mock<FilterPaginationArgs>({
+          filter: undefined,
+        });
+      });
 
+      it('should call PaginationService with correct findAny args', async () => {
         await service.getFriends(userId, paginationArgs);
 
         const [{ findMany }] = paginationServiceMock.Paginate.mock.calls[0];
 
-        await findMany(findManyArgs);
+        await findMany(findManyArgsMock);
 
         expect(prismaMock.user.findUniqueOrThrow).toBeCalledWith({
           where: {
@@ -316,43 +254,11 @@ describe('FriendService', () => {
           },
         });
         expect(userClientMock.friends).toBeCalledWith({
-          ...findManyArgs,
-          where: {
-            AND: [
-              {
-                OR: [
-                  {
-                    username: {
-                      contains: 'finn',
-                      mode: 'insensitive',
-                    },
-                  },
-                  {
-                    name: {
-                      contains: 'finn',
-                      mode: 'insensitive',
-                    },
-                  },
-                ],
-              },
-            ],
-          },
+          ...findManyArgsMock,
         });
       });
 
       it('should call PaginationService with correct aggregate args', async () => {
-        const userId = 1;
-        const paginationArgs: FilterPaginationArgs = {
-          first: 1,
-          filter: 'finn',
-        };
-
-        prismaMock.user.findUniqueOrThrow.mockResolvedValueOnce({
-          _count: {
-            friends: 10,
-          },
-        } as unknown as User);
-
         await service.getFriends(userId, paginationArgs);
 
         const [{ aggregate, args }] =
@@ -361,45 +267,10 @@ describe('FriendService', () => {
         await aggregate();
 
         expect(args).toBe(paginationArgs);
-        expect(prismaMock.user.findUniqueOrThrow).toBeCalledWith({
-          include: {
-            _count: {
-              select: {
-                friends: true,
-              },
-            },
-          },
-          where: {
-            AND: [
-              {
-                OR: [
-                  {
-                    username: {
-                      contains: 'finn',
-                      mode: 'insensitive',
-                    },
-                  },
-                  {
-                    name: {
-                      contains: 'finn',
-                      mode: 'insensitive',
-                    },
-                  },
-                ],
-              },
-            ],
-            id: userId,
-          },
-        });
+        expect(prismaMock.user.count).toBeCalledWith();
       });
 
       it('should call PaginationService with correct connection args', async () => {
-        const userId = 1;
-        const paginationArgs: FilterPaginationArgs = {
-          first: 1,
-          filter: 'finn',
-        };
-
         await service.getFriends(userId, paginationArgs);
 
         const [{ args }] = paginationServiceMock.Paginate.mock.calls[0];
