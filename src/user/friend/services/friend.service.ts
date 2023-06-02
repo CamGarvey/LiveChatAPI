@@ -88,7 +88,7 @@ export class FriendService {
     filterPaginationArgs: FilterPaginationArgs,
   ): Promise<Connection<User>> {
     this.logger.debug('Getting friends', { userId, filterPaginationArgs });
-
+   
     if (filterPaginationArgs.filter) {
       const where = this.getUserWhereValidator(filterPaginationArgs.filter);
 
